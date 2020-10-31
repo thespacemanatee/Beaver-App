@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Beever</string>
+    <string name="sign_up_text"><u>Sign up</u></string>
+    <string name="sign_in_text"><u>Sign in</u></string>
+</resources>
