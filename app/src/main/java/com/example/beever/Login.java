@@ -23,10 +23,10 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Login extends AppCompatActivity {
 
-    Button callRegistration, loginButton;
-    ImageView image;
-    TextView logoText, signUpText;
-    TextInputLayout username, password;
+    private Button callRegistration, loginButton;
+    private ImageView image;
+    private TextView logoText, signUpText;
+    private TextInputLayout username, password;
 
 
     @Override

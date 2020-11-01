@@ -35,6 +35,7 @@
                 android:layout_toEndOf="@+id/profile_image"
                 android:fontFamily="@font/poppins"
                 android:includeFontPadding="false"
+                android:text="Full Name"
                 android:textSize="20sp" />
 
             <TextView
@@ -46,6 +47,7 @@
                 android:layout_toEndOf="@id/profile_image"
                 android:fontFamily="@font/poppins"
                 android:includeFontPadding="false"
+                android:text="Username"
                 android:textSize="14sp" />
 
         </RelativeLayout>
@@ -61,7 +63,7 @@
                 android:layout_height="125dp"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="#B8E1FF"
+                app:cardBackgroundColor="#587291"
                 app:cardElevation="10dp">
 
                 <RelativeLayout
@@ -82,7 +84,8 @@
                         android:layout_centerInParent="true"
                         android:fontFamily="@font/poppins"
                         android:includeFontPadding="false"
-                        android:text="$123"
+                        android:text="5"
+                        android:textColor="@color/white"
                         android:textSize="20sp" />
 
                     <TextView
@@ -92,7 +95,8 @@
                         android:layout_below="@id/payment_label"
                         android:layout_centerHorizontal="true"
                         android:includeFontPadding="false"
-                        android:text="Balance"
+                        android:text="Upcoming Meetings"
+                        android:textColor="@color/white"
                         android:textSize="14sp" />
 
 
@@ -105,7 +109,7 @@
                 android:layout_height="125dp"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="#B8E1FF"
+                app:cardBackgroundColor="#587291"
                 app:cardElevation="10dp">
 
                 <RelativeLayout
@@ -127,6 +131,7 @@
                         android:fontFamily="@font/poppins"
                         android:includeFontPadding="false"
                         android:text="12"
+                        android:textColor="@color/white"
                         android:textSize="20sp" />
 
                     <TextView
@@ -136,7 +141,8 @@
                         android:layout_below="@id/booking_label"
                         android:layout_centerHorizontal="true"
                         android:includeFontPadding="false"
-                        android:text="Booking"
+                        android:text="Deadlines"
+                        android:textColor="@color/white"
                         android:textSize="14sp" />
 
 

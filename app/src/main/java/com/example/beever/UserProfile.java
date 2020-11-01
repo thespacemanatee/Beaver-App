@@ -14,12 +14,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class UserProfile extends AppCompatActivity {
 
-    TextInputLayout name, email, password;
-    TextView usernameLabel, nameLabel;
+    private TextInputLayout name, email, password;
+    private TextView usernameLabel, nameLabel;
 
     //Global variables to hold user data inside this activity
-    String _USERNAME,_NAME,_EMAIL,_PASSWORD;
-    DatabaseReference ref;
+    private String _USERNAME,_NAME,_EMAIL,_PASSWORD;
+    private DatabaseReference ref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

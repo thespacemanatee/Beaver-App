@@ -16,11 +16,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Registration extends AppCompatActivity {
 
-    Button callLogin, regButton;
-    TextInputLayout regName, regUsername, regEmail, regPassword;
-
-    FirebaseDatabase rootNode;
-    DatabaseReference reference;
+    private TextInputLayout regName, regUsername, regEmail, regPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +25,12 @@ public class Registration extends AppCompatActivity {
         setContentView(R.layout.activity_registration);
 
         //Hooks
-        callLogin = findViewById(R.id.sign_in);
+        Button callLogin = findViewById(R.id.sign_in);
         regName = findViewById(R.id.reg_name);
         regUsername = findViewById(R.id.reg_username);
         regEmail = findViewById(R.id.reg_email);
         regPassword = findViewById(R.id.reg_password);
-        regButton = findViewById(R.id.register);
+        Button regButton = findViewById(R.id.register);
 
         //Store data to firebase on click Submit button
         regButton.setOnClickListener(new View.OnClickListener() {
@@ -141,8 +137,8 @@ public class Registration extends AppCompatActivity {
             return;
         }
 
-        rootNode = FirebaseDatabase.getInstance();
-        reference = rootNode.getReference("Users");
+        FirebaseDatabase rootNode = FirebaseDatabase.getInstance();
+        DatabaseReference reference = rootNode.getReference("Users");
 
         //Get values from user inputs
         String name = regName.getEditText().getText().toString();
