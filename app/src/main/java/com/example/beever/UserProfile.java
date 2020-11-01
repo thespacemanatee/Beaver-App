@@ -6,8 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class UserProfile extends AppCompatActivity {
 
@@ -16,11 +19,14 @@ public class UserProfile extends AppCompatActivity {
 
     //Global variables to hold user data inside this activity
     String _USERNAME,_NAME,_EMAIL,_PASSWORD;
+    DatabaseReference ref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
+
+        ref = FirebaseDatabase.getInstance().getReference("Users");
 
         //Hooks
         usernameLabel = findViewById(R.id.username_label);
@@ -50,6 +56,48 @@ public class UserProfile extends AppCompatActivity {
 
     public void update(View v) {
 
+        if (isNameChanged() || isPasswordChanged() || isEmailChanged()) {
+            Toast.makeText(this, "Updated Successfully", Toast.LENGTH_LONG).show();
+
+        } else {
+            Toast.makeText(this, "Please enter a different value", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private boolean isEmailChanged() {
+
+        if (!_EMAIL.equals(email.getEditText().getText().toString())) {
+            String newEmail = email.getEditText().getText().toString();
+            ref.child(_USERNAME).child("email").setValue(newEmail);
+            _EMAIL = newEmail;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isPasswordChanged() {
+
+        if (!_PASSWORD.equals(password.getEditText().getText().toString())) {
+            String newPassword = password.getEditText().getText().toString();
+            ref.child(_USERNAME).child("password").setValue(newPassword);
+            _PASSWORD = newPassword;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isNameChanged() {
+
+        if (!_NAME.equals(name.getEditText().getText().toString())) {
+            String newName = name.getEditText().getText().toString();
+            ref.child(_USERNAME).child("name").setValue(newName);
+            _NAME = newName;
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

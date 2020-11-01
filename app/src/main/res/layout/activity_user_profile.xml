@@ -35,7 +35,6 @@
                 android:layout_toEndOf="@+id/profile_image"
                 android:fontFamily="@font/poppins"
                 android:includeFontPadding="false"
-                android:text="Dummy"
                 android:textSize="20sp" />
 
             <TextView
@@ -47,7 +46,6 @@
                 android:layout_toEndOf="@id/profile_image"
                 android:fontFamily="@font/poppins"
                 android:includeFontPadding="false"
-                android:text="dummy_username"
                 android:textSize="14sp" />
 
         </RelativeLayout>
@@ -165,7 +163,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Dummy" />
+                    android:inputType="textCapWords"/>
 
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -181,7 +179,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="dummy@gmail.com" />
+                    android:inputType="textEmailAddress"/>
 
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -192,12 +190,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:hint="Password"
+                app:passwordToggleEnabled="true"
                 app:boxBackgroundColor="@color/white">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="123456" />
+                    android:inputType="textPassword"/>
 
 
             </com.google.android.material.textfield.TextInputLayout>
