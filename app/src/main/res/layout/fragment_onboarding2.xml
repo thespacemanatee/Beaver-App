@@ -21,7 +21,7 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="50dp"
         android:text="Groups Function"
         android:textColor="#587291"
         android:textSize="16sp"
