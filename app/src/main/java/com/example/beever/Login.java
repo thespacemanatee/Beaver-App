@@ -1,5 +1,6 @@
 package com.example.beever;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityOptions;
@@ -13,6 +14,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 public class Login extends AppCompatActivity {
 
@@ -57,5 +64,103 @@ public class Login extends AppCompatActivity {
 
             }
         });
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginUser(v);
+            }
+        });
     }
+
+    private Boolean validateUserName() {
+        String s = username.getEditText().getText().toString();
+
+        if (s.isEmpty()) {
+            username.setError("Field cannot be empty");
+            return false;
+
+        } else {
+            username.setError(null);
+            username.setErrorEnabled(false);
+            return true;
+        }
+    }
+
+    private Boolean validatePassword() {
+        String s = password.getEditText().getText().toString();
+
+        if (s.isEmpty()) {
+            password.setError("Field cannot be empty");
+            return false;
+
+        } else {
+            password.setError(null);
+            password.setErrorEnabled(false);
+            return true;
+        }
+    }
+
+    public void loginUser(View v) {
+
+        //validate login credentials
+        if (!validateUserName() || !validatePassword()) {
+            return;
+        } else {
+            isUser();
+        }
+
+    }
+
+    private void isUser() {
+
+        String usernameProvided = username.getEditText().getText().toString().trim();
+        String passwordProvided = password.getEditText().getText().toString().trim();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+
+        Query validateUser = ref.orderByChild("username").equalTo(usernameProvided);
+
+        validateUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    username.setError(null);
+                    username.setErrorEnabled(false);
+
+                    String passwordFromDB = dataSnapshot.child(usernameProvided).child("password").getValue(String.class);
+
+                    if (passwordFromDB.equals(passwordProvided)) {
+
+                        password.setError(null);
+                        password.setErrorEnabled(false);
+
+                        String nameFromDB = dataSnapshot.child(usernameProvided).child("name").getValue(String.class);
+                        String usernameFromDB = dataSnapshot.child(usernameProvided).child("username").getValue(String.class);
+                        String emailFromDB = dataSnapshot.child(usernameProvided).child("email").getValue(String.class);
+
+                        Intent intent = new Intent(getApplicationContext(),UserProfile.class);
+                        intent.putExtra("name",nameFromDB);
+                        intent.putExtra("username",usernameFromDB);
+                        intent.putExtra("email",emailFromDB);
+                        intent.putExtra("password",passwordFromDB);
+
+                        startActivity(intent);
+                    } else {
+                        password.setError("Wrong password");
+                        password.requestFocus();
+                    }
+                } else {
+                    username.setError("Username does not exist");
+                    username.requestFocus();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
+        });
+
+    }
+
 }

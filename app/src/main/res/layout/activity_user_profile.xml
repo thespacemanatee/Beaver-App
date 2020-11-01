@@ -27,7 +27,7 @@
                 android:src="@drawable/profile" />
 
             <TextView
-                android:id="@+id/full_name"
+                android:id="@+id/name_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -39,9 +39,10 @@
                 android:textSize="20sp" />
 
             <TextView
+                android:id="@+id/username_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/full_name"
+                android:layout_below="@+id/name_label"
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@id/profile_image"
                 android:fontFamily="@font/poppins"
@@ -154,6 +155,7 @@
             android:padding="20dp">
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/name_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
@@ -169,6 +171,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/email_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
@@ -184,6 +187,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/password_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
@@ -204,6 +208,7 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="#587291"
                 android:fontFamily="@font/poppins"
+                android:onClick="update"
                 android:text="Update" />
 
 
