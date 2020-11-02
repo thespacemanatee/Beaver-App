@@ -30,4 +30,5 @@
     <string name="function_3_text_2">On The Ball</string>
     <string name="function_3_text_3">Never forget your deadlines again! With this app, all your schoolwork will be synced automatically!</string>
     <string name="go_to_login_activity">Go to login activity</string>
+    <string name="signout_button">Sign Out</string>
 </resources>

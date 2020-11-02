@@ -91,6 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:backgroundTint="#587291"
+            android:textColor="@color/white"
             android:fontFamily="@font/poppins"
             android:text="@string/login_button"
             android:transitionName="button_tran" />

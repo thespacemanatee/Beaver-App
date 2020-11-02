@@ -1,13 +1,17 @@
 package com.example.beever;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -17,13 +21,17 @@ public class UserProfile extends AppCompatActivity {
     //Create variables for each element
     private TextInputLayout name, email, password;
     private TextView usernameLabel, nameLabel;
+    private SharedPreferences mSharedPref;
+    private MaterialButton signOut;
 
     //Global variables to hold user data inside this activity
     private String _USERNAME,_NAME,_EMAIL,_PASSWORD;
     private DatabaseReference reference;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
@@ -36,8 +44,29 @@ public class UserProfile extends AppCompatActivity {
         name = findViewById(R.id.name_field);
         email = findViewById(R.id.email_field);
         password = findViewById(R.id.password_field);
+        signOut = findViewById(R.id.signout_button);
 
         showUserData();
+
+        signOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putBoolean("isLoggedIn", false);
+                editor.remove("registeredName");
+                editor.remove("registeredUsername");
+                editor.remove("registeredEmail");
+                editor.remove("registeredPassword");
+                editor.commit();
+
+                Intent intent = new Intent(UserProfile.this, Login.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+
     }
 
     private void showUserData() {
