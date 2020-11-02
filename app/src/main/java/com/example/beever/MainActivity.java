@@ -25,7 +25,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     private static final int NUM_PAGES = 3;
-    private static final int SPLASH_TIMEOUT = 2000;
+    public static final int SPLASH_TIMEOUT = 2000;
     private SharedPreferences mSharedPref;
 
     @Override
@@ -83,16 +83,34 @@ public class MainActivity extends AppCompatActivity {
 
                 if (!isFirstTime) {
 
-                    //If not the first time launching app, create intent and startActivity with animations
-                    Intent intent = new Intent(MainActivity.this,Login.class);
+                    //Check if user was registered before and still logged in from previous session
+                    boolean isRegistered = mSharedPref.getBoolean("isLoggedIn", false);
 
-                    Pair[] pairs = new Pair[2];
-                    pairs[0] = new Pair<View, String>(image,"logo_image");
-                    pairs[1] = new Pair<View, String>(logo,"logo_text");
+                    if (isRegistered) {
 
-                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this,pairs);
-                    startActivity(intent, options.toBundle());
+                        //Pass stored user data into new userprofile activity as Extras
+                        Intent intent = new Intent(MainActivity.this, UserProfile.class);
 
+                        intent.putExtra("name",mSharedPref.getString("registeredName", ""));
+                        intent.putExtra("username",mSharedPref.getString("registeredUsername", ""));
+                        intent.putExtra("email",mSharedPref.getString("registeredEmail", ""));
+                        intent.putExtra("password",mSharedPref.getString("registeredPassword", ""));
+
+                        startActivity(intent);
+                        finish();
+
+                    } else {
+
+                        //If not the first time launching app, create intent and startActivity with animations
+                        Intent intent = new Intent(MainActivity.this,Login.class);
+
+                        Pair[] pairs = new Pair[2];
+                        pairs[0] = new Pair<View, String>(image,"logo_image");
+                        pairs[1] = new Pair<View, String>(logo,"logo_text");
+
+                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this,pairs);
+                        startActivity(intent, options.toBundle());
+                    }
                 }
             }
         },SPLASH_TIMEOUT);
@@ -109,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             }
-        }, SPLASH_TIMEOUT+1000);
+        }, SPLASH_TIMEOUT+500);
     }
 
     //Create LiquidPagers

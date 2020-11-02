@@ -7,6 +7,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Pair;
 import android.view.View;
 import android.view.WindowManager;
@@ -158,11 +159,21 @@ public class Login extends AppCompatActivity {
                         password.setError(null);
                         password.setErrorEnabled(false);
 
-                        //Retrieve relevant data from database and pass them into new intent as Extras, and start new activity
+                        //Retrieve relevant data from database
                         String nameFromDB = dataSnapshot.child(usernameProvided).child("name").getValue(String.class);
                         String usernameFromDB = dataSnapshot.child(usernameProvided).child("username").getValue(String.class);
                         String emailFromDB = dataSnapshot.child(usernameProvided).child("email").getValue(String.class);
 
+                        //Store user data to SharedPreferences
+                        SharedPreferences.Editor editor = mSharedPref.edit();
+                        editor.putBoolean("isLoggedIn", true);
+                        editor.putString("registeredName", nameFromDB);
+                        editor.putString("registeredUsername", usernameFromDB);
+                        editor.putString("registeredEmail", emailFromDB);
+                        editor.putString("registeredPassword", passwordFromDB);
+                        editor.commit();
+
+                        //Pass user data into new intent as Extras, and start new activity
                         Intent intent = new Intent(getApplicationContext(),UserProfile.class);
                         intent.putExtra("name",nameFromDB);
                         intent.putExtra("username",usernameFromDB);
