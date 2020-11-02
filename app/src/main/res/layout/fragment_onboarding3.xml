@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
-        android:text="To-do List Function"
+        android:text="@string/function_3"
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -36,7 +36,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Skip"
+        android:text="@string/skip_button"
         android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="@color/white"
@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins"
-        android:text="On Time"
+        android:text="@string/function_3_text_1"
         android:textSize="35sp"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -67,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_bold"
-        android:text="On The Ball"
+        android:text="@string/function_3_text_2"
         android:textColor="@color/white"
         android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -82,7 +82,7 @@
         android:layout_width="250dp"
         android:layout_height="100dp"
         android:layout_marginTop="5dp"
-        android:text="Never forget your deadlines again! With this app, all your schoolwork will be synced automatically!"
+        android:text="@string/function_3_text_3"
         android:textSize="16sp"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -100,7 +100,7 @@
         android:src="@drawable/tab3"
         app:layout_constraintVertical_bias=".6"
         app:layout_constraintHorizontal_bias="0"
-        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/textView7"
@@ -118,6 +118,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/go_to_login_activity" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

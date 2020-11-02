@@ -26,7 +26,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:transitionName="logo_image"
-        app:layout_constraintVertical_bias=".1"
+        app:layout_constraintVertical_bias="0.3"
         android:elevation="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,7 +39,7 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/chewy"
-        android:text="beever"
+        android:text="@string/splash_logo"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="70sp"
@@ -56,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_light"
-        android:text="Be the best version of yourself!"
+        android:text="@string/splash_slogan"
         android:textColor="@color/black"
         android:textAlignment="center"
         android:textSize="18sp"
@@ -70,6 +70,8 @@
     <com.cuberto.liquid_swipe.LiquidPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

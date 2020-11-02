@@ -1,5 +1,33 @@
 <resources>
     <string name="app_name">Beever</string>
+    <string name="sign_up_header">Sign Up</string>
+    <string name="log_in_header">Log in</string>
     <string name="sign_up_text"><u>Sign up</u></string>
-    <string name="sign_in_text"><u>Sign in</u></string>
+    <string name="log_in_text"><u>Log in</u></string>
+    <string name="splash_logo">beever</string>
+    <string name="splash_slogan">Be the best version of yourself!</string>
+    <string name="login_button">Login</string>
+    <string name="submit_button">Submit</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="account_creation_prompt">"Don't have an account?"</string>
+    <string name="account_exists_prompt">"Already have an account?"</string>
+    <string name="email_hint">Email</string>
+    <string name="full_name_hint">Full Name</string>
+    <string name="update_button">Update</string>
+    <string name="function_1">Calendar Function</string>
+    <string name="skip_button">Skip</string>
+    <string name="function_1_text_1">Efficiency</string>
+    <string name="function_1_text_2">Efficacy</string>
+    <string name="function_1_text_3">Never miss an important meeting again!</string>
+    <string name="function_2">Groups Function</string>
+    <string name="function_2_text_1">Creative</string>
+    <string name="function_2_text_2">Collaborative</string>
+    <string name="function_2_text_3">Be more creative together and achieve greater heights!</string>
+    <string name="function_3">To-do List Function</string>
+    <string name="function_3_text_1">On Time</string>
+    <string name="function_3_text_2">On The Ball</string>
+    <string name="function_3_text_3">Never forget your deadlines again! With this app, all your schoolwork will be synced automatically!</string>
+    <string name="go_to_login_activity">Go to login activity</string>
 </resources>

@@ -35,7 +35,7 @@
                 android:layout_toEndOf="@+id/profile_image"
                 android:fontFamily="@font/poppins"
                 android:includeFontPadding="false"
-                android:text="Full Name"
+                android:text="@string/full_name_hint"
                 android:textSize="20sp" />
 
             <TextView
@@ -47,7 +47,7 @@
                 android:layout_toEndOf="@id/profile_image"
                 android:fontFamily="@font/poppins"
                 android:includeFontPadding="false"
-                android:text="Username"
+                android:text="@string/username_hint"
                 android:textSize="14sp" />
 
         </RelativeLayout>
@@ -163,7 +163,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:hint="Full Name"
+                android:hint="@string/full_name_hint"
                 app:boxBackgroundColor="@color/white">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -179,7 +179,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:hint="E-Mail"
+                android:hint="@string/email_hint"
                 app:boxBackgroundColor="@color/white">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -195,7 +195,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:hint="Password"
+                android:hint="@string/password_hint"
                 app:passwordToggleEnabled="true"
                 app:boxBackgroundColor="@color/white">
 
@@ -214,7 +214,7 @@
                 android:backgroundTint="#587291"
                 android:fontFamily="@font/poppins"
                 android:onClick="update"
-                android:text="Update" />
+                android:text="@string/update_button" />
 
 
         </LinearLayout>

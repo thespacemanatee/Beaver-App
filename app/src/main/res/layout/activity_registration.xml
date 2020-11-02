@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:fontFamily="@font/poppins_bold"
-        android:text="Sign Up"
+        android:text="@string/sign_up_header"
         android:textSize="20sp"
         android:transitionName="logo_text" />
 
@@ -41,7 +41,7 @@
             android:id="@+id/reg_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Full Name"
+            android:hint="@string/full_name_hint"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -55,7 +55,7 @@
             android:id="@+id/reg_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username"
+            android:hint="@string/username_hint"
             app:counterMaxLength="12"
             android:transitionName="user_tran"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
@@ -71,7 +71,7 @@
             android:id="@+id/reg_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email"
+            android:hint="@string/email_hint"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -85,7 +85,7 @@
             android:id="@+id/reg_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password"
+            android:hint="@string/password_hint"
             app:passwordToggleEnabled="true"
             android:transitionName="password_tran"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
@@ -102,7 +102,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"
-            android:text="Submit"
+            android:text="@string/submit_button"
             android:backgroundTint="#587291"
             android:textColor="@color/white"
             android:transitionName="button_tran"/>
@@ -114,7 +114,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="50dp"
             android:fontFamily="@font/poppins_light"
-            android:text="Already have an account?"
+            android:text="@string/account_exists_prompt"
             android:textSize="12sp"
             android:transitionName="sign_up_text_tran"/>
 
@@ -122,11 +122,11 @@
             android:id="@+id/sign_in"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="-10dp"
             android:layout_gravity="center"
-            android:elevation="0dp"
             android:fontFamily="@font/poppins_light"
-            android:text="@string/sign_in_text"
+            android:text="@string/log_in_text"
             android:textAllCaps="false"
             android:textColor="@color/black"
             android:textSize="12sp"
