@@ -38,6 +38,8 @@ public class Registration extends AppCompatActivity {
         regPassword = findViewById(R.id.reg_password);
         Button regButton = findViewById(R.id.register);
 
+        mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
+
         //Validate if user entered information is formatted properly by calling registerUser()
         regButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,14 +178,6 @@ public class Registration extends AppCompatActivity {
                         String usernameFromDB = dataSnapshot.child(userName).child("username").getValue(String.class);
                         String emailFromDB = dataSnapshot.child(userName).child("email").getValue(String.class);
 
-                        Intent intent = new Intent(getApplicationContext(),UserProfile.class);
-                        intent.putExtra("name",nameFromDB);
-                        intent.putExtra("username",usernameFromDB);
-                        intent.putExtra("email",emailFromDB);
-                        intent.putExtra("password",passwordFromDB);
-
-
-                        mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
                         SharedPreferences.Editor editor = mSharedPref.edit();
                         editor.putBoolean("isLoggedIn", true);
                         editor.putString("registeredName", nameFromDB);
@@ -191,6 +185,8 @@ public class Registration extends AppCompatActivity {
                         editor.putString("registeredEmail", emailFromDB);
                         editor.putString("registeredPassword", passwordFromDB);
                         editor.commit();
+
+                        Intent intent = new Intent(getApplicationContext(),UserProfile.class);
 
                         startActivity(intent);
                         finish();

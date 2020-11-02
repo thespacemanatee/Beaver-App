@@ -22,13 +22,13 @@ public class OnBoardingFragment2 extends Fragment {
 
         mSharedPref = this.getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
+        boolean isLoggedIn = mSharedPref.getBoolean("isLoggedIn", false);
+
         MaterialButton skip = root.findViewById(R.id.skip_button);
 
         skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                boolean isLoggedIn = mSharedPref.getBoolean("isLoggedIn", false);
 
                 if (isLoggedIn) {
 
@@ -37,11 +37,6 @@ public class OnBoardingFragment2 extends Fragment {
                     editor.commit();
 
                     Intent intent = new Intent(getActivity(), UserProfile.class);
-
-                    intent.putExtra("name",mSharedPref.getString("registeredName", ""));
-                    intent.putExtra("username",mSharedPref.getString("registeredUsername", ""));
-                    intent.putExtra("email",mSharedPref.getString("registeredEmail", ""));
-                    intent.putExtra("password",mSharedPref.getString("registeredPassword", ""));
 
                     startActivity(intent);
 

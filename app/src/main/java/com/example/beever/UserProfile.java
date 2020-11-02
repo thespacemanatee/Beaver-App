@@ -37,6 +37,7 @@ public class UserProfile extends AppCompatActivity {
 
         //Create new reference to Firebase database
         reference = FirebaseDatabase.getInstance().getReference("Users");
+        mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
 
         //Hooks
         usernameLabel = findViewById(R.id.username_label);
@@ -70,7 +71,6 @@ public class UserProfile extends AppCompatActivity {
         toOnBoarding.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
                 SharedPreferences.Editor editor = mSharedPref.edit();
                 editor.putBoolean("firstTime", true);
                 editor.commit();
@@ -86,12 +86,11 @@ public class UserProfile extends AppCompatActivity {
 
     private void showUserData() {
 
-        //Get current intent and get respective Extras that were passed in from previous activity
-        Intent intent = getIntent();
-        _USERNAME = intent.getStringExtra("username");
-        _NAME = intent.getStringExtra("name");
-        _EMAIL = intent.getStringExtra("email");
-        _PASSWORD = intent.getStringExtra("password");
+        //Get user information from SharedPreferences
+        _USERNAME = mSharedPref.getString("registeredUsername","");
+        _NAME = mSharedPref.getString("registeredName","");
+        _EMAIL = mSharedPref.getString("registeredEmail","");
+        _PASSWORD = mSharedPref.getString("registeredPassword","");
 
         usernameLabel.setText(_USERNAME);
         nameLabel.setText(_NAME);

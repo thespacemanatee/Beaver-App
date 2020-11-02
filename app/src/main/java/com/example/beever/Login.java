@@ -92,7 +92,7 @@ public class Login extends AppCompatActivity {
         String s = username.getEditText().getText().toString();
 
         if (s.isEmpty()) {
-            username.setError("Field cannot be empty");
+            username.setError("Please enter your username!");
             return false;
 
         } else {
@@ -106,7 +106,7 @@ public class Login extends AppCompatActivity {
         String s = password.getEditText().getText().toString();
 
         if (s.isEmpty()) {
-            password.setError("Field cannot be empty");
+            password.setError("Please enter your password!");
             return false;
 
         } else {
@@ -175,10 +175,6 @@ public class Login extends AppCompatActivity {
 
                         //Pass user data into new intent as Extras, and start new activity
                         Intent intent = new Intent(getApplicationContext(),UserProfile.class);
-                        intent.putExtra("name",nameFromDB);
-                        intent.putExtra("username",usernameFromDB);
-                        intent.putExtra("email",emailFromDB);
-                        intent.putExtra("password",passwordFromDB);
 
                         startActivity(intent);
                         finish();

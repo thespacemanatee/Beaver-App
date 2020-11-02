@@ -26,12 +26,12 @@ public class OnBoardingFragment3 extends Fragment {
         //Hook floating action button element to variable fab
         FloatingActionButton fab = root.findViewById(R.id.fab);
 
+        boolean isLoggedIn = mSharedPref.getBoolean("isLoggedIn", false);
+
         //Create new OnClickListener that starts the login activity when clicked
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                boolean isLoggedIn = mSharedPref.getBoolean("isLoggedIn", false);
 
                 if (isLoggedIn) {
 
@@ -40,11 +40,6 @@ public class OnBoardingFragment3 extends Fragment {
                     editor.commit();
 
                     Intent intent = new Intent(getActivity(), UserProfile.class);
-
-                    intent.putExtra("name",mSharedPref.getString("registeredName", ""));
-                    intent.putExtra("username",mSharedPref.getString("registeredUsername", ""));
-                    intent.putExtra("email",mSharedPref.getString("registeredEmail", ""));
-                    intent.putExtra("password",mSharedPref.getString("registeredPassword", ""));
 
                     startActivity(intent);
 

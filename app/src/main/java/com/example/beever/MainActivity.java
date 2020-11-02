@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
+
         //Set fullscreen mode to allow drawing over cutout
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
                 View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
@@ -78,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
 
                 //Check if "firstTime" key value in SharedPreferences is true or false
-                mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
                 boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
                 boolean isRegistered = mSharedPref.getBoolean("isLoggedIn", false);
+
 
                 if (!isFirstTime) {
 
@@ -89,11 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
                         //Pass stored user data into new userprofile activity as Extras
                         Intent intent = new Intent(MainActivity.this, UserProfile.class);
-
-                        intent.putExtra("name",mSharedPref.getString("registeredName", ""));
-                        intent.putExtra("username",mSharedPref.getString("registeredUsername", ""));
-                        intent.putExtra("email",mSharedPref.getString("registeredEmail", ""));
-                        intent.putExtra("password",mSharedPref.getString("registeredPassword", ""));
 
                         startActivity(intent);
                         finish();
@@ -117,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
                 boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
 
                 //If not the first time launching app then finish() after slight delay
@@ -156,5 +152,18 @@ public class MainActivity extends AppCompatActivity {
         public int getCount() {
             return NUM_PAGES;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        boolean isLoggedIn = mSharedPref.getBoolean("isLoggedIn", false);
+
+        if (isLoggedIn) {
+            SharedPreferences.Editor editor = mSharedPref.edit();
+            editor.putBoolean("firstTime", false);
+            editor.commit();
+        }
+        super.onBackPressed();
     }
 }
