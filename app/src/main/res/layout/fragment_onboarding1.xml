@@ -26,6 +26,7 @@
         android:textColor="#587291"
         android:textSize="16sp"
         android:textStyle="bold"
+        android:fontFamily="@font/poppins_bold"
         app:layout_constraintBottom_toTopOf="@+id/imageView3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
@@ -33,13 +34,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0" />
 
-    <TextView
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/skip_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:text="@string/skip_button"
-        android:textSize="16sp"
+        android:textSize="12sp"
         android:textStyle="bold"
         android:textColor="#587291"
+        android:fontFamily="@font/poppins"
         app:layout_constraintHorizontal_bias="1"
         android:layout_marginEnd="30dp"
         app:layout_constraintBottom_toBottomOf="@+id/textView4"
@@ -85,6 +89,7 @@
         android:text="@string/function_1_text_3"
         android:textSize="16sp"
         android:textColor="#587291"
+        android:fontFamily="@font/poppins_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent=".1"

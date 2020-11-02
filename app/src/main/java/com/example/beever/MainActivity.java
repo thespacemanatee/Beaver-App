@@ -24,7 +24,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     private static final int NUM_PAGES = 3;
-    private static final int SPLASH_TIMEOUT = 3000;
+    private static final int SPLASH_TIMEOUT = 2000;
     SharedPreferences mSharedPref;
 
     @Override
@@ -65,10 +65,10 @@ public class MainActivity extends AppCompatActivity {
 //        viewPager.startAnimation(anim);
 
         //Splash screen exit animation
-        splashImg.animate().translationY(-3600).setDuration(1000).setStartDelay(3000);
-        image.animate().translationY(3400).setDuration(1000).setStartDelay(3000);
-        logo.animate().translationY(3400).setDuration(1000).setStartDelay(3000);
-        slogan.animate().translationY(3400).setDuration(1000).setStartDelay(3000);
+        splashImg.animate().translationY(-3600).setDuration(1000).setStartDelay(2000);
+        image.animate().translationY(3400).setDuration(1000).setStartDelay(2000);
+        logo.animate().translationY(3400).setDuration(1000).setStartDelay(2000);
+        slogan.animate().translationY(3400).setDuration(1000).setStartDelay(2000);
 
 
         Handler handler = new Handler();
