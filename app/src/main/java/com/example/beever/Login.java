@@ -23,11 +23,11 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Login extends AppCompatActivity {
 
+    //Create variables for each element
     private Button callRegistration, loginButton;
     private ImageView image;
     private TextView logoText, signUpText;
     private TextInputLayout username, password;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +44,12 @@ public class Login extends AppCompatActivity {
         loginButton = findViewById(R.id.log_in);
         signUpText = findViewById(R.id.sign_up_text);
 
+        //Create OnClickListener for sign up button
         callRegistration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //Starts new registration activity when clicked on with smooth animations
                 Intent intent = new Intent(Login.this,Registration.class);
 
 
@@ -65,9 +68,12 @@ public class Login extends AppCompatActivity {
             }
         });
 
+        //Create OnClickListener for login button
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //Call loginUser() method on click login button
                 loginUser(v);
             }
         });
@@ -103,10 +109,13 @@ public class Login extends AppCompatActivity {
 
     public void loginUser(View v) {
 
-        //validate login credentials
+        //Validate if anything is entered in login fields
         if (!validateUserName() || !validatePassword()) {
             return;
+
         } else {
+
+            //Call isUser() to authenticate credentials
             isUser();
         }
 
@@ -114,12 +123,15 @@ public class Login extends AppCompatActivity {
 
     private void isUser() {
 
+        //Get user entered credentials and parse them into strings that can be fed into auth functions
         String usernameProvided = username.getEditText().getText().toString().trim();
         String passwordProvided = password.getEditText().getText().toString().trim();
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        //Create new reference from Firebase Database
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
 
-        Query validateUser = ref.orderByChild("username").equalTo(usernameProvided);
+        //Check if username provided is equal to any username in database
+        Query validateUser = reference.orderByChild("username").equalTo(usernameProvided);
 
         validateUser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -129,13 +141,16 @@ public class Login extends AppCompatActivity {
                     username.setError(null);
                     username.setErrorEnabled(false);
 
+                    //Get password from entered username from database
                     String passwordFromDB = dataSnapshot.child(usernameProvided).child("password").getValue(String.class);
 
+                    //Check if password is valid
                     if (passwordFromDB.equals(passwordProvided)) {
 
                         password.setError(null);
                         password.setErrorEnabled(false);
 
+                        //Retrieve relevant data from database and pass them into new intent as Extras, and start new activity
                         String nameFromDB = dataSnapshot.child(usernameProvided).child("name").getValue(String.class);
                         String usernameFromDB = dataSnapshot.child(usernameProvided).child("username").getValue(String.class);
                         String emailFromDB = dataSnapshot.child(usernameProvided).child("email").getValue(String.class);

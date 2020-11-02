@@ -14,19 +14,21 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class UserProfile extends AppCompatActivity {
 
+    //Create variables for each element
     private TextInputLayout name, email, password;
     private TextView usernameLabel, nameLabel;
 
     //Global variables to hold user data inside this activity
     private String _USERNAME,_NAME,_EMAIL,_PASSWORD;
-    private DatabaseReference ref;
+    private DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
-        ref = FirebaseDatabase.getInstance().getReference("Users");
+        //Create new reference to Firebase database
+        reference = FirebaseDatabase.getInstance().getReference("Users");
 
         //Hooks
         usernameLabel = findViewById(R.id.username_label);
@@ -40,6 +42,7 @@ public class UserProfile extends AppCompatActivity {
 
     private void showUserData() {
 
+        //Get current intent and get respective Extras that were passed in from previous activity
         Intent intent = getIntent();
         _USERNAME = intent.getStringExtra("username");
         _NAME = intent.getStringExtra("name");
@@ -56,6 +59,7 @@ public class UserProfile extends AppCompatActivity {
 
     public void update(View v) {
 
+        //Call each method to check if user inputs are different from existing values and if not, set them to new values
         if (isNameChanged() || isPasswordChanged() || isEmailChanged()) {
             Toast.makeText(this, "Updated Successfully", Toast.LENGTH_LONG).show();
 
@@ -68,9 +72,10 @@ public class UserProfile extends AppCompatActivity {
 
         if (!_EMAIL.equals(email.getEditText().getText().toString())) {
             String newEmail = email.getEditText().getText().toString();
-            ref.child(_USERNAME).child("email").setValue(newEmail);
+            reference.child(_USERNAME).child("email").setValue(newEmail);
             _EMAIL = newEmail;
             return true;
+
         } else {
             return false;
         }
@@ -80,9 +85,10 @@ public class UserProfile extends AppCompatActivity {
 
         if (!_PASSWORD.equals(password.getEditText().getText().toString())) {
             String newPassword = password.getEditText().getText().toString();
-            ref.child(_USERNAME).child("password").setValue(newPassword);
+            reference.child(_USERNAME).child("password").setValue(newPassword);
             _PASSWORD = newPassword;
             return true;
+
         } else {
             return false;
         }
@@ -92,9 +98,10 @@ public class UserProfile extends AppCompatActivity {
 
         if (!_NAME.equals(name.getEditText().getText().toString())) {
             String newName = name.getEditText().getText().toString();
-            ref.child(_USERNAME).child("name").setValue(newName);
+            reference.child(_USERNAME).child("name").setValue(newName);
             _NAME = newName;
             return true;
+
         } else {
             return false;
         }

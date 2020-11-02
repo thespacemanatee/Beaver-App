@@ -33,8 +33,10 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        //Set fullscreen mode to allow drawing over cutout
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
 
         //Animations for logo
         Animation topAnim = AnimationUtils.loadAnimation(this, R.anim.top_animation);
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         TextView logo = findViewById(R.id.textView);
         TextView slogan = findViewById(R.id.textView2);
 
-        //Set animations to hooks
+        //Set logo animations to hooks
         image.setAnimation(topAnim);
         logo.setAnimation(bottomAnim);
         slogan.setAnimation(bottomAnim);
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 //        Animation anim = AnimationUtils.loadAnimation(this,R.anim.onboarding_animation);
 //        viewPager.startAnimation(anim);
 
-        //Exit Animation
+        //Splash screen exit animation
         splashImg.animate().translationY(-3600).setDuration(1000).setStartDelay(3000);
         image.animate().translationY(3400).setDuration(1000).setStartDelay(3000);
         logo.animate().translationY(3400).setDuration(1000).setStartDelay(3000);
@@ -72,11 +74,14 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+
+                //Check if "firstTime" key value in SharedPreferences is true or false
                 mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
                 boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
 
                 if (!isFirstTime) {
 
+                    //If not the first time launching app, create intent and startActivity with animations
                     Intent intent = new Intent(MainActivity.this,Login.class);
 
                     Pair[] pairs = new Pair[2];
@@ -96,17 +101,20 @@ public class MainActivity extends AppCompatActivity {
                 mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
                 boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
 
+                //If isFirstTime then set "firstTime" to false in SharedPreferences
                 if (isFirstTime) {
                     SharedPreferences.Editor editor = mSharedPref.edit();
                     editor.putBoolean("firstTime", false);
                     editor.commit();
+
                 } else {
-                    MainActivity.this.finish();
+                    finish();
                 }
             }
         }, SPLASH_TIMEOUT+1000);
     }
 
+    //Create LiquidPagers
     private static class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
         public ScreenSlidePagerAdapter(@NonNull FragmentManager fm) {

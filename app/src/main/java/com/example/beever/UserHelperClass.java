@@ -4,9 +4,11 @@ public class UserHelperClass {
 
     private String name, username, email, password;
 
+    //No-arg constructor
     public UserHelperClass() {
     }
 
+    //Constructor that takes in user inputs during registration
     public UserHelperClass(String name, String username, String email, String password) {
         this.name = name;
         this.username = username;
@@ -14,6 +16,7 @@ public class UserHelperClass {
         this.password = password;
     }
 
+    //Getters and Setters
     public String getName() {
         return name;
     }

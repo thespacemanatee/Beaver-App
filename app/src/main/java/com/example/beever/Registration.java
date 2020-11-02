@@ -16,6 +16,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Registration extends AppCompatActivity {
 
+    //Create variables for each element
     private TextInputLayout regName, regUsername, regEmail, regPassword;
 
     @Override
@@ -32,7 +33,7 @@ public class Registration extends AppCompatActivity {
         regPassword = findViewById(R.id.reg_password);
         Button regButton = findViewById(R.id.register);
 
-        //Store data to firebase on click Submit button
+        //Validate if user entered information is formatted properly by calling registerUser()
         regButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,6 +134,7 @@ public class Registration extends AppCompatActivity {
     //Save user data to Firebase on register click
     public void registerUser(View view) {
 
+        //Check if each field is formatting correctly
         if (!validateName() || !validateUserName() || !validateEmail() || !validatePassword()) {
             return;
         }
@@ -146,6 +148,7 @@ public class Registration extends AppCompatActivity {
         String email = regEmail.getEditText().getText().toString();
         String password = regPassword.getEditText().getText().toString();
 
+        //Pass user inputs into helper class constructor and set database to those values
         UserHelperClass userHelperClass = new UserHelperClass(name,userName,email,password);
 
         reference.child(userName).setValue(userHelperClass);
