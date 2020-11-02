@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int NUM_PAGES = 3;
     private static final int SPLASH_TIMEOUT = 2000;
-    SharedPreferences mSharedPref;
+    private SharedPreferences mSharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 //        viewPager.startAnimation(anim);
 
         //Splash screen exit animation
-        splashImg.animate().translationY(-3600).setDuration(1000).setStartDelay(2000);
+        splashImg.animate().translationY(-4200).setDuration(1000).setStartDelay(2000);
         image.animate().translationY(3400).setDuration(1000).setStartDelay(2000);
         logo.animate().translationY(3400).setDuration(1000).setStartDelay(2000);
         slogan.animate().translationY(3400).setDuration(1000).setStartDelay(2000);
@@ -102,14 +102,10 @@ public class MainActivity extends AppCompatActivity {
                 mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
                 boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
 
-                //If isFirstTime then set "firstTime" to false in SharedPreferences
-                if (isFirstTime) {
-                    SharedPreferences.Editor editor = mSharedPref.edit();
-                    editor.putBoolean("firstTime", false);
-                    editor.commit();
-
-                } else {
+                //If not the first time launching app then finish() after slight delay
+                if (!isFirstTime) {
                     finish();
+
                 }
             }
         }, SPLASH_TIMEOUT+1000);

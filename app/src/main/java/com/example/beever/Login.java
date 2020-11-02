@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
@@ -28,12 +29,19 @@ public class Login extends AppCompatActivity {
     private ImageView image;
     private TextView logoText, signUpText;
     private TextInputLayout username, password;
+    private SharedPreferences mSharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //Set firstTime to false in SharedPreferences
+        mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
+        SharedPreferences.Editor editor = mSharedPref.edit();
+        editor.putBoolean("firstTime", false);
+        editor.commit();
 
         //Hooks
         callRegistration = findViewById(R.id.sign_up);
