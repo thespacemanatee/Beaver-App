@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -22,7 +23,6 @@ public class UserProfile extends AppCompatActivity {
     private TextInputLayout name, email, password;
     private TextView usernameLabel, nameLabel;
     private SharedPreferences mSharedPref;
-    private MaterialButton signOut;
 
     //Global variables to hold user data inside this activity
     private String _USERNAME,_NAME,_EMAIL,_PASSWORD;
@@ -44,7 +44,8 @@ public class UserProfile extends AppCompatActivity {
         name = findViewById(R.id.name_field);
         email = findViewById(R.id.email_field);
         password = findViewById(R.id.password_field);
-        signOut = findViewById(R.id.signout_button);
+        MaterialButton signOut = findViewById(R.id.signout_button);
+        FloatingActionButton toOnBoarding = findViewById(R.id.to_onboarding);
 
         showUserData();
 
@@ -61,6 +62,20 @@ public class UserProfile extends AppCompatActivity {
                 editor.commit();
 
                 Intent intent = new Intent(UserProfile.this, Login.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        toOnBoarding.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putBoolean("firstTime", true);
+                editor.commit();
+
+                Intent intent = new Intent(UserProfile.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }

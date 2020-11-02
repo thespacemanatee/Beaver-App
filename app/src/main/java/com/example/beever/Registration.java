@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -21,6 +22,7 @@ public class Registration extends AppCompatActivity {
 
     //Create variables for each element
     private TextInputLayout regName, regUsername, regEmail, regPassword;
+    private SharedPreferences mSharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +181,16 @@ public class Registration extends AppCompatActivity {
                         intent.putExtra("username",usernameFromDB);
                         intent.putExtra("email",emailFromDB);
                         intent.putExtra("password",passwordFromDB);
+
+
+                        mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
+                        SharedPreferences.Editor editor = mSharedPref.edit();
+                        editor.putBoolean("isLoggedIn", true);
+                        editor.putString("registeredName", nameFromDB);
+                        editor.putString("registeredUsername", usernameFromDB);
+                        editor.putString("registeredEmail", emailFromDB);
+                        editor.putString("registeredPassword", passwordFromDB);
+                        editor.commit();
 
                         startActivity(intent);
                         finish();

@@ -80,12 +80,11 @@ public class MainActivity extends AppCompatActivity {
                 //Check if "firstTime" key value in SharedPreferences is true or false
                 mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
                 boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
+                boolean isRegistered = mSharedPref.getBoolean("isLoggedIn", false);
 
                 if (!isFirstTime) {
 
                     //Check if user was registered before and still logged in from previous session
-                    boolean isRegistered = mSharedPref.getBoolean("isLoggedIn", false);
-
                     if (isRegistered) {
 
                         //Pass stored user data into new userprofile activity as Extras

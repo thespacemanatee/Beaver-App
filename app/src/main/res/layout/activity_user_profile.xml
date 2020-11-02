@@ -9,7 +9,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
 
@@ -19,12 +19,24 @@
             android:background="#B8E1FF"
             android:padding="20dp">
 
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/to_onboarding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/information"
+                app:fabSize="mini"
+                app:maxImageSize="45dp"
+                android:backgroundTint="@color/white"
+                android:contentDescription="@string/to_onboarding" />
+
             <ImageView
                 android:id="@+id/profile_image"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/profile" />
+                android:src="@drawable/profile"
+                android:contentDescription="@string/profile_image" />
 
             <TextView
                 android:id="@+id/name_label"

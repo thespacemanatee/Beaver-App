@@ -99,7 +99,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
-        android:src="@drawable/right"
+        android:src="@drawable/right_arrow"
         app:layout_constraintVertical_bias="1"
         app:layout_constraintHorizontal_bias="1"
         android:layout_margin="30dp"
