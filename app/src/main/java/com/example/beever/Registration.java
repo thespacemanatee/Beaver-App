@@ -1,7 +1,9 @@
 package com.example.beever;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -12,6 +14,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class Registration extends AppCompatActivity {
@@ -152,6 +155,40 @@ public class Registration extends AppCompatActivity {
         UserHelperClass userHelperClass = new UserHelperClass(name,userName,email,password);
 
         reference.child(userName).setValue(userHelperClass);
+
+        Query validateUser = reference.orderByChild("username").equalTo(userName);
+
+        validateUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    //Get password from entered username from database
+                    String passwordFromDB = dataSnapshot.child(userName).child("password").getValue(String.class);
+
+                    //Check if password is valid
+                    if (passwordFromDB.equals(password)) {
+
+                        //Retrieve relevant data from database and pass them into new intent as Extras, and start new activity
+                        String nameFromDB = dataSnapshot.child(userName).child("name").getValue(String.class);
+                        String usernameFromDB = dataSnapshot.child(userName).child("username").getValue(String.class);
+                        String emailFromDB = dataSnapshot.child(userName).child("email").getValue(String.class);
+
+                        Intent intent = new Intent(getApplicationContext(),UserProfile.class);
+                        intent.putExtra("name",nameFromDB);
+                        intent.putExtra("username",usernameFromDB);
+                        intent.putExtra("email",emailFromDB);
+                        intent.putExtra("password",passwordFromDB);
+
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
+        });
 
     }
 }

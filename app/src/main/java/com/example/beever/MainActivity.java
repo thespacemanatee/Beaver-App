@@ -11,6 +11,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Pair;
