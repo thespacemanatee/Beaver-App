@@ -4,13 +4,15 @@
 
 - Android 5.0+
 
-## Running Beaver Application
+## Running Beever Application
 
 To run the project, clone the repo, and run `app` after following the steps below.
 
 ### Required libraries
 
-#### GitHub Packages
+#### [Liquid Swipe](https://github.com/Cuberto/liquid-swipe-android) by Cuberto
+
+#### How to Setup build environment
 
 Step 1 : Generate a Personal Access Token for GitHub
 - Inside you GitHub account:
