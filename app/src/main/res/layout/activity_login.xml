@@ -19,7 +19,8 @@
         android:layout_height="150dp"
         android:layout_gravity="center"
         android:src="@drawable/beever_logo"
-        android:transitionName="logo_image" />
+        android:transitionName="logo_image"
+        android:contentDescription="@string/sign_in_logo" />
 
     <TextView
         android:id="@+id/logo_name"

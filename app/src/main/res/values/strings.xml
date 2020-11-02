@@ -4,7 +4,7 @@
     <string name="log_in_header">Log in</string>
     <string name="sign_up_text"><u>Sign up</u></string>
     <string name="log_in_text"><u>Log in</u></string>
-    <string name="splash_logo">beever</string>
+    <string name="splash_name">beever</string>
     <string name="splash_slogan">Be the best version of yourself!</string>
     <string name="login_button">Login</string>
     <string name="submit_button">Submit</string>
@@ -33,4 +33,11 @@
     <string name="signout_button">Sign Out</string>
     <string name="to_onboarding">Go to onBoarding screens</string>
     <string name="profile_image">Profile Image</string>
+    <string name="to_do_splash">To Do List Splash</string>
+    <string name="group_splash">Group Splash</string>
+    <string name="calendar_splash">Calendar Splash</string>
+    <string name="logo">Logo</string>
+    <string name="splash_background">Splash Background</string>
+    <string name="splash_logo">Splash Logo</string>
+    <string name="sign_in_logo">Sign In Logo</string>
 </resources>

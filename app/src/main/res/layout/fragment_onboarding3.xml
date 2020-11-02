@@ -15,7 +15,8 @@
         app:layout_constraintHorizontal_bias=".3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias=".3" />
+        app:layout_constraintVertical_bias=".3"
+        android:contentDescription="@string/to_do_splash" />
 
     <TextView
         android:id="@+id/textView4"
