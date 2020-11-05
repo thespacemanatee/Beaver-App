@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.Beever" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">#587291</item>
-        <item name="colorPrimaryVariant">#B8E1FF</item>
+        <item name="colorPrimary">@color/beever_blue</item>
+        <item name="colorPrimaryVariant">@color/beever_light_blue</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -13,7 +13,7 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowBackground">#B8E1FF</item>
-        <item name="android:colorBackground">#B8E1FF</item>
+        <item name="android:windowBackground">@color/beever_light_blue</item>
+        <item name="android:colorBackground">@color/beever_light_blue</item>
     </style>
 </resources>
