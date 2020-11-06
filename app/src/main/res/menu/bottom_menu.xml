@@ -6,24 +6,28 @@
         android:id="@+id/bottom_menu_dashboard"
         android:title="Dashboard"
         android:icon="@drawable/information"
-        app:cnb_backgroundColor="@color/beever_light_blue"/>
+        app:cnb_iconColor="@color/beever_dark_blue"
+        app:cnb_backgroundColor="@color/beever_pink"/>
 
     <item
         android:id="@+id/bottom_menu_calendar"
         android:title="Calendar"
         android:icon="@drawable/information"
+        app:cnb_iconColor="@color/beever_dark_blue"
         app:cnb_backgroundColor="@color/beever_light_blue"/>
 
     <item
         android:id="@+id/bottom_menu_groups"
         android:title="Groups"
         android:icon="@drawable/information"
-        app:cnb_backgroundColor="@color/beever_light_blue"/>
+        app:cnb_iconColor="@color/white"
+        app:cnb_backgroundColor="@color/beever_blue"/>
 
     <item
         android:id="@+id/bottom_menu_todo"
         android:title="To Do"
         android:icon="@drawable/information"
-        app:cnb_backgroundColor="@color/beever_light_blue"/>
+        app:cnb_iconColor="@color/white"
+        app:cnb_backgroundColor="@color/beever_dark_blue"/>
 
 </menu>

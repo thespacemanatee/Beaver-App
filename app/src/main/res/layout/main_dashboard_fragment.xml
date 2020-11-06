@@ -13,7 +13,7 @@
         app:cnb_menuResource="@menu/bottom_menu"
         android:layout_alignParentBottom="true"
         android:background="@drawable/rounded_corners_nav"
-        app:cnb_unselectedColor="@color/black"
+        app:cnb_unselectedColor="@color/beever_blue"
         app:cnb_radius="8dp"
         android:layout_margin="30dp"
         android:elevation="8dp" />

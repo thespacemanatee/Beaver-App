@@ -10,39 +10,40 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/to_onboarding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/information"
+            android:layout_gravity="end"
+            android:layout_marginEnd="20dp"
+            app:fabSize="mini"
+            app:maxImageSize="45dp"
+            android:backgroundTint="@color/white"
+            android:contentDescription="@string/to_onboarding" />
+
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:background="#B8E1FF"
+            android:layout_height="150dp"
+            android:layout_marginTop="-50dp"
             android:padding="20dp">
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/to_onboarding"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:src="@drawable/information"
-                app:fabSize="mini"
-                app:maxImageSize="45dp"
-                android:backgroundTint="@color/white"
-                android:contentDescription="@string/to_onboarding" />
 
             <ImageView
                 android:id="@+id/profile_image"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_centerVertical="true"
                 android:src="@drawable/profile"
-                android:contentDescription="@string/profile_image" />
+                android:contentDescription="@string/profile_image"/>
 
             <TextView
                 android:id="@+id/name_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@+id/profile_image"
+                android:layout_above="@+id/username_label"
                 android:fontFamily="@font/poppins"
                 android:includeFontPadding="false"
                 android:text="@string/full_name_hint"
@@ -52,9 +53,9 @@
                 android:id="@+id/username_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/name_label"
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@id/profile_image"
+                android:layout_alignBottom="@+id/profile_image"
                 android:fontFamily="@font/poppins"
                 android:includeFontPadding="false"
                 android:text="@string/username_hint"
@@ -65,7 +66,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-100dp"
             android:padding="20dp">
 
             <com.google.android.material.card.MaterialCardView

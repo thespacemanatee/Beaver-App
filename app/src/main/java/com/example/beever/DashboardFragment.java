@@ -19,7 +19,6 @@ import java.util.Calendar;
 public class DashboardFragment extends Fragment {
 
     int currentTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-    ChipNavigationBar chipNavigationBar;
     private SharedPreferences mSharedPref;
     TextView greeting, name;
 
