@@ -185,7 +185,7 @@ public class Registration extends AppCompatActivity {
                         editor.putString("registeredUsername", usernameFromDB);
                         editor.putString("registeredEmail", emailFromDB);
                         editor.putString("registeredPassword", passwordFromDB);
-                        editor.commit();
+                        editor.apply();
 
                         Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
 

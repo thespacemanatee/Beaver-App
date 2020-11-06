@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         if (isLoggedIn) {
             SharedPreferences.Editor editor = mSharedPref.edit();
             editor.putBoolean("firstTime", false);
-            editor.commit();
+            editor.apply();
         }
         super.onBackPressed();
     }

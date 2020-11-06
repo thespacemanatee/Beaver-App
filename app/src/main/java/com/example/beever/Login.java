@@ -42,7 +42,7 @@ public class Login extends AppCompatActivity {
         mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
         SharedPreferences.Editor editor = mSharedPref.edit();
         editor.putBoolean("firstTime", false);
-        editor.commit();
+        editor.apply();
 
         //Hooks
         callRegistration = findViewById(R.id.sign_up);
@@ -119,15 +119,10 @@ public class Login extends AppCompatActivity {
     public void loginUser(View v) {
 
         //Validate if anything is entered in login fields
-        if (!validateUserName() || !validatePassword()) {
-            return;
-
-        } else {
-
+        if (validateUserName() && validatePassword()) {
             //Call isUser() to authenticate credentials
             isUser();
         }
-
     }
 
     private void isUser() {
@@ -171,7 +166,7 @@ public class Login extends AppCompatActivity {
                         editor.putString("registeredUsername", usernameFromDB);
                         editor.putString("registeredEmail", emailFromDB);
                         editor.putString("registeredPassword", passwordFromDB);
-                        editor.commit();
+                        editor.apply();
 
                         //Pass user data into new intent as Extras, and start new activity
                         Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);

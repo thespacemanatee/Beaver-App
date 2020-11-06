@@ -38,7 +38,7 @@ public class OnBoardingFragment3 extends Fragment {
 
                     SharedPreferences.Editor editor = mSharedPref.edit();
                     editor.putBoolean("firstTime", false);
-                    editor.commit();
+                    editor.apply();
 
                     Intent intent = new Intent(getActivity(), NavigationDrawer.class);
 
