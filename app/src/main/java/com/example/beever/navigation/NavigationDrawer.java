@@ -1,5 +1,7 @@
 package com.example.beever.navigation;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.beever.Login;
 import com.example.beever.R;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
@@ -30,6 +33,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     private String[] screenTitles;
     private Drawable[] screenIcons;
     private SlidingRootNav slidingRootNav;
+    private SharedPreferences mSharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,8 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
 
         slidingRootNav = new SlidingRootNavBuilder(this)
                 .withDragDistance(180)
@@ -123,6 +129,17 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
             transaction.replace(R.id.container, settingsFragment);
 
         } else if (position == POS_LOGOUT) {
+            SharedPreferences.Editor editor = mSharedPref.edit();
+            editor.putBoolean("isLoggedIn", false);
+            editor.remove("registeredName");
+            editor.remove("registeredUsername");
+            editor.remove("registeredEmail");
+            editor.remove("registeredPassword");
+            editor.apply();
+
+            Intent intent = new Intent(NavigationDrawer.this, Login.class);
+            startActivity(intent);
+            NavigationDrawer.this.finish();
             finish();
         }
 

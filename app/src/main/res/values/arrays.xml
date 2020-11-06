@@ -3,7 +3,7 @@
 
     <string-array name="id_activityScreenTitles">
 
-        <item></item>
+        <item/>
         <item>Dashboard</item>
         <item>My Profile</item>
         <item>Settings</item>
@@ -18,7 +18,7 @@
         <item>@drawable/right_arrow</item>
         <item>@drawable/right_arrow</item>
         <item>@drawable/right_arrow</item>
-        <item>0</item>
+        <item/>
         <item>@drawable/right_arrow</item>
 
 

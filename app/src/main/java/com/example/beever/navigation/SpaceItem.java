@@ -37,7 +37,7 @@ public class SpaceItem extends  DrawerItem<SpaceItem.ViewHolder> {
         return false;
     }
 
-    public class ViewHolder extends DrawerAdapter.ViewHolder {
+    public static class ViewHolder extends DrawerAdapter.ViewHolder {
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -218,25 +218,14 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/update_button"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#587291"
-                android:textColor="@color/white"
                 android:fontFamily="@font/poppins"
-                android:onClick="update"
-                android:text="@string/update_button" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/signout_button"
-                style="@style/Widget.MaterialComponents.Button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/white"
-                android:textColor="@color/black"
-                android:fontFamily="@font/poppins"
-                android:onClick="update"
-                android:text="@string/signout_button" />
+                android:text="@string/update_button"
+                android:textColor="@color/white" />
 
 
         </LinearLayout>
