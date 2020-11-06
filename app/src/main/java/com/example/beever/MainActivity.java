@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                     if (isRegistered) {
 
                         //Pass stored user data into new userprofile activity as Extras
-                        Intent intent = new Intent(MainActivity.this, UserProfile.class);
+                        Intent intent = new Intent(MainActivity.this, NavigationDrawer.class);
 
                         startActivity(intent);
                         finish();
