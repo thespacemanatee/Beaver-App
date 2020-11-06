@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Beever">
-        <activity android:name=".navigation.NavigationDrawer" />
+        <activity android:name=".navigation.NavigationDrawer"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".admin.Registration"
             android:screenOrientation="portrait" />
