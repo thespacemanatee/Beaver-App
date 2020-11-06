@@ -1,4 +1,4 @@
-package com.example.beever;
+package com.example.beever.navigation;
 
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.beever.R;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
 

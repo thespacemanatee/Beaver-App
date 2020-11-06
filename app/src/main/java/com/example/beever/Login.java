@@ -7,7 +7,6 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Pair;
 import android.view.View;
 import android.view.WindowManager;
@@ -15,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -174,7 +174,7 @@ public class Login extends AppCompatActivity {
                         editor.commit();
 
                         //Pass user data into new intent as Extras, and start new activity
-                        Intent intent = new Intent(getApplicationContext(),UserProfile.class);
+                        Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
 
                         startActivity(intent);
                         finish();

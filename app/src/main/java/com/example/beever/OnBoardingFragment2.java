@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.button.MaterialButton;
 
 public class OnBoardingFragment2 extends Fragment {
@@ -36,7 +37,7 @@ public class OnBoardingFragment2 extends Fragment {
                     editor.putBoolean("firstTime", false);
                     editor.commit();
 
-                    Intent intent = new Intent(getActivity(), UserProfile.class);
+                    Intent intent = new Intent(getActivity(), NavigationDrawer.class);
 
                     startActivity(intent);
 

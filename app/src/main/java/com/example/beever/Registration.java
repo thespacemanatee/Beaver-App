@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -186,7 +187,7 @@ public class Registration extends AppCompatActivity {
                         editor.putString("registeredPassword", passwordFromDB);
                         editor.commit();
 
-                        Intent intent = new Intent(getApplicationContext(),UserProfile.class);
+                        Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
 
                         startActivity(intent);
                         finish();

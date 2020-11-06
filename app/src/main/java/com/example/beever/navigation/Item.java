@@ -1,4 +1,4 @@
-package com.example.beever;
+package com.example.beever.navigation;
 
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+
+import com.example.beever.R;
 
 public class Item extends DrawerItem<Item.ViewHolder> {
 

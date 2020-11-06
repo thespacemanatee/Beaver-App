@@ -1,4 +1,4 @@
-package com.example.beever;
+package com.example.beever.navigation;
 
 import android.content.Context;
 import android.view.View;
