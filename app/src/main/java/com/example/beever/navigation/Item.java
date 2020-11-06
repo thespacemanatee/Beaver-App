@@ -1,5 +1,7 @@
 package com.example.beever.navigation;
 
+import android.content.Context;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.example.beever.R;
 
@@ -17,8 +20,8 @@ public class Item extends DrawerItem<Item.ViewHolder> {
     private int selectedItemTextTint;
     private int normalItemIconTint;
     private int normalItemTextTint;
-    private Drawable icon;
-    private String title;
+    private final Drawable icon;
+    private final String title;
 
     public Item(Drawable icon, String title) {
         this.icon = icon;
@@ -34,7 +37,11 @@ public class Item extends DrawerItem<Item.ViewHolder> {
 
     @Override
     public void bindViewHolder(ViewHolder holder) {
+        Context context = holder.title.getContext();
+        Typeface typeface = ResourcesCompat.getFont(context, R.font.poppins);
+
         holder.title.setText(title);
+        holder.title.setTypeface(typeface);
         holder.icon.setImageDrawable(icon);
         holder.title.setTextColor(isChecked ? selectedItemTextTint : normalItemTextTint);
         holder.icon.setColorFilter(isChecked ? selectedItemIconTint : normalItemIconTint);

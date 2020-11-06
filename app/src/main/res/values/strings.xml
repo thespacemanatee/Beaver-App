@@ -40,4 +40,8 @@
     <string name="splash_background">Splash Background</string>
     <string name="splash_logo">Splash Logo</string>
     <string name="sign_in_logo">Sign In Logo</string>
+    <string name="greetings_morning">Good Morning,</string>
+    <string name="greetings_afternoon">Good Afternoon,</string>
+    <string name="greetings_evening">Good Evening,</string>
+    <string name="name">Claudia.</string>
 </resources>
