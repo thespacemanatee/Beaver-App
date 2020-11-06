@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.beever.admin.MainActivity;
@@ -17,8 +18,12 @@ import com.example.beever.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 public class MyProfileFragment extends Fragment {
 
@@ -28,8 +33,8 @@ public class MyProfileFragment extends Fragment {
     private SharedPreferences mSharedPref;
 
     //Global variables to hold user data inside this activity
-    private String _USERNAME,_NAME,_EMAIL,_PASSWORD;
-    private DatabaseReference reference;
+    private static String _USERNAME,_NAME,_EMAIL,_PASSWORD;
+    private final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,8 +42,6 @@ public class MyProfileFragment extends Fragment {
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Profile");
 
-        //Create new reference to Firebase database
-        reference = FirebaseDatabase.getInstance().getReference("Users");
         mSharedPref = this.getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
         //Hooks
@@ -91,12 +94,37 @@ public class MyProfileFragment extends Fragment {
         _EMAIL = mSharedPref.getString("registeredEmail","");
         _PASSWORD = mSharedPref.getString("registeredPassword","");
 
+//        //Create new reference to Firebase database
+//        reference = FirebaseDatabase.getInstance().getReference("Users");
+//        Query user = reference.orderByChild("username").equalTo(_USERNAME);
+//        user.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()) {
+//                    _NAME = snapshot.child(_USERNAME).child("name").getValue(String.class);
+//                    _EMAIL = snapshot.child(_USERNAME).child("email").getValue(String.class);
+//                    _PASSWORD = snapshot.child(_USERNAME).child("password").getValue(String.class);
+//
+//                    usernameLabel.setText(_USERNAME);
+//                    nameLabel.setText(_NAME);
+//                    name.getEditText().setText(_NAME);
+//                    email.getEditText().setText(_EMAIL);
+//                    password.getEditText().setText(_PASSWORD);
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+
         usernameLabel.setText(_USERNAME);
         nameLabel.setText(_NAME);
         name.getEditText().setText(_NAME);
         email.getEditText().setText(_EMAIL);
         password.getEditText().setText(_PASSWORD);
-
     }
 
     private boolean isEmailChanged() {
@@ -116,6 +144,9 @@ public class MyProfileFragment extends Fragment {
                 email.setErrorEnabled(false);
                 reference.child(_USERNAME).child("email").setValue(newEmail);
                 _EMAIL = newEmail;
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putString("registeredEmail", newEmail);
+                editor.apply();
                 return true;
             }
 
@@ -153,6 +184,9 @@ public class MyProfileFragment extends Fragment {
                 password.setErrorEnabled(false);
                 reference.child(_USERNAME).child("password").setValue(newPassword);
                 _PASSWORD = newPassword;
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putString("registeredPassword", newPassword);
+                editor.apply();
                 return true;
             }
 
@@ -173,6 +207,9 @@ public class MyProfileFragment extends Fragment {
                 name.setErrorEnabled(false);
                 reference.child(_USERNAME).child("name").setValue(newName);
                 _NAME = newName;
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putString("registeredName", newName);
+                editor.apply();
                 return true;
             }
 

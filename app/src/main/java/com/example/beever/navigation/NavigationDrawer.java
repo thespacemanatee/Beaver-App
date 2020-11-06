@@ -32,11 +32,13 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     private static final int POS_MY_PROFILE = 1;
     private static final int POS_SETTINGS = 2;
     private static final int POS_LOGOUT = 4;
+    private int pos;
 
     private String[] screenTitles;
     private Drawable[] screenIcons;
     private SlidingRootNav slidingRootNav;
     private SharedPreferences mSharedPref;
+    private DrawerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +65,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         screenIcons = loadScreenIcons();
         screenTitles = loadScreenTitles();
 
-        DrawerAdapter adapter = new DrawerAdapter(Arrays.asList(
+        adapter = new DrawerAdapter(Arrays.asList(
                 createItemFor(POS_DASHBOARD),
                 createItemFor(POS_MY_PROFILE),
                 createItemFor(POS_SETTINGS),
@@ -126,7 +128,12 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
     @Override
     public void onBackPressed() {
-        finish();
+        if (pos == POS_DASHBOARD && slidingRootNav.isMenuClosed()) {
+            finish();
+        } else {
+            adapter.setSelected(POS_DASHBOARD);
+            onItemSelected(POS_DASHBOARD);
+        }
     }
 
     @Override
@@ -134,18 +141,22 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         if (position == POS_DASHBOARD) {
+            pos = POS_DASHBOARD;
             MainDashboardFragment mainDashboardFragment = new MainDashboardFragment();
             transaction.replace(R.id.container, mainDashboardFragment);
 
         } else if (position == POS_MY_PROFILE) {
             MyProfileFragment myProfileFragmentFragment = new MyProfileFragment();
+            pos = POS_MY_PROFILE;
             transaction.replace(R.id.container, myProfileFragmentFragment);
 
         } else if (position == POS_SETTINGS) {
+            pos = POS_SETTINGS;
             SettingsFragment settingsFragment = new SettingsFragment();
             transaction.replace(R.id.container, settingsFragment);
 
         } else if (position == POS_LOGOUT) {
+            pos = POS_LOGOUT;
             SharedPreferences.Editor editor = mSharedPref.edit();
             editor.putBoolean("isLoggedIn", false);
             editor.remove("registeredName");

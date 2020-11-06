@@ -72,7 +72,7 @@ public class Login extends AppCompatActivity {
                 pairs[5] = new Pair<View, String>(signUpText,"sign_up_text_tran");
                 pairs[6] = new Pair<View, String>(callRegistration,"sign_up_tran");
 
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(Login.this,pairs);
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(Login.this, pairs);
                 startActivity(intent,options.toBundle());
 
             }
@@ -179,6 +179,7 @@ public class Login extends AppCompatActivity {
                         password.setError("Wrong password");
                         password.requestFocus();
                     }
+
                 } else {
                     username.setError("Username does not exist");
                     username.requestFocus();
