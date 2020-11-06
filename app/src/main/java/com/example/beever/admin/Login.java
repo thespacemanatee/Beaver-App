@@ -62,7 +62,7 @@ public class Login extends AppCompatActivity {
                 //Starts new registration activity when clicked on with smooth animations
                 Intent intent = new Intent(Login.this,Registration.class);
 
-
+                @SuppressWarnings("rawtypes")
                 Pair[] pairs = new Pair[7];
                 pairs[0] = new Pair<View, String>(image,"logo_image");
                 pairs[1] = new Pair<View, String>(logoText,"logo_text");

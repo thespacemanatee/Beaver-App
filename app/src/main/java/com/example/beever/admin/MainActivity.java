@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                         //If not the first time launching app, create intent and startActivity with animations
                         Intent intent = new Intent(MainActivity.this, Login.class);
 
+                        @SuppressWarnings("rawtypes")
                         Pair[] pairs = new Pair[2];
                         pairs[0] = new Pair<View, String>(image,"logo_image");
                         pairs[1] = new Pair<View, String>(logo,"logo_text");

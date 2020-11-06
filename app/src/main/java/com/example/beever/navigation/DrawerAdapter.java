@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("rawtypes")
 public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder> {
 
     private final List<DrawerItem> items;
@@ -45,6 +46,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         items.get(position).bindViewHolder(holder);
     }

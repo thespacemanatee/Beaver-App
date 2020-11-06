@@ -8,7 +8,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="beever_pink">#EF798A</color>
+    <color name="beever_pink_transparent">#AAEF798A</color>
     <color name="beever_light_blue">#B8E1FF</color>
+    <color name="beever_light_blue_transparent">#AAB8E1FF</color>
     <color name="beever_blue">#587291</color>
+    <color name="beever_blue_transparent">#AA587291</color>
     <color name="beever_dark_blue">#585481</color>
+    <color name="beever_dark_blue_transparent">#AA585481</color>
 </resources>

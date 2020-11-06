@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -20,7 +22,9 @@ import com.example.beever.R;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter.OnItemSelectedListener{
 
@@ -46,8 +50,8 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
 
         slidingRootNav = new SlidingRootNavBuilder(this)
-                .withDragDistance(180)
-                .withRootViewScale(0.75f)
+                .withDragDistance(140)
+                .withRootViewScale(0.7f)
                 .withRootViewElevation(25)
                 .withToolbarMenuToggle(toolbar)
                 .withMenuOpened(false)
@@ -63,7 +67,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
                 createItemFor(POS_DASHBOARD),
                 createItemFor(POS_MY_PROFILE),
                 createItemFor(POS_SETTINGS),
-                new SpaceItem(260),
+                new SpaceItem(300),
                 createItemFor(POS_LOGOUT)
         ));
 
@@ -73,8 +77,22 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         list.setLayoutManager(new LinearLayoutManager(this));
         list.setAdapter(adapter);
         adapter.setSelected(POS_DASHBOARD);
+
+        TextView countdown = (TextView) findViewById(R.id.countdown);
+        new CountDownTimer(600000000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                countdown.setText(new SimpleDateFormat("HH:mm").format(new Date(millisUntilFinished)));
+            }
+
+            public void onFinish() {
+                countdown.setText("No upcoming meetings!");
+            }
+        }.start();
+
     }
 
+    @SuppressWarnings("rawtypes")
     private DrawerItem createItemFor(int position) {
         return new SimpleItem(screenIcons[position], screenTitles[position])
                 .withIconTint(color(R.color.beever_pink))
@@ -138,7 +156,6 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
             Intent intent = new Intent(NavigationDrawer.this, Login.class);
             startActivity(intent);
-            NavigationDrawer.this.finish();
             finish();
         }
 
