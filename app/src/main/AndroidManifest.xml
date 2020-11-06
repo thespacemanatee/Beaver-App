@@ -11,13 +11,13 @@
         android:theme="@style/Theme.Beever">
         <activity android:name=".navigation.NavigationDrawer" />
         <activity
-            android:name=".Registration"
+            android:name=".admin.Registration"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Login"
+            android:name=".admin.Login"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivity"
+            android:name=".admin.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,4 @@
-package com.example.beever;
+package com.example.beever.admin;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,24 +10,28 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
-import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class OnBoardingFragment2 extends Fragment {
+public class OnBoardingFragment3 extends Fragment {
 
     private SharedPreferences mSharedPref;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_onboarding2,container,false);
+
+        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_onboarding3,container,false);
 
         mSharedPref = this.getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
+        //Hook floating action button element to variable fab
+        FloatingActionButton fab = root.findViewById(R.id.fab);
+
         boolean isLoggedIn = mSharedPref.getBoolean("isLoggedIn", false);
 
-        MaterialButton skip = root.findViewById(R.id.skip_button);
-
-        skip.setOnClickListener(new View.OnClickListener() {
+        //Create new OnClickListener that starts the login activity when clicked
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -49,7 +53,6 @@ public class OnBoardingFragment2 extends Fragment {
                 getActivity().finish();
             }
         });
-
         return root;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.beever;
+package com.example.beever.admin;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,17 +10,17 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.button.MaterialButton;
 
-public class OnBoardingFragment1 extends Fragment {
+public class OnBoardingFragment2 extends Fragment {
 
     private SharedPreferences mSharedPref;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_onboarding1,container,false);
+        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_onboarding2,container,false);
 
         mSharedPref = this.getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 

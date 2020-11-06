@@ -1,4 +1,4 @@
-package com.example.beever;
+package com.example.beever.admin;
 
 public class UserHelperClass {
 

@@ -15,8 +15,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.beever.DashboardFragment;
-import com.example.beever.Login;
+import com.example.beever.admin.Login;
 import com.example.beever.R;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
@@ -25,11 +24,10 @@ import java.util.Arrays;
 
 public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter.OnItemSelectedListener{
 
-    private static final int POS_CLOSE = 0;
-    private static final int POS_DASHBOARD = 1;
-    private static final int POS_MY_PROFILE = 2;
-    private static final int POS_SETTINGS = 3;
-    private static final int POS_LOGOUT = 5;
+    private static final int POS_DASHBOARD = 0;
+    private static final int POS_MY_PROFILE = 1;
+    private static final int POS_SETTINGS = 2;
+    private static final int POS_LOGOUT = 4;
 
     private String[] screenTitles;
     private Drawable[] screenIcons;
@@ -62,7 +60,6 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         screenTitles = loadScreenTitles();
 
         DrawerAdapter adapter = new DrawerAdapter(Arrays.asList(
-                createItemFor(POS_CLOSE),
                 createItemFor(POS_DASHBOARD),
                 createItemFor(POS_MY_PROFILE),
                 createItemFor(POS_SETTINGS),
@@ -79,7 +76,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     }
 
     private DrawerItem createItemFor(int position) {
-        return new Item(screenIcons[position], screenTitles[position])
+        return new SimpleItem(screenIcons[position], screenTitles[position])
                 .withIconTint(color(R.color.beever_pink))
                 .withTextTint(color(R.color.black))
                 .withSelectedIconTint(color(R.color.beever_pink))

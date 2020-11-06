@@ -1,23 +1,18 @@
 package com.example.beever.navigation;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.beever.CalendarFragment;
-import com.example.beever.DashboardFragment;
-import com.example.beever.GroupsFragment;
+import com.example.beever.feature.CalendarFragment;
+import com.example.beever.feature.DashboardFragment;
+import com.example.beever.feature.GroupsFragment;
 import com.example.beever.R;
-import com.example.beever.ToDoFragment;
+import com.example.beever.feature.ToDoFragment;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
-
-import java.util.Calendar;
 
 public class MainDashboardFragment extends Fragment {
 

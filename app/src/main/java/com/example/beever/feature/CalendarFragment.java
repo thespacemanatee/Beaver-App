@@ -1,4 +1,4 @@
-package com.example.beever;
+package com.example.beever.feature;
 
 import android.os.Bundle;
 
@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
 
 public class CalendarFragment extends Fragment {

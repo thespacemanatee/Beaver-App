@@ -1,4 +1,4 @@
-package com.example.beever;
+package com.example.beever.admin;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +21,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
 
 public class MainActivity extends AppCompatActivity {
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
 
                         //If not the first time launching app, create intent and startActivity with animations
-                        Intent intent = new Intent(MainActivity.this,Login.class);
+                        Intent intent = new Intent(MainActivity.this, Login.class);
 
                         Pair[] pairs = new Pair[2];
                         pairs[0] = new Pair<View, String>(image,"logo_image");

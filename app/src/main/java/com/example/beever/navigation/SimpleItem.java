@@ -14,7 +14,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.example.beever.R;
 
-public class Item extends DrawerItem<Item.ViewHolder> {
+public class SimpleItem extends DrawerItem<SimpleItem.ViewHolder> {
 
     private int selectedItemIconTint;
     private int selectedItemTextTint;
@@ -23,7 +23,7 @@ public class Item extends DrawerItem<Item.ViewHolder> {
     private final Drawable icon;
     private final String title;
 
-    public Item(Drawable icon, String title) {
+    public SimpleItem(Drawable icon, String title) {
         this.icon = icon;
         this.title = title;
     }
@@ -47,22 +47,22 @@ public class Item extends DrawerItem<Item.ViewHolder> {
         holder.icon.setColorFilter(isChecked ? selectedItemIconTint : normalItemIconTint);
     }
 
-    public Item withSelectedIconTint(int selectedItemIconTint) {
+    public SimpleItem withSelectedIconTint(int selectedItemIconTint) {
         this.selectedItemIconTint = selectedItemIconTint;
         return this;
     }
 
-    public Item withSelectedTextTint(int selectedItemTextTint) {
+    public SimpleItem withSelectedTextTint(int selectedItemTextTint) {
         this.selectedItemTextTint = selectedItemTextTint;
         return this;
     }
 
-    public Item withIconTint(int normalItemIconTint) {
+    public SimpleItem withIconTint(int normalItemIconTint) {
         this.normalItemIconTint = normalItemIconTint;
         return this;
     }
 
-    public Item withTextTint(int normalItemTextTint) {
+    public SimpleItem withTextTint(int normalItemTextTint) {
         this.normalItemTextTint = normalItemTextTint;
         return this;
     }

@@ -1,4 +1,4 @@
-package com.example.beever;
+package com.example.beever.feature;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
