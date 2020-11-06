@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -17,6 +15,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.beever.DashboardFragment;
 import com.example.beever.Login;
 import com.example.beever.R;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
@@ -120,8 +119,8 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         if (position == POS_DASHBOARD) {
-            DashboardFragment dashboardFragment = new DashboardFragment();
-            transaction.replace(R.id.container, dashboardFragment);
+            MainDashboardFragment mainDashboardFragment = new MainDashboardFragment();
+            transaction.replace(R.id.container, mainDashboardFragment);
 
         } else if (position == POS_MY_PROFILE) {
             MyProfileFragment myProfileFragmentFragment = new MyProfileFragment();

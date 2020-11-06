@@ -1,79 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/greeting"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingStart="34dp"
+            android:paddingEnd="34dp"
+            android:text="@string/greetings_morning"
+            android:fontFamily="@font/poppins_bold"
+            android:textSize="36sp"
+            android:textColor="@color/beever_blue"/>
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
+            android:paddingStart="34dp"
+            android:paddingEnd="34dp"
+            android:text="@string/name"
+            android:fontFamily="@font/poppins_bold"
+            android:textSize="36sp"
+            android:textColor="@color/beever_blue"
+            android:layout_below="@+id/greeting"/>
+
+
+        <LinearLayout
+            android:layout_width="220dp"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/name"
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/greeting"
+                android:id="@+id/upcoming_events"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/upcoming_events"
                 android:paddingStart="34dp"
-                android:paddingEnd="34dp"
-                android:text="@string/greetings_morning"
+                android:elevation="2dp"
                 android:fontFamily="@font/poppins_bold"
-                android:textSize="36sp"
+                android:textSize="18sp"
                 android:textColor="@color/beever_blue"/>
 
-            <TextView
-                android:id="@+id/name"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-10dp"
-                android:paddingStart="34dp"
-                android:paddingEnd="34dp"
-                android:text="@string/name"
-                android:fontFamily="@font/poppins_bold"
-                android:textSize="36sp"
-                android:textColor="@color/beever_blue"
-                android:layout_below="@+id/greeting"/>
+                android:layout_height="6dp"
+                android:background="@color/beever_pink"
+                android:layout_marginTop="-10dp"/>
 
 
-            <LinearLayout
-                android:layout_width="220dp"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/name"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/upcoming_events"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:text="@string/upcoming_events"
-                    android:paddingStart="34dp"
-                    android:elevation="2dp"
-                    android:fontFamily="@font/poppins_bold"
-                    android:textSize="18sp"
-                    android:textColor="@color/beever_blue"/>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="6dp"
-                    android:background="@color/beever_pink"
-                    android:layout_marginTop="-10dp"/>
+        </LinearLayout>
 
 
-            </LinearLayout>
+    </RelativeLayout>
 
-
-        </RelativeLayout>
-
-    </ScrollView>
-
-
-
-
-
-
-</RelativeLayout>
+</ScrollView>

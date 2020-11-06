@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/bottom_menu_dashboard"
+        android:title="Dashboard"
+        android:icon="@drawable/information"
+        app:cnb_backgroundColor="@color/beever_light_blue"/>
+
+    <item
+        android:id="@+id/bottom_menu_calendar"
+        android:title="Calendar"
+        android:icon="@drawable/information"
+        app:cnb_backgroundColor="@color/beever_light_blue"/>
+
+    <item
+        android:id="@+id/bottom_menu_groups"
+        android:title="Groups"
+        android:icon="@drawable/information"
+        app:cnb_backgroundColor="@color/beever_light_blue"/>
+
+    <item
+        android:id="@+id/bottom_menu_todo"
+        android:title="To Do"
+        android:icon="@drawable/information"
+        app:cnb_backgroundColor="@color/beever_light_blue"/>
+
+</menu>
