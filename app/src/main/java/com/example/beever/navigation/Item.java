@@ -62,8 +62,8 @@ public class Item extends DrawerItem<Item.ViewHolder> {
 
     static class ViewHolder extends DrawerAdapter.ViewHolder {
 
-        private ImageView icon;
-        private TextView title;
+        private final ImageView icon;
+        private final TextView title;
 
 
         public ViewHolder(@NonNull View itemView) {

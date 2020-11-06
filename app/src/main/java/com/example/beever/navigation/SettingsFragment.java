@@ -15,6 +15,8 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.settings_fragment, container, false);
 
+        ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Settings");
+
         return root;
     }
 }

@@ -36,6 +36,8 @@ public class MyProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.my_profile_fragment, container, false);
 
+        ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Profile");
+
         //Create new reference to Firebase database
         reference = FirebaseDatabase.getInstance().getReference("Users");
         mSharedPref = this.getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);

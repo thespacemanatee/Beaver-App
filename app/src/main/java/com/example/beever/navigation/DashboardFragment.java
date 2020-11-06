@@ -15,6 +15,8 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.dashboard_fragment, container, false);
 
+        ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Dashboard");
+
         return root;
     }
 }

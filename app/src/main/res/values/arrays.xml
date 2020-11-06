@@ -14,12 +14,12 @@
 
     <array name="id_activityScreenIcons">
 
-        <item>@drawable/right_arrow</item>
-        <item>@drawable/right_arrow</item>
-        <item>@drawable/right_arrow</item>
-        <item>@drawable/right_arrow</item>
+        <item>@drawable/cross</item>
+        <item>@drawable/dashboard</item>
+        <item>@drawable/user</item>
+        <item>@drawable/settings</item>
         <item/>
-        <item>@drawable/right_arrow</item>
+        <item>@drawable/logout</item>
 
 
     </array>
