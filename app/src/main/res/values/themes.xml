@@ -17,4 +17,11 @@
         <item name="android:colorBackground">@color/beever_light_blue</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
+
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+
 </resources>
