@@ -46,4 +46,5 @@
     <string name="name">Claudia.</string>
     <string name="upcoming_events">Upcoming Events</string>
     <string name="upcoming_meeting">UPCOMING MEETING</string>
+    <string name="jump_to_group">Jump to Group...</string>
 </resources>

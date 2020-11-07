@@ -2,12 +2,12 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/greeting"
@@ -30,18 +30,16 @@
             android:text="@string/name"
             android:fontFamily="@font/poppins_bold"
             android:textSize="36sp"
-            android:textColor="@color/beever_blue"
-            android:layout_below="@+id/greeting"/>
+            android:textColor="@color/beever_blue" />
 
 
         <LinearLayout
+            android:id="@+id/upcoming_events"
             android:layout_width="220dp"
             android:layout_height="match_parent"
-            android:layout_below="@+id/name"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/upcoming_events"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
@@ -61,7 +59,46 @@
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Event"
+            android:paddingHorizontal="34dp"
+            android:padding="34dp"/>
 
-    </RelativeLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dashboard_to_do"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="34dp"
+            android:paddingBottom="34dp"/>
+
+        <LinearLayout
+            android:id="@+id/jump_to_group"
+            android:layout_width="220dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/jump_to_group"
+                android:paddingStart="34dp"
+                android:elevation="2dp"
+                android:fontFamily="@font/poppins_bold"
+                android:textSize="18sp"
+                android:textColor="@color/beever_blue"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:background="@color/beever_pink"
+                android:layout_marginTop="-10dp"/>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </ScrollView>
