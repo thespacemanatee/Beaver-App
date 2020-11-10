@@ -190,9 +190,6 @@ public class Registration extends AppCompatActivity {
                     //Check if password is valid
                     if (passwordFromDB.equals(password)) {
 
-                        Bitmap bitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.tick);
-                        regButton.doneLoadingAnimation(R.color.beever_pink, bitmap);
-
                         //Retrieve relevant data from database and pass them into new intent as Extras, and start new activity
                         String nameFromDB = dataSnapshot.child(userName).child("name").getValue(String.class);
                         String usernameFromDB = dataSnapshot.child(userName).child("username").getValue(String.class);

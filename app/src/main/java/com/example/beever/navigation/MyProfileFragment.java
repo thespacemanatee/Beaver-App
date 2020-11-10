@@ -1,9 +1,12 @@
 package com.example.beever.navigation;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,30 +14,38 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.beever.admin.MainActivity;
+import com.bumptech.glide.Glide;
 import com.example.beever.R;
-import com.google.android.material.button.MaterialButton;
+import com.example.beever.admin.MainActivity;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MyProfileFragment extends Fragment {
 
     //Create variables for each element
     private TextInputLayout name, email, password;
     private TextView usernameLabel, nameLabel;
+    private CircularProgressButton update;
+    private CircleImageView profilePic;
     private SharedPreferences mSharedPref;
 
     //Global variables to hold user data inside this activity
     private static String _USERNAME,_NAME,_EMAIL,_PASSWORD;
     private final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+    private final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,13 +55,22 @@ public class MyProfileFragment extends Fragment {
 
         mSharedPref = this.getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
+        //Get user information from SharedPreferences
+        _USERNAME = mSharedPref.getString("registeredUsername","");
+        _NAME = mSharedPref.getString("registeredName","");
+        _EMAIL = mSharedPref.getString("registeredEmail","");
+        _PASSWORD = mSharedPref.getString("registeredPassword","");
+
+        StorageReference profileReference = FirebaseStorage.getInstance().getReference("users/" + _USERNAME + "/profile.jpg");
+
         //Hooks
         usernameLabel = root.findViewById(R.id.username_label);
         nameLabel = root.findViewById(R.id.name_label);
         name = root.findViewById(R.id.name_field);
         email = root.findViewById(R.id.email_field);
         password = root.findViewById(R.id.password_field);
-        MaterialButton update = root.findViewById(R.id.update_button);
+        update = root.findViewById(R.id.update_button);
+        profilePic = root.findViewById(R.id.profile_image);
         FloatingActionButton toOnBoarding = root.findViewById(R.id.to_onboarding);
 
         showUserData();
@@ -72,13 +92,36 @@ public class MyProfileFragment extends Fragment {
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                update.startAnimation();
+
                 //Call each method to check if user inputs are different from existing values and if not, set them to new values
                 if (isNameChanged() || isPasswordChanged() || isEmailChanged()) {
+
+                    update.revertAnimation();
                     Toast.makeText(getActivity(), "Updated Successfully", Toast.LENGTH_SHORT).show();
 
                 } else {
+
+                    update.revertAnimation();
                     Toast.makeText(getActivity(), "Please enter a different value", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, 1000);
+            }
+        });
+
+        profileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(getActivity()).load(uri).into(profilePic);
             }
         });
 
@@ -86,39 +129,42 @@ public class MyProfileFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1000) {
+            if (resultCode == Activity.RESULT_OK) {
+                Uri imageUri = data.getData();
+
+                uploadImageFirebase(imageUri);
+            }
+        }
+    }
+
+    private void uploadImageFirebase(Uri imageUri) {
+
+        StorageReference fileReference = storageReference.child("users/" + _USERNAME + "/profile.jpg");
+        fileReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Glide.with(getActivity()).load(uri).into(profilePic);
+                    }
+                });
+                Toast.makeText(getActivity(), "Updated profile image", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getActivity(), "Failed to update profile image", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
     private void showUserData() {
-
-        //Get user information from SharedPreferences
-        _USERNAME = mSharedPref.getString("registeredUsername","");
-        _NAME = mSharedPref.getString("registeredName","");
-        _EMAIL = mSharedPref.getString("registeredEmail","");
-        _PASSWORD = mSharedPref.getString("registeredPassword","");
-
-//        //Create new reference to Firebase database
-//        reference = FirebaseDatabase.getInstance().getReference("Users");
-//        Query user = reference.orderByChild("username").equalTo(_USERNAME);
-//        user.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (snapshot.exists()) {
-//                    _NAME = snapshot.child(_USERNAME).child("name").getValue(String.class);
-//                    _EMAIL = snapshot.child(_USERNAME).child("email").getValue(String.class);
-//                    _PASSWORD = snapshot.child(_USERNAME).child("password").getValue(String.class);
-//
-//                    usernameLabel.setText(_USERNAME);
-//                    nameLabel.setText(_NAME);
-//                    name.getEditText().setText(_NAME);
-//                    email.getEditText().setText(_EMAIL);
-//                    password.getEditText().setText(_PASSWORD);
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
 
         usernameLabel.setText(_USERNAME);
         nameLabel.setText(_NAME);

@@ -160,10 +160,6 @@ public class Login extends AppCompatActivity {
                     //Check if password is valid
                     if (passwordFromDB.equals(passwordProvided)) {
 
-                        Bitmap bitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.tick);
-                        loginButton.doneLoadingAnimation(R.color.beever_pink, bitmap);
-
-
                         password.setError(null);
                         password.setErrorEnabled(false);
 

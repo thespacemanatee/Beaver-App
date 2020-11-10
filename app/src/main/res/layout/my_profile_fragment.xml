@@ -30,12 +30,13 @@
             android:padding="20dp">
 
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profile_image"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
                 android:src="@drawable/profile"
-                android:contentDescription="@string/profile_image"/>
+                app:civ_border_width="2dp"
+                app:civ_border_color="#FF000000"/>
 
             <TextView
                 android:id="@+id/name_label"
@@ -217,15 +218,20 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.button.MaterialButton
+            <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
                 android:id="@+id/update_button"
-                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#587291"
-                android:fontFamily="@font/poppins"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center"
+                android:background="@drawable/circular_border_shape"
                 android:text="@string/update_button"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                app:spinning_bar_width="4dp"
+                app:spinning_bar_color="#FFF"
+                app:spinning_bar_padding="6dp"
+                app:initialCornerAngle="1000dp"
+                app:finalCornerAngle="1000dp"/>
 
 
         </LinearLayout>
