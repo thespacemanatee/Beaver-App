@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,10 +22,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
+
 public class Registration extends AppCompatActivity {
 
     //Create variables for each element
     private TextInputLayout regName, regUsername, regEmail, regPassword;
+    private CircularProgressButton regButton;
     private SharedPreferences mSharedPref;
 
     @Override
@@ -38,7 +43,7 @@ public class Registration extends AppCompatActivity {
         regUsername = findViewById(R.id.reg_username);
         regEmail = findViewById(R.id.reg_email);
         regPassword = findViewById(R.id.reg_password);
-        Button regButton = findViewById(R.id.register);
+        regButton = findViewById(R.id.register);
 
         mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
 
@@ -46,6 +51,7 @@ public class Registration extends AppCompatActivity {
         regButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                regButton.startAnimation();
                 registerUser(v);
             }
         });
@@ -62,6 +68,7 @@ public class Registration extends AppCompatActivity {
     private Boolean validateName() {
         String s = regName.getEditText().getText().toString();
         if (s.isEmpty()) {
+            regButton.revertAnimation();
             regName.setError("Field cannot be empty");
             return false;
         } else {
@@ -76,14 +83,17 @@ public class Registration extends AppCompatActivity {
         String noWhiteSpace = ".*\\s+.*";
 
         if (s.isEmpty()) {
+            regButton.revertAnimation();
             regUsername.setError("Field cannot be empty");
             return false;
 
         } else if (s.matches(noWhiteSpace)) {
+            regButton.revertAnimation();
             regUsername.setError("Spaces are not allowed in username");
             return false;
 
         } else if (s.length() >= 12) {
+            regButton.revertAnimation();
             regUsername.setError("Username cannot be more than 12 characters");
             return false;
 
@@ -98,9 +108,11 @@ public class Registration extends AppCompatActivity {
         String s = regEmail.getEditText().getText().toString();
         String validEmail = "[a-zA-z0-9._-]+@[a-z]+\\.+[a-z]+";
         if (s.isEmpty()) {
+            regButton.revertAnimation();
             regEmail.setError("Field cannot be empty");
             return false;
         } else if (!s.matches(validEmail)) {
+            regButton.revertAnimation();
             regEmail.setError("Invalid email address");
             return false;
 
@@ -122,14 +134,17 @@ public class Registration extends AppCompatActivity {
                 ".{4,}" +                  //at least 4 characters
                 "$";
         if (s.isEmpty()) {
+            regButton.revertAnimation();
             regPassword.setError("Field cannot be empty");
             return false;
 
         } else if (s.contains(" ")) {
+            regButton.revertAnimation();
             regPassword.setError("Spaces not allowed in password");
             return false;
 
         } else if (!s.matches(validPassword)) {
+            regButton.revertAnimation();
             regPassword.setError("Password is too weak");
             return false;
 
@@ -174,6 +189,9 @@ public class Registration extends AppCompatActivity {
 
                     //Check if password is valid
                     if (passwordFromDB.equals(password)) {
+
+                        Bitmap bitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.tick);
+                        regButton.doneLoadingAnimation(R.color.beever_pink, bitmap);
 
                         //Retrieve relevant data from database and pass them into new intent as Extras, and start new activity
                         String nameFromDB = dataSnapshot.child(userName).child("name").getValue(String.class);

@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
@@ -157,6 +159,10 @@ public class Login extends AppCompatActivity {
 
                     //Check if password is valid
                     if (passwordFromDB.equals(passwordProvided)) {
+
+                        Bitmap bitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.tick);
+                        loginButton.doneLoadingAnimation(R.color.beever_pink, bitmap);
+
 
                         password.setError(null);
                         password.setErrorEnabled(false);

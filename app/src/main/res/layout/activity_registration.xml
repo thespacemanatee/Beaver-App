@@ -98,15 +98,20 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.button.MaterialButton
+        <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
             android:id="@+id/register"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/circular_border_shape"
             android:text="@string/submit_button"
-            android:backgroundTint="#587291"
             android:textColor="@color/white"
-            android:transitionName="button_tran"/>
+            app:spinning_bar_width="4dp"
+            app:spinning_bar_color="#FFF"
+            app:spinning_bar_padding="6dp"
+            app:initialCornerAngle="1000dp"
+            app:finalCornerAngle="1000dp"/>
 
         <TextView
             android:id="@+id/sign_in_text"
