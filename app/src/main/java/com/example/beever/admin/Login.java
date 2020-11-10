@@ -24,13 +24,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
+
 public class Login extends AppCompatActivity {
 
     //Create variables for each element
-    private Button callRegistration, loginButton;
+    private Button callRegistration;
     private ImageView image;
     private TextView logoText, signUpText;
     private TextInputLayout username, password;
+    private CircularProgressButton loginButton;
     private SharedPreferences mSharedPref;
 
     @Override
@@ -51,7 +54,7 @@ public class Login extends AppCompatActivity {
         logoText = findViewById(R.id.logo_name);
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
-        loginButton = findViewById(R.id.log_in);
+        loginButton = (CircularProgressButton) findViewById(R.id.log_in);
         signUpText = findViewById(R.id.sign_up_text);
 
         //Create OnClickListener for sign up button
@@ -84,6 +87,7 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
 
                 //Call loginUser() method on click login button
+                loginButton.startAnimation();
                 loginUser(v);
             }
         });
@@ -94,6 +98,7 @@ public class Login extends AppCompatActivity {
 
         if (s.isEmpty()) {
             username.setError("Please enter your username!");
+            loginButton.revertAnimation();
             return false;
 
         } else {
@@ -108,6 +113,7 @@ public class Login extends AppCompatActivity {
 
         if (s.isEmpty()) {
             password.setError("Please enter your password!");
+            loginButton.revertAnimation();
             return false;
 
         } else {
@@ -176,11 +182,13 @@ public class Login extends AppCompatActivity {
                         finish();
 
                     } else {
+                        loginButton.revertAnimation();
                         password.setError("Wrong password");
                         password.requestFocus();
                     }
 
                 } else {
+                    loginButton.revertAnimation();
                     username.setError("Username does not exist");
                     username.requestFocus();
                 }
