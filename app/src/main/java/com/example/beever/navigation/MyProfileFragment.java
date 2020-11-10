@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,10 +47,11 @@ public class MyProfileFragment extends Fragment {
     private static String _USERNAME,_NAME,_EMAIL,_PASSWORD;
     private final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
     private final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+    private ViewGroup root;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.my_profile_fragment, container, false);
+        root = (ViewGroup) inflater.inflate(R.layout.my_profile_fragment, container, false);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Profile");
 
@@ -61,8 +63,6 @@ public class MyProfileFragment extends Fragment {
         _EMAIL = mSharedPref.getString("registeredEmail","");
         _PASSWORD = mSharedPref.getString("registeredPassword","");
 
-        StorageReference profileReference = FirebaseStorage.getInstance().getReference("users/" + _USERNAME + "/profile.jpg");
-
         //Hooks
         usernameLabel = root.findViewById(R.id.username_label);
         nameLabel = root.findViewById(R.id.name_label);
@@ -72,6 +72,9 @@ public class MyProfileFragment extends Fragment {
         update = root.findViewById(R.id.update_button);
         profilePic = root.findViewById(R.id.profile_image);
         FloatingActionButton toOnBoarding = root.findViewById(R.id.to_onboarding);
+
+        StorageReference profileReference = FirebaseStorage.getInstance().getReference("users/" + _USERNAME + "/profile.jpg");
+        Glide.with(getActivity()).load(NavigationDrawer.profile_uri).into(profilePic);
 
         showUserData();
 
@@ -136,6 +139,7 @@ public class MyProfileFragment extends Fragment {
             if (resultCode == Activity.RESULT_OK) {
                 Uri imageUri = data.getData();
 
+                update.startAnimation();
                 uploadImageFirebase(imageUri);
             }
         }
@@ -151,6 +155,9 @@ public class MyProfileFragment extends Fragment {
                     @Override
                     public void onSuccess(Uri uri) {
                         Glide.with(getActivity()).load(uri).into(profilePic);
+                        Glide.with(getActivity()).load(uri).into((CircleImageView) getActivity().findViewById(R.id.profile_nav));
+                        NavigationDrawer.profile_uri = uri;
+                        update.revertAnimation();
                     }
                 });
                 Toast.makeText(getActivity(), "Updated profile image", Toast.LENGTH_SHORT).show();
