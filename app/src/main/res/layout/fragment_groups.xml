@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".feature.GroupsFragment"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:padding="16dp"
+    android:orientation="vertical">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/greeting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/group_fragment"
+        android:fontFamily="@font/poppins_bold"
+        android:textSize="36sp"
+        android:textColor="@color/beever_blue"/>
+
+    <GridView
+        android:id="@+id/groupButtons"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Groups Fragment"
-        android:gravity="center"/>
+        android:horizontalSpacing="16dp"
+        android:verticalSpacing="16dp"
+        android:scrollbars="none"
+        android:numColumns="3"/>
 
-</FrameLayout>
+</LinearLayout>
