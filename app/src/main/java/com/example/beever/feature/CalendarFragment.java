@@ -33,9 +33,9 @@ public class CalendarFragment extends Fragment {
         addEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment AddEventFragment = new AddEventFragment();
+                Fragment addEventFragment = new AddEventFragment();
                 System.out.println("click");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_container,AddEventFragment).addToBackStack(null).commit();
+                getFragmentManager().beginTransaction().replace(R.id.fragment_container, addEventFragment).addToBackStack(null).commit();
             }
         });
 
@@ -80,7 +80,7 @@ public class CalendarFragment extends Fragment {
         });
 
 
-        return inflater.inflate(R.layout.fragment_calendar, container, false);
+        return root;
     }
 
 
