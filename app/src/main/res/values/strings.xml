@@ -48,4 +48,6 @@
     <string name="upcoming_meeting">UPCOMING MEETING</string>
     <string name="jump_to_group">Jump to Group...</string>
     <string name="group_fragment">Groups</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
