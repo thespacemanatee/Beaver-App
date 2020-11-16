@@ -34,7 +34,6 @@ public class GroupsFragment extends Fragment {
         grpImages.add(R.drawable.pink_circle);
         grpImages.add(R.drawable.pink_circle);
         grpImages.add(R.drawable.pink_circle);
-        grpImages.add(R.drawable.pink_circle);
 
         grpNames.add("Test");
         grpNames.add("Test");
