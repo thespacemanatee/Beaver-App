@@ -1,8 +1,10 @@
 package com.example.beever.feature;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,12 +12,14 @@ import android.view.ViewGroup;
 
 import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.shrikanthravi.collapsiblecalendarview.data.Day;
 import com.shrikanthravi.collapsiblecalendarview.widget.CollapsibleCalendar;
 import android.util.Log;
 
 
 public class CalendarFragment extends Fragment {
+    FloatingActionButton addEvent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -24,6 +28,17 @@ public class CalendarFragment extends Fragment {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_calendar, container, false);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Calendar");
+
+        addEvent = root.findViewById(R.id.addEvent);
+        addEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment AddEventFragment = new AddEventFragment();
+                System.out.println("click");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_container,AddEventFragment).addToBackStack(null).commit();
+            }
+        });
+
         final CollapsibleCalendar collapsibleCalendar = root.findViewById(R.id.calendarView);
         collapsibleCalendar.setCalendarListener(new CollapsibleCalendar.CalendarListener() {
             @Override
@@ -67,4 +82,6 @@ public class CalendarFragment extends Fragment {
 
         return inflater.inflate(R.layout.fragment_calendar, container, false);
     }
+
+
 }

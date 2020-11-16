@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -23,7 +24,17 @@
         <com.shrikanthravi.collapsiblecalendarview.widget.CollapsibleCalendar
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></com.shrikanthravi.collapsiblecalendarview.widget.CollapsibleCalendar>
+            android:layout_height="wrap_content"
+            app:primaryColor="@color/beever_light_blue_transparent"
+            app:textColor="@android:color/black"
+            app:selectedItem_textColor="@color/beever_dark_blue"
+            app:todayItem_textColor="@android:color/black"
+            app:todayItem_background="@drawable/circle_black_stroke_background"
+            app:selectedItem_background="@drawable/circle_white_solid_background"
+            app:buttonLeft_drawableTintColor="@android:color/white"
+            app:buttonRight_drawableTintColor="@android:color/white"
+            app:expandIconColor="@android:color/white">
+        </com.shrikanthravi.collapsiblecalendarview.widget.CollapsibleCalendar>
         <!--        <CalendarView-->
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="wrap_content" />-->
@@ -40,17 +51,25 @@
         android:layout_marginTop="5dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"/>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_add_24"
+            android:id="@+id/addEvent"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:elevation="8dp"
+            android:backgroundTint="@color/beever_light_blue"
+            android:layout_marginEnd="25dp"
+            android:layout_marginBottom="100dp"
+            android:tint="@android:color/white"
+            android:src="@drawable/ic_baseline_add_40"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_margin="20dp"/>
+            app:maxImageSize="40dp"
+            app:backgroundTint="@color/beever_dark_blue_transparent"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
