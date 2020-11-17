@@ -1,3 +1,4 @@
+
 package com.example.beever.feature;
 
 import android.content.Context;
@@ -5,7 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +19,12 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.beever.R;
+import com.example.beever.admin.MainActivity;
 import com.example.beever.navigation.NavigationDrawer;
+import com.example.beever.navigation.SpaceItem;
 
 import java.util.ArrayList;
 
@@ -76,20 +84,43 @@ public class GroupsFragment extends Fragment {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
 
+            //ViewHolder for smoother scrolling
+            ViewHolder viewHolder;
             if (view == null) {
+                viewHolder = new ViewHolder();
                 //Inflate the layout
                 view = gridInflater.inflate(R.layout.group_grid_item, null);
-
-                // Add The ImageButton
-                ImageButton gridImg = (ImageButton) view.findViewById(R.id.grid_item_img);
-                gridImg.setImageResource(grpImages.get(i));
-
-                // Add The Text
-                TextView gridTxt = (TextView) view.findViewById(R.id.grid_item_text);
-                gridTxt.setText(grpIds.get(i));
+                viewHolder.gridImg = view.findViewById(R.id.grid_item_img);
+                viewHolder.gridTxt = view.findViewById(R.id.grid_item_text);
+                view.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder)view.getTag();
             }
+            // Add the ImageButton and Text
+            int selectedGrpImg = grpImages.get(i);
+            String selectedGrpId = grpIds.get(i);
+            viewHolder.gridImg.setImageResource(selectedGrpImg);
+            viewHolder.gridTxt.setText(selectedGrpId);
+
+            // set Click
+            viewHolder.gridImg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Toast.makeText(v.getContext(), "toasty", Toast.LENGTH_SHORT).show();
+                    ChatFragment chatFragment = new ChatFragment();
+                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container, chatFragment, "openChat");
+                    transaction.setReorderingAllowed(true).addToBackStack(null);
+                    transaction.commit();
+                }
+            });
 
             return view;
+        }
+
+        class ViewHolder {
+            ImageButton gridImg;
+            TextView gridTxt;
         }
     }
 }
