@@ -153,8 +153,10 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
     @Override
     public void onBackPressed() {
-        if (pos == POS_DASHBOARD && slidingRootNav.isMenuClosed()) {
-            finish();
+        if (getFragmentManager().getBackStackEntryCount() > 0 ){
+            getFragmentManager().popBackStack();
+        } else if (pos == POS_DASHBOARD && slidingRootNav.isMenuClosed()) {
+            super.onBackPressed();
         } else {
             adapter.setSelected(POS_DASHBOARD);
             onItemSelected(POS_DASHBOARD);
@@ -196,7 +198,6 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         }
 
         slidingRootNav.closeMenu();
-        transaction.addToBackStack(null);
         transaction.commit();
     }
 }
