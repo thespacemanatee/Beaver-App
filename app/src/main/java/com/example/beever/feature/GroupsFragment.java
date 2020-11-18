@@ -1,6 +1,9 @@
 
 package com.example.beever.feature;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -51,6 +54,12 @@ public class GroupsFragment extends Fragment {
         // Inflate the layout for this fragment
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Chats");
+
+        View view = getActivity().findViewById(R.id.bottom_menu);
+        if (view.getVisibility() == View.GONE) {
+            Utils utils = new Utils(getContext());
+            utils.fadeIn();
+        }
 
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
         GridView layout = rootView.findViewById(R.id.groupButtons);
@@ -111,6 +120,9 @@ public class GroupsFragment extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putInt("selectedGrpImg", selectedGrpImg);
                     bundle.putString("selectedGrpId", selectedGrpId);
+
+                    Utils utils = new Utils(getContext());
+                    utils.fadeOut();
 
                     ChatFragment chatFragment = new ChatFragment();
                     chatFragment.setArguments(bundle);
