@@ -106,12 +106,16 @@ public class GroupsFragment extends Fragment {
             viewHolder.gridImg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(v.getContext(), "toasty", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(v.getContext(), "toasty", Toast.LENGTH_SHORT).show(); // for testing
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("selectedGrpImg", selectedGrpImg);
+                    bundle.putString("selectedGrpId", selectedGrpId);
+
                     ChatFragment chatFragment = new ChatFragment();
+                    chatFragment.setArguments(bundle);
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_container, chatFragment, "openChat");
-                    transaction.setReorderingAllowed(true).addToBackStack(null);
-                    transaction.commit();
+                    transaction.replace(R.id.fragment_container, chatFragment, "openChat").addToBackStack(null).commit();
                 }
             });
 

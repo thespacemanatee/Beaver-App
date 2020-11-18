@@ -4,22 +4,73 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".feature.ChatFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/white">
 
-    <ImageButton
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/chat_img"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        android:gravity="center"
-        android:src="@drawable/pink_circle"
-        android:background="?android:selectableItemBackground"/>
-    <TextView
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Group Name"
+            android:id="@+id/chat_id"
+            android:fontFamily="@font/poppins_bold"
+            android:textColor="@color/beever_blue"
+            android:textSize="36sp"
+            android:layout_alignParentBottom="true"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/chat_img"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/pink_circle"
+            android:background="?android:selectableItemBackground"
+            android:layout_alignParentEnd="true"
+            />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/chat_bubbles"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Group Name Placeholder"
-        android:id="@+id/chat_id"
-        android:gravity="center"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="@color/beever_light_blue">
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:padding="16dp"
+        android:orientation="horizontal"
+    android:layout_marginBottom="80dp">
+
+        <EditText
+            android:layout_height="wrap_content"
+            android:layout_width="320dp"
+            android:inputType="text"
+            android:hint="Type a message..."
+            android:layout_alignParentStart="true"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/pink_circle"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:background="?android:selectableItemBackground"
+            android:layout_alignParentEnd="true"
+            />
+
+    </RelativeLayout>
 
 </LinearLayout>
