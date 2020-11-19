@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Pair;
 import android.view.View;
 import android.view.WindowManager;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         slogan.animate().translationY(3400).setDuration(1000).setStartDelay(2000);
 
 
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {

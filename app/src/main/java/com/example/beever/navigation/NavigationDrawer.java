@@ -48,7 +48,6 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     private static final int POS_SETTINGS = 2;
     private static final int POS_LOGOUT = 4;
     private int pos;
-    public static Uri profile_uri;
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
 
     private String[] screenTitles;
@@ -86,7 +85,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
                 createItemFor(POS_DASHBOARD),
                 createItemFor(POS_MY_PROFILE),
                 createItemFor(POS_SETTINGS),
-                new SpaceItem(300),
+                new SpaceItem(200),
                 createItemFor(POS_LOGOUT)
         ));
 
@@ -158,7 +157,9 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     protected void onStart() {
         super.onStart();
         FirebaseUser fUser = fAuth.getCurrentUser();
-        Glide.with(NavigationDrawer.this).load(fUser.getPhotoUrl()).into((CircleImageView) findViewById(R.id.profile_nav));
+        if (fUser.getPhotoUrl() != null) {
+            Glide.with(NavigationDrawer.this).load(fUser.getPhotoUrl()).into((CircleImageView) findViewById(R.id.profile_nav));
+        }
     }
 
     @Override

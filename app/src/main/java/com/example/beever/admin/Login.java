@@ -167,7 +167,7 @@ public class Login extends AppCompatActivity {
 
                     userID = fAuth.getCurrentUser().getUid();
 
-                    DocumentReference documentReference = fStore.collection("Users").document(userID);
+                    DocumentReference documentReference = fStore.collection("users").document(userID);
                     documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -190,9 +190,11 @@ public class Login extends AppCompatActivity {
                     });
 
                     Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                     startActivity(intent);
                     finish();
+
                 } else {
                     Toast.makeText(Login.this, "Error! " + task.getException(), Toast.LENGTH_SHORT).show();
                     loginButton.revertAnimation();
