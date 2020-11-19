@@ -1,6 +1,7 @@
 package com.example.beever.admin;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityOptions;
@@ -9,22 +10,33 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
@@ -37,6 +49,9 @@ public class Login extends AppCompatActivity {
     private TextInputLayout username, password;
     private CircularProgressButton loginButton;
     private SharedPreferences mSharedPref;
+    private FirebaseAuth fAuth;
+    private FirebaseFirestore fStore;
+    private String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +73,9 @@ public class Login extends AppCompatActivity {
         password = findViewById(R.id.password);
         loginButton = (CircularProgressButton) findViewById(R.id.log_in);
         signUpText = findViewById(R.id.sign_up_text);
+
+        fAuth = FirebaseAuth.getInstance();
+        fStore = FirebaseFirestore.getInstance();
 
         //Create OnClickListener for sign up button
         callRegistration.setOnClickListener(new View.OnClickListener() {
@@ -140,65 +158,110 @@ public class Login extends AppCompatActivity {
         String usernameProvided = username.getEditText().getText().toString().trim();
         String passwordProvided = password.getEditText().getText().toString().trim();
 
-        //Create new reference from Firebase Database
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-
-        //Check if username provided is equal to any username in database
-        Query validateUser = reference.orderByChild("username").equalTo(usernameProvided);
-
-        validateUser.addListenerForSingleValueEvent(new ValueEventListener() {
+        fAuth.signInWithEmailAndPassword(usernameProvided,passwordProvided).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(Login.this, "Login Successful", Toast.LENGTH_SHORT).show();
 
-                    username.setError(null);
-                    username.setErrorEnabled(false);
+                    userID = fAuth.getCurrentUser().getUid();
 
-                    //Get password from entered username from database
-                    String passwordFromDB = dataSnapshot.child(usernameProvided).child("password").getValue(String.class);
+                    DocumentReference documentReference = fStore.collection("Users").document(userID);
+                    documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                            if(documentSnapshot.exists()){
+                                SharedPreferences.Editor editor = mSharedPref.edit();
+                                editor.putBoolean("isLoggedIn", true);
+                                editor.putString("registeredName", documentSnapshot.getString("Name"));
+                                editor.putString("registeredUsername", documentSnapshot.getString("Name"));
+                                editor.putString("registeredEmail", email);
+                                editor.putString("registeredPassword", passwordProvided);
+                                editor.apply();
 
-                    //Check if password is valid
-                    if (passwordFromDB.equals(passwordProvided)) {
+                            }else {
+                                Log.d("tag", "onEvent: Document do not exists");
+                            }
+                        }
+                    });
 
-                        password.setError(null);
-                        password.setErrorEnabled(false);
+//                    SharedPreferences.Editor editor = mSharedPref.edit();
+//                    editor.putBoolean("isLoggedIn", true);
+//                    editor.putString("registeredName", name);
+//                    editor.putString("registeredUsername", userName);
+//                    editor.putString("registeredEmail", email);
+//                    editor.putString("registeredPassword", passwordProvided);
+//                    editor.apply();
+                    Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
 
-                        //Retrieve relevant data from database
-                        String nameFromDB = dataSnapshot.child(usernameProvided).child("name").getValue(String.class);
-                        String usernameFromDB = dataSnapshot.child(usernameProvided).child("username").getValue(String.class);
-                        String emailFromDB = dataSnapshot.child(usernameProvided).child("email").getValue(String.class);
-
-                        //Store user data to SharedPreferences
-                        SharedPreferences.Editor editor = mSharedPref.edit();
-                        editor.putBoolean("isLoggedIn", true);
-                        editor.putString("registeredName", nameFromDB);
-                        editor.putString("registeredUsername", usernameFromDB);
-                        editor.putString("registeredEmail", emailFromDB);
-                        editor.putString("registeredPassword", passwordFromDB);
-                        editor.apply();
-
-                        //Pass user data into new intent as Extras, and start new activity
-                        Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
-
-                        startActivity(intent);
-                        finish();
-
-                    } else {
-                        loginButton.revertAnimation();
-                        password.setError("Wrong password");
-                        password.requestFocus();
-                    }
-
+                    startActivity(intent);
+                    finish();
                 } else {
+                    Toast.makeText(Login.this, "Error! " + task.getException(), Toast.LENGTH_SHORT).show();
                     loginButton.revertAnimation();
-                    username.setError("Username does not exist");
-                    username.requestFocus();
                 }
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {}
         });
+
+//        //Create new reference from Firebase Database
+//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+//
+//        //Check if username provided is equal to any username in database
+//        Query validateUser = reference.orderByChild("username").equalTo(usernameProvided);
+//
+//        validateUser.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()) {
+//
+//                    username.setError(null);
+//                    username.setErrorEnabled(false);
+//
+//                    //Get password from entered username from database
+//                    String passwordFromDB = dataSnapshot.child(usernameProvided).child("password").getValue(String.class);
+//
+//                    //Check if password is valid
+//                    if (passwordFromDB.equals(passwordProvided)) {
+//
+//                        password.setError(null);
+//                        password.setErrorEnabled(false);
+//
+//                        //Retrieve relevant data from database
+//                        String nameFromDB = dataSnapshot.child(usernameProvided).child("name").getValue(String.class);
+//                        String usernameFromDB = dataSnapshot.child(usernameProvided).child("username").getValue(String.class);
+//                        String emailFromDB = dataSnapshot.child(usernameProvided).child("email").getValue(String.class);
+//
+//                        //Store user data to SharedPreferences
+//                        SharedPreferences.Editor editor = mSharedPref.edit();
+//                        editor.putBoolean("isLoggedIn", true);
+//                        editor.putString("registeredName", nameFromDB);
+//                        editor.putString("registeredUsername", usernameFromDB);
+//                        editor.putString("registeredEmail", emailFromDB);
+//                        editor.putString("registeredPassword", passwordFromDB);
+//                        editor.apply();
+//
+//                        //Pass user data into new intent as Extras, and start new activity
+//                        Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
+//
+//                        startActivity(intent);
+//                        finish();
+//
+//                    } else {
+//                        loginButton.revertAnimation();
+//                        password.setError("Wrong password");
+//                        password.requestFocus();
+//                    }
+//
+//                } else {
+//                    loginButton.revertAnimation();
+//                    username.setError("Username does not exist");
+//                    username.requestFocus();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {}
+//        });
 
     }
 

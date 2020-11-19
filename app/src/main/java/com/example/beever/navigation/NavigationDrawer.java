@@ -27,6 +27,7 @@ import com.example.beever.admin.Login;
 import com.example.beever.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
@@ -46,6 +47,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     private static final int POS_LOGOUT = 4;
     private int pos;
     public static Uri profile_uri;
+    private FirebaseAuth fAuth;
 
     private CircleImageView profilePic;
     private String[] screenTitles;
@@ -65,6 +67,8 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
         mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
         String _USERNAME = mSharedPref.getString("registeredUsername", "");
+
+        fAuth = FirebaseAuth.getInstance();
 
         StorageReference profileReference = FirebaseStorage.getInstance().getReference("users/" + _USERNAME + "/profile.jpg");
 
@@ -184,6 +188,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
         } else if (position == POS_LOGOUT) {
             pos = POS_LOGOUT;
+            FirebaseAuth.getInstance().signOut();
             SharedPreferences.Editor editor = mSharedPref.edit();
             editor.putBoolean("isLoggedIn", false);
             editor.remove("registeredName");
