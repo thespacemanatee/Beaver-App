@@ -52,6 +52,7 @@ public class Login extends AppCompatActivity {
     private FirebaseAuth fAuth;
     private FirebaseFirestore fStore;
     private String userID;
+    private final String TAG = "Logcat";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,31 +168,27 @@ public class Login extends AppCompatActivity {
                     userID = fAuth.getCurrentUser().getUid();
 
                     DocumentReference documentReference = fStore.collection("Users").document(userID);
-                    documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+                    documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
-                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                            if(documentSnapshot.exists()){
-                                SharedPreferences.Editor editor = mSharedPref.edit();
-                                editor.putBoolean("isLoggedIn", true);
-                                editor.putString("registeredName", documentSnapshot.getString("Name"));
-                                editor.putString("registeredUsername", documentSnapshot.getString("Name"));
-                                editor.putString("registeredEmail", email);
-                                editor.putString("registeredPassword", passwordProvided);
-                                editor.apply();
-
-                            }else {
-                                Log.d("tag", "onEvent: Document do not exists");
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    SharedPreferences.Editor editor = mSharedPref.edit();
+                                    editor.putBoolean("isLoggedIn", true);
+                                    editor.putString("registeredName", document.getString("Name"));
+                                    editor.putString("registeredUsername", document.getString("username"));
+                                    editor.putString("registeredEmail", document.getString("Email"));
+                                    editor.apply();
+                                } else {
+                                    Log.d(TAG, "No such document");
+                                }
+                            } else {
+                                Log.d(TAG, "get failed with ", task.getException());
                             }
                         }
                     });
 
-//                    SharedPreferences.Editor editor = mSharedPref.edit();
-//                    editor.putBoolean("isLoggedIn", true);
-//                    editor.putString("registeredName", name);
-//                    editor.putString("registeredUsername", userName);
-//                    editor.putString("registeredEmail", email);
-//                    editor.putString("registeredPassword", passwordProvided);
-//                    editor.apply();
                     Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
 
                     startActivity(intent);
@@ -202,66 +199,6 @@ public class Login extends AppCompatActivity {
                 }
             }
         });
-
-//        //Create new reference from Firebase Database
-//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-//
-//        //Check if username provided is equal to any username in database
-//        Query validateUser = reference.orderByChild("username").equalTo(usernameProvided);
-//
-//        validateUser.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//
-//                    username.setError(null);
-//                    username.setErrorEnabled(false);
-//
-//                    //Get password from entered username from database
-//                    String passwordFromDB = dataSnapshot.child(usernameProvided).child("password").getValue(String.class);
-//
-//                    //Check if password is valid
-//                    if (passwordFromDB.equals(passwordProvided)) {
-//
-//                        password.setError(null);
-//                        password.setErrorEnabled(false);
-//
-//                        //Retrieve relevant data from database
-//                        String nameFromDB = dataSnapshot.child(usernameProvided).child("name").getValue(String.class);
-//                        String usernameFromDB = dataSnapshot.child(usernameProvided).child("username").getValue(String.class);
-//                        String emailFromDB = dataSnapshot.child(usernameProvided).child("email").getValue(String.class);
-//
-//                        //Store user data to SharedPreferences
-//                        SharedPreferences.Editor editor = mSharedPref.edit();
-//                        editor.putBoolean("isLoggedIn", true);
-//                        editor.putString("registeredName", nameFromDB);
-//                        editor.putString("registeredUsername", usernameFromDB);
-//                        editor.putString("registeredEmail", emailFromDB);
-//                        editor.putString("registeredPassword", passwordFromDB);
-//                        editor.apply();
-//
-//                        //Pass user data into new intent as Extras, and start new activity
-//                        Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
-//
-//                        startActivity(intent);
-//                        finish();
-//
-//                    } else {
-//                        loginButton.revertAnimation();
-//                        password.setError("Wrong password");
-//                        password.requestFocus();
-//                    }
-//
-//                } else {
-//                    loginButton.revertAnimation();
-//                    username.setError("Username does not exist");
-//                    username.requestFocus();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {}
-//        });
 
     }
 
