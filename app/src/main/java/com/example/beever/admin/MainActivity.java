@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Pair;
 import android.view.View;
 import android.view.WindowManager;
@@ -23,12 +24,14 @@ import android.widget.TextView;
 
 import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int NUM_PAGES = 3;
     public static final int SPLASH_TIMEOUT = 2000;
     private SharedPreferences mSharedPref;
+    private FirebaseAuth fAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
+
+        fAuth = FirebaseAuth.getInstance();
 
         //Set fullscreen mode to allow drawing over cutout
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
@@ -76,20 +81,20 @@ public class MainActivity extends AppCompatActivity {
         slogan.animate().translationY(3400).setDuration(1000).setStartDelay(2000);
 
 
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
 
                 //Check if "firstTime" key value in SharedPreferences is true or false
                 boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
-                boolean isRegistered = mSharedPref.getBoolean("isLoggedIn", false);
+//                boolean isLoggedIn = mSharedPref.getBoolean("isLoggedIn", false);
 
 
                 if (!isFirstTime) {
 
                     //Check if user was registered before and still logged in from previous session
-                    if (isRegistered) {
+                    if (fAuth.getCurrentUser() != null) {
 
                         //Pass stored user data into new userprofile activity as Extras
                         Intent intent = new Intent(MainActivity.this, NavigationDrawer.class);

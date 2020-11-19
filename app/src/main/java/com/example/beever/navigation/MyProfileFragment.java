@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +22,18 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.admin.MainActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -46,22 +53,21 @@ public class MyProfileFragment extends Fragment {
     //Global variables to hold user data inside this activity
     private static String _USERNAME,_NAME,_EMAIL,_PASSWORD;
     private final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-    private final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-    private ViewGroup root;
+    private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
+    private final String TAG = "Logcat";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        root = (ViewGroup) inflater.inflate(R.layout.my_profile_fragment, container, false);
+        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.my_profile_fragment, container, false);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Profile");
 
-        mSharedPref = this.getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
+        mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
         //Get user information from SharedPreferences
         _USERNAME = mSharedPref.getString("registeredUsername","");
         _NAME = mSharedPref.getString("registeredName","");
         _EMAIL = mSharedPref.getString("registeredEmail","");
-        _PASSWORD = mSharedPref.getString("registeredPassword","");
 
         //Hooks
         usernameLabel = root.findViewById(R.id.username_label);
@@ -73,8 +79,10 @@ public class MyProfileFragment extends Fragment {
         profilePic = root.findViewById(R.id.profile_image);
         FloatingActionButton toOnBoarding = root.findViewById(R.id.to_onboarding);
 
-        StorageReference profileReference = FirebaseStorage.getInstance().getReference("users/" + _USERNAME + "/profile.jpg");
-        Glide.with(getActivity()).load(NavigationDrawer.profile_uri).into(profilePic);
+        FirebaseUser fUser = fAuth.getCurrentUser();
+        if (fUser.getPhotoUrl() != null) {
+            Glide.with(getActivity()).load(fUser.getPhotoUrl()).into(profilePic);
+        }
 
         showUserData();
 
@@ -121,14 +129,6 @@ public class MyProfileFragment extends Fragment {
             }
         });
 
-        profileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Glide.with(getActivity()).load(uri).into(profilePic);
-            }
-        });
-
-
         return root;
     }
 
@@ -147,27 +147,25 @@ public class MyProfileFragment extends Fragment {
 
     private void uploadImageFirebase(Uri imageUri) {
 
-        StorageReference fileReference = storageReference.child("users/" + _USERNAME + "/profile.jpg");
-        fileReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        FirebaseUser fUser = fAuth.getCurrentUser();
+        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                .setPhotoUri(imageUri)
+                .build();
+        fUser.updateProfile(request)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(Uri uri) {
-                        Glide.with(getActivity()).load(uri).into(profilePic);
-                        Glide.with(getActivity()).load(uri).into((CircleImageView) getActivity().findViewById(R.id.profile_nav));
-                        NavigationDrawer.profile_uri = uri;
-                        update.revertAnimation();
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Glide.with(getActivity()).load(imageUri).into(profilePic);
+                            Glide.with(getActivity()).load(imageUri).into((CircleImageView) getActivity().findViewById(R.id.profile_nav));
+                            update.revertAnimation();
+                            Log.d(TAG, "User profile updated.");
+                            Toast.makeText(getActivity(), "Updated profile image", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity(), "Failed to update profile image", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
-                Toast.makeText(getActivity(), "Updated profile image", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getActivity(), "Failed to update profile image", Toast.LENGTH_SHORT).show();
-            }
-        });
 
     }
 

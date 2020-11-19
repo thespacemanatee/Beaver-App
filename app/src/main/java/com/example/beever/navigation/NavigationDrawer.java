@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -27,6 +28,8 @@ import com.example.beever.admin.Login;
 import com.example.beever.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
@@ -45,9 +48,8 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     private static final int POS_SETTINGS = 2;
     private static final int POS_LOGOUT = 4;
     private int pos;
-    public static Uri profile_uri;
+    private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
 
-    private CircleImageView profilePic;
     private String[] screenTitles;
     private Drawable[] screenIcons;
     private SlidingRootNav slidingRootNav;
@@ -64,9 +66,6 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         getSupportActionBar().setTitle("My title");
 
         mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
-        String _USERNAME = mSharedPref.getString("registeredUsername", "");
-
-        StorageReference profileReference = FirebaseStorage.getInstance().getReference("users/" + _USERNAME + "/profile.jpg");
 
         slidingRootNav = new SlidingRootNavBuilder(this)
                 .withDragDistance(140)
@@ -86,7 +85,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
                 createItemFor(POS_DASHBOARD),
                 createItemFor(POS_MY_PROFILE),
                 createItemFor(POS_SETTINGS),
-                new SpaceItem(300),
+                new SpaceItem(200),
                 createItemFor(POS_LOGOUT)
         ));
 
@@ -108,15 +107,6 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
                 countdown.setText("No upcoming meetings!");
             }
         }.start();
-
-        profileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Glide.with(NavigationDrawer.this).load(uri).into((CircleImageView)findViewById(R.id.profile_nav));
-                profile_uri = uri;
-
-            }
-        });
     }
 
     @SuppressWarnings("rawtypes")
@@ -164,6 +154,15 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser fUser = fAuth.getCurrentUser();
+        if (fUser.getPhotoUrl() != null) {
+            Glide.with(NavigationDrawer.this).load(fUser.getPhotoUrl()).into((CircleImageView) findViewById(R.id.profile_nav));
+        }
+    }
+
+    @Override
     public void onItemSelected(int position) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -184,12 +183,12 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
         } else if (position == POS_LOGOUT) {
             pos = POS_LOGOUT;
+            FirebaseAuth.getInstance().signOut();
             SharedPreferences.Editor editor = mSharedPref.edit();
             editor.putBoolean("isLoggedIn", false);
             editor.remove("registeredName");
             editor.remove("registeredUsername");
             editor.remove("registeredEmail");
-            editor.remove("registeredPassword");
             editor.apply();
 
             Intent intent = new Intent(NavigationDrawer.this, Login.class);
