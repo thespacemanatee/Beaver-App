@@ -1,141 +1,125 @@
 package com.example.beever.feature;
 
-import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CheckBox;
-
 import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.Date;
-import java.util.List;
+import java.util.ArrayList;
 
-public class ToDoFragment extends Fragment {
+public class ToDoFragment extends Fragment implements AdapterView.OnItemSelectedListener{
 
-    private RecyclerView toDoRecyclerView;
-    private ToDoAdapter toDoAdapter;
+    public static final String TAG = "ToDoFragment";
+    public static final String SPINNER = "Spinner Set-Up Successfully";
+    public static final String RECYCLERVIEW = "RecyclerView Set-Up Successfully";
+    public static final String FAB = "FAB Set-Up Successfully";
 
-    private List<ToDoModel> toDoModelList;
-    ViewGroup root;
+    protected RecyclerView toDoRecyclerView;
+    protected RecyclerView.LayoutManager layoutManager;
+    protected ToDoAdapter toDoAdapter;
+    protected Spinner toDoSpinner;
+    protected FloatingActionButton toDoAddButton;
+    protected ArrayList<String> toDoList = new ArrayList<>();
+    protected ArrayList<String> projectList = new ArrayList<>();
+    protected int scrollPosition = 0;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        root = (ViewGroup) inflater.inflate(R.layout.fragment_to_do, container, false);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // initialise to-do and project list from firebase
+        initToDoList();
+        initProjectList();
+    }
+
+    /**
+     * initialise to do list with items (of type String) from firebase
+     */
+    private void initToDoList() {
+        // TODO: get to do list from firebase
+        for (int i = 0; i < 20; i++) {
+            toDoList.add("This is task number " + String.valueOf(i) + "\nThis is the DueDate");
+        }
+    }
+
+    /**
+     * initialise project list with items (of type String) from firebase
+     */
+    private void initProjectList() {
+        // TODO: get project list from firebase
+        projectList.add("50.001 1D");
+        projectList.add("50.002 1D");
+        projectList.add("50.004 2D");
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
+        View rootView = layoutInflater.inflate(R.layout.fragment_to_do, viewGroup, false);
+        rootView.setTag(TAG);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("To-Do");
 
-        toDoRecyclerView = root.findViewById(R.id.toDoRecyclerView);
-        toDoRecyclerView.setLayoutManager(new LinearLayoutManager(root.getContext()));
-        toDoAdapter = new ToDoAdapter(root.getContext());
+        // setting Spinner to select Project
+        toDoSpinner = rootView.findViewById(R.id.toDoSpinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, projectList);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown);
+        toDoSpinner.setAdapter(adapter);
+        toDoSpinner.setOnItemSelectedListener(this);
+        Log.d(TAG, SPINNER);
+
+        toDoRecyclerView = rootView.findViewById(R.id.toDoRecyclerView);
+
+        // set Linear Layout for RecyclerView To Do List
+        layoutManager = new LinearLayoutManager(getActivity());
+        if (toDoRecyclerView.getLayoutManager() != null) {
+            scrollPosition = ((LinearLayoutManager) toDoRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        }
+        toDoRecyclerView.setLayoutManager(layoutManager);
+        toDoRecyclerView.scrollToPosition(scrollPosition);
+
+        toDoAdapter = new ToDoAdapter(toDoList);
+        // set toDoAdapter for RecyclerView
         toDoRecyclerView.setAdapter(toDoAdapter);
+        Log.d(TAG, RECYCLERVIEW);
 
-        return root;
-    }
-
-    static class ToDoAdapter extends RecyclerView.ViewHolder {
-        private List<ToDoModel> toDoList;
-        private Context context;
-
-        public ToDoAdapter (Context context) {
-            this.context = context;
-        }
-
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_to_do_task_, parent, false);
-
-            return new ViewHolder(itemView);
-        }
-
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            ToDoModel item = toDoList.get(position);
-            holder.toDo.setText(item.getItemName());
-            holder.toDo.setChecked(toBoolean(item.getArchived()));
-        }
-
-        private boolean toBoolean(int n) {
-            return n != 0;
-        }
-
-        public int getItemCount() {
-            return toDoList.size();
-        }
-
-        public static class ViewHolder extends RecyclerView.ViewHolder {
-            CheckBox toDo;
-
-            ViewHolder(View view) {
-                super(view);
-                toDo = view.findViewById(R.id.toDoCheckbox);
+        // set To Do Form for FloatingActionButton
+        toDoAddButton = rootView.findViewById(R.id.toDoAddButton);
+        toDoAddButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Add TO DO", Toast.LENGTH_SHORT).show();
             }
-        }
+        });
+        Log.d(TAG, FAB);
 
+        return rootView;
     }
 
-    class ToDoModel {
-        private int id, archived, overdue;
-        private String itemName, description;
-        private Date dueDate;
-        // TODO: 17/11/2020 assignedTo: user(obj)
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        String spinnerItem = parent.getItemAtPosition(position).toString();
+        Toast.makeText(parent.getContext(), "Selected: " + spinnerItem, Toast.LENGTH_SHORT).show();
+        // TODO: get the to do list from firebase according to the project
+    }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        public int getArchived() {
-            return archived;
-        }
-
-        public void setArchived(int archived) {
-            this.archived = archived;
-        }
-
-        public int getOverdue() {
-            return overdue;
-        }
-
-        public void setOverdue(int overdue) {
-            this.overdue = overdue;
-        }
-
-        public String getItemName() {
-            return itemName;
-        }
-
-        public void setItemName(String itemName) {
-            this.itemName = itemName;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public Date getDueDate() {
-            return dueDate;
-        }
-
-        public void setDueDate(Date dueDate) {
-            this.dueDate = dueDate;
-        }
     }
 }
