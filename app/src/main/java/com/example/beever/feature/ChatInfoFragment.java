@@ -42,18 +42,6 @@ public class ChatInfoFragment extends Fragment {
         ShapeableImageView chatImg = rootView.findViewById(R.id.chat_info_img);
         chatImg.setImageResource(selectedGrpImg);
 
-        //Get chat_info_back_button to go back to ChatFragment
-        ImageButton chatInfoBackBtn = rootView.findViewById(R.id.chat_info_back_button);
-        chatInfoBackBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ChatFragment chatFragment = new ChatFragment();
-                chatFragment.setArguments(bundle);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, chatFragment, "closeChatInfo").addToBackStack(null).commit();
-            }
-        });
-
         return rootView;
 
     }

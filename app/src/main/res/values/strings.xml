@@ -54,4 +54,6 @@
     <string name="chat_info_files">Files</string>
     <string name="chat_info_links">Links</string>
     <string name="email_address_hint">Email Address</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

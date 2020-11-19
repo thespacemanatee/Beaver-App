@@ -42,16 +42,16 @@ public class GroupsFragment extends Fragment {
     String addGrpBtnText = "Add group...";
     {
         grpImages.add(addGrpBtnImg);
-        grpImages.add(R.drawable.profile);
-        grpImages.add(R.drawable.beever_logo);
-        grpImages.add(R.drawable.beever_logo_blue);
-        grpImages.add(R.drawable.beever_logo_only);
+//        grpImages.add(R.drawable.profile);
+//        grpImages.add(R.drawable.beever_logo);
+//        grpImages.add(R.drawable.beever_logo_blue);
+//        grpImages.add(R.drawable.beever_logo_only);
 
         grpIds.add(addGrpBtnText);
-        grpIds.add("Test 1");
-        grpIds.add("Test 2");
-        grpIds.add("Test 3");
-        grpIds.add("Test 4");
+//        grpIds.add("Test 1");
+//        grpIds.add("Test 2");
+//        grpIds.add("Test 3");
+//        grpIds.add("Test 4");
     }
 
     @Override
@@ -69,6 +69,8 @@ public class GroupsFragment extends Fragment {
         }
 
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
+
+        //TODO: Retrieve groups from database
 
         //Populate GridView in fragment_groups.xml with Groups
         GridView layout = rootView.findViewById(R.id.groupButtons);
@@ -144,7 +146,14 @@ public class GroupsFragment extends Fragment {
                 viewHolder.gridImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(getContext(), "Make AddGroupFragment", Toast.LENGTH_SHORT).show();
+                        //Fade Out Nav Bar
+                        Utils utils = new Utils(getContext());
+                        utils.fadeOut();
+
+                        //Go to ChatFragment
+                        CreateGroupFragment fragment = new CreateGroupFragment();
+                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.fragment_container, fragment, "openChat").addToBackStack(null).commit();
                     }
                 });
             } else {

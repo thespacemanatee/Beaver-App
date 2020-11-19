@@ -147,6 +147,8 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
             getFragmentManager().popBackStack();
         } else if (pos == POS_DASHBOARD && slidingRootNav.isMenuClosed()) {
             super.onBackPressed();
+        } else if (slidingRootNav.isMenuOpened()) {
+            slidingRootNav.closeMenu();
         } else {
             adapter.setSelected(POS_DASHBOARD);
             onItemSelected(POS_DASHBOARD);

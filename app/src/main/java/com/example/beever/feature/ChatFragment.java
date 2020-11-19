@@ -54,17 +54,6 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        //Get chat_back_button to go back to GroupFragment
-        ImageButton chatBackBtn = rootView.findViewById(R.id.chat_back_button);
-        chatBackBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GroupsFragment groupFragment = new GroupsFragment();
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, groupFragment, "closeChat").addToBackStack(null).commit();
-            }
-        });
-
         //Populate ListView with Chat Bubbles
 
         return rootView;

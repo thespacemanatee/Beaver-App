@@ -14,7 +14,7 @@
         android:scaleType="fitCenter"
         android:gravity="center"
         android:layout_gravity="center"
-        android:background="?android:selectableItemBackground"/>
+        android:foreground="@drawable/my_selector"/>
 
     <TextView
         android:layout_width="match_parent"
