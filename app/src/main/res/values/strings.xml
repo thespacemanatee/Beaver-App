@@ -46,11 +46,12 @@
     <string name="name">Claudia.</string>
     <string name="upcoming_events">Upcoming Events</string>
     <string name="upcoming_meeting">UPCOMING MEETING</string>
-    <string name="jump_to_group">Jump to Group&#8230;</string>
+    <string name="jump_to_group">Jump to Group...</string>
     <string name="group_fragment">Groups</string>
     <string name="chat_hint">Type a message&#8230;</string>
     <string name="chat_info_grp_info">Group Information</string>
     <string name="chat_info_media">Media</string>
     <string name="chat_info_files">Files</string>
     <string name="chat_info_links">Links</string>
+    <string name="email_address_hint">Email Address</string>
 </resources>
