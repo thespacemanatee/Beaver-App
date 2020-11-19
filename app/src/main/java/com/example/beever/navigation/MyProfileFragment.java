@@ -80,7 +80,9 @@ public class MyProfileFragment extends Fragment {
         FloatingActionButton toOnBoarding = root.findViewById(R.id.to_onboarding);
 
         FirebaseUser fUser = fAuth.getCurrentUser();
-        Glide.with(getActivity()).load(fUser.getPhotoUrl()).into(profilePic);
+        if (fUser.getPhotoUrl() != null) {
+            Glide.with(getActivity()).load(fUser.getPhotoUrl()).into(profilePic);
+        }
 
         showUserData();
 
@@ -156,7 +158,6 @@ public class MyProfileFragment extends Fragment {
                         if (task.isSuccessful()) {
                             Glide.with(getActivity()).load(imageUri).into(profilePic);
                             Glide.with(getActivity()).load(imageUri).into((CircleImageView) getActivity().findViewById(R.id.profile_nav));
-                            NavigationDrawer.profile_uri = imageUri;
                             update.revertAnimation();
                             Log.d(TAG, "User profile updated.");
                             Toast.makeText(getActivity(), "Updated profile image", Toast.LENGTH_SHORT).show();

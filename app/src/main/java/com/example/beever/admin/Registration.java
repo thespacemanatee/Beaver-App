@@ -7,13 +7,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,6 +26,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,6 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class Registration extends AppCompatActivity {
 
@@ -191,7 +198,7 @@ public class Registration extends AppCompatActivity {
         fAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isComplete()) {
+                if (task.isSuccessful()) {
                     Toast.makeText(Registration.this, "Registration Successful", Toast.LENGTH_SHORT).show();
                     userID = fAuth.getCurrentUser().getUid();
                     SharedPreferences.Editor editor = mSharedPref.edit();
@@ -213,13 +220,25 @@ public class Registration extends AppCompatActivity {
                         }
                     });
 
-                    Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
+                    FirebaseUser fUser = fAuth.getCurrentUser();
+                    UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                            .setDisplayName(name)
+                            .build();
+                    fUser.updateProfile(request);
 
-                    startActivity(intent);
-                    finish();
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }, 2000);
+
 
                 } else {
                     Toast.makeText(Registration.this, "Error! " + task.getException(), Toast.LENGTH_SHORT).show();
+                    regButton.revertAnimation();
                 }
             }
         });
