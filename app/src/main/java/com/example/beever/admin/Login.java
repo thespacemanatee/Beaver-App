@@ -176,9 +176,9 @@ public class Login extends AppCompatActivity {
                                 if (document.exists()) {
                                     SharedPreferences.Editor editor = mSharedPref.edit();
                                     editor.putBoolean("isLoggedIn", true);
-                                    editor.putString("registeredName", document.getString("Name"));
+                                    editor.putString("registeredName", document.getString("name"));
                                     editor.putString("registeredUsername", document.getString("username"));
-                                    editor.putString("registeredEmail", document.getString("Email"));
+                                    editor.putString("registeredEmail", document.getString("email"));
                                     editor.apply();
                                 } else {
                                     Log.d(TAG, "No such document");
