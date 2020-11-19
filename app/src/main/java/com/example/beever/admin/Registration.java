@@ -181,8 +181,6 @@ public class Registration extends AppCompatActivity {
             return;
         }
 
-//        FirebaseDatabase rootNode = FirebaseDatabase.getInstance();
-//        DatabaseReference reference = rootNode.getReference("Users");
 
         //Get values from user inputs
         String name = regName.getEditText().getText().toString();
@@ -201,7 +199,6 @@ public class Registration extends AppCompatActivity {
                     editor.putString("registeredName", name);
                     editor.putString("registeredUsername", userName);
                     editor.putString("registeredEmail", email);
-                    editor.putString("registeredPassword", password);
                     editor.apply();
 
                     DocumentReference documentReference = fStore.collection("Users").document(userID);
@@ -226,49 +223,6 @@ public class Registration extends AppCompatActivity {
                 }
             }
         });
-
-//        //Pass user inputs into helper class constructor and set database to those values
-//        UserHelperClass userHelperClass = new UserHelperClass(name,userName,email,password);
-//
-//        reference.child(userName).setValue(userHelperClass);
-//
-//        Query validateUser = reference.orderByChild("username").equalTo(userName);
-//
-//        validateUser.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//
-//                    //Get password from entered username from database
-//                    String passwordFromDB = dataSnapshot.child(userName).child("password").getValue(String.class);
-//
-//                    //Check if password is valid
-//                    if (passwordFromDB.equals(password)) {
-//
-//                        //Retrieve relevant data from database and pass them into new intent as Extras, and start new activity
-//                        String nameFromDB = dataSnapshot.child(userName).child("name").getValue(String.class);
-//                        String usernameFromDB = dataSnapshot.child(userName).child("username").getValue(String.class);
-//                        String emailFromDB = dataSnapshot.child(userName).child("email").getValue(String.class);
-//
-//                        SharedPreferences.Editor editor = mSharedPref.edit();
-//                        editor.putBoolean("isLoggedIn", true);
-//                        editor.putString("registeredName", nameFromDB);
-//                        editor.putString("registeredUsername", usernameFromDB);
-//                        editor.putString("registeredEmail", emailFromDB);
-//                        editor.putString("registeredPassword", passwordFromDB);
-//                        editor.apply();
-//
-//                        Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
-//
-//                        startActivity(intent);
-//                        finish();
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {}
-//        });
 
     }
 }
