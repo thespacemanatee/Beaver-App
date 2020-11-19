@@ -51,7 +51,6 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     public static Uri profile_uri;
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
 
-    private CircleImageView profilePic;
     private String[] screenTitles;
     private Drawable[] screenIcons;
     private SlidingRootNav slidingRootNav;
@@ -68,7 +67,6 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         getSupportActionBar().setTitle("My title");
 
         mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
-//        String _USERNAME = mSharedPref.getString("registeredUsername", "");
 
         slidingRootNav = new SlidingRootNavBuilder(this)
                 .withDragDistance(140)
