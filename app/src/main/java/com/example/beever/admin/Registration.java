@@ -201,10 +201,10 @@ public class Registration extends AppCompatActivity {
                     editor.putString("registeredEmail", email);
                     editor.apply();
 
-                    DocumentReference documentReference = fStore.collection("Users").document(userID);
+                    DocumentReference documentReference = fStore.collection("users").document(userID);
                     Map<String, Object> user = new HashMap<>();
-                    user.put("Name", name);
-                    user.put("Email", email);
+                    user.put("name", name);
+                    user.put("email", email);
                     user.put("username", userName);
                     documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
