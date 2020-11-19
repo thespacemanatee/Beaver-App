@@ -8,19 +8,31 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
@@ -30,6 +42,9 @@ public class Registration extends AppCompatActivity {
     private TextInputLayout regName, regUsername, regEmail, regPassword;
     private CircularProgressButton regButton;
     private SharedPreferences mSharedPref;
+    private FirebaseAuth fAuth;
+    private FirebaseFirestore fStore;
+    private String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +59,9 @@ public class Registration extends AppCompatActivity {
         regEmail = findViewById(R.id.reg_email);
         regPassword = findViewById(R.id.reg_password);
         regButton = findViewById(R.id.register);
+
+        fAuth = FirebaseAuth.getInstance();
+        fStore = FirebaseFirestore.getInstance();
 
         mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
 
@@ -163,8 +181,8 @@ public class Registration extends AppCompatActivity {
             return;
         }
 
-        FirebaseDatabase rootNode = FirebaseDatabase.getInstance();
-        DatabaseReference reference = rootNode.getReference("Users");
+//        FirebaseDatabase rootNode = FirebaseDatabase.getInstance();
+//        DatabaseReference reference = rootNode.getReference("Users");
 
         //Get values from user inputs
         String name = regName.getEditText().getText().toString();
@@ -172,48 +190,85 @@ public class Registration extends AppCompatActivity {
         String email = regEmail.getEditText().getText().toString();
         String password = regPassword.getEditText().getText().toString();
 
-        //Pass user inputs into helper class constructor and set database to those values
-        UserHelperClass userHelperClass = new UserHelperClass(name,userName,email,password);
-
-        reference.child(userName).setValue(userHelperClass);
-
-        Query validateUser = reference.orderByChild("username").equalTo(userName);
-
-        validateUser.addListenerForSingleValueEvent(new ValueEventListener() {
+        fAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isComplete()) {
+                    Toast.makeText(Registration.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                    userID = fAuth.getCurrentUser().getUid();
+                    SharedPreferences.Editor editor = mSharedPref.edit();
+                    editor.putBoolean("isLoggedIn", true);
+                    editor.putString("registeredName", name);
+                    editor.putString("registeredUsername", userName);
+                    editor.putString("registeredEmail", email);
+                    editor.putString("registeredPassword", password);
+                    editor.apply();
 
-                    //Get password from entered username from database
-                    String passwordFromDB = dataSnapshot.child(userName).child("password").getValue(String.class);
+                    DocumentReference documentReference = fStore.collection("Users").document(userID);
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("Name", name);
+                    user.put("Email", email);
+                    user.put("username", userName);
+                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("Log", "onSuccess: User profile is created for " + userID);
+                        }
+                    });
 
-                    //Check if password is valid
-                    if (passwordFromDB.equals(password)) {
+                    Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
 
-                        //Retrieve relevant data from database and pass them into new intent as Extras, and start new activity
-                        String nameFromDB = dataSnapshot.child(userName).child("name").getValue(String.class);
-                        String usernameFromDB = dataSnapshot.child(userName).child("username").getValue(String.class);
-                        String emailFromDB = dataSnapshot.child(userName).child("email").getValue(String.class);
+                    startActivity(intent);
+                    finish();
 
-                        SharedPreferences.Editor editor = mSharedPref.edit();
-                        editor.putBoolean("isLoggedIn", true);
-                        editor.putString("registeredName", nameFromDB);
-                        editor.putString("registeredUsername", usernameFromDB);
-                        editor.putString("registeredEmail", emailFromDB);
-                        editor.putString("registeredPassword", passwordFromDB);
-                        editor.apply();
-
-                        Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
-
-                        startActivity(intent);
-                        finish();
-                    }
+                } else {
+                    Toast.makeText(Registration.this, "Error! " + task.getException(), Toast.LENGTH_SHORT).show();
                 }
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {}
         });
+
+//        //Pass user inputs into helper class constructor and set database to those values
+//        UserHelperClass userHelperClass = new UserHelperClass(name,userName,email,password);
+//
+//        reference.child(userName).setValue(userHelperClass);
+//
+//        Query validateUser = reference.orderByChild("username").equalTo(userName);
+//
+//        validateUser.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()) {
+//
+//                    //Get password from entered username from database
+//                    String passwordFromDB = dataSnapshot.child(userName).child("password").getValue(String.class);
+//
+//                    //Check if password is valid
+//                    if (passwordFromDB.equals(password)) {
+//
+//                        //Retrieve relevant data from database and pass them into new intent as Extras, and start new activity
+//                        String nameFromDB = dataSnapshot.child(userName).child("name").getValue(String.class);
+//                        String usernameFromDB = dataSnapshot.child(userName).child("username").getValue(String.class);
+//                        String emailFromDB = dataSnapshot.child(userName).child("email").getValue(String.class);
+//
+//                        SharedPreferences.Editor editor = mSharedPref.edit();
+//                        editor.putBoolean("isLoggedIn", true);
+//                        editor.putString("registeredName", nameFromDB);
+//                        editor.putString("registeredUsername", usernameFromDB);
+//                        editor.putString("registeredEmail", emailFromDB);
+//                        editor.putString("registeredPassword", passwordFromDB);
+//                        editor.apply();
+//
+//                        Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
+//
+//                        startActivity(intent);
+//                        finish();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {}
+//        });
 
     }
 }
