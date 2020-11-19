@@ -25,6 +25,7 @@
         android:textSize="28sp"
         android:textColor="@color/beever_blue"
         android:text="@string/project"
+        android:textStyle="bold"
         android:layout_below="@+id/toDoTextView"
         android:fontFamily="@font/poppins"
         android:layout_marginStart="36dp"
@@ -47,34 +48,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/toDoSpinner"
         android:layout_marginStart="36dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="88dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="36dp"
         android:nestedScrollingEnabled="true"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/toDoArchived"
-        android:layout_below="@+id/toDoRecyclerView"
-        android:layout_marginLeft="36dp"
-        android:layout_marginRight="36dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/archived"
-        android:textSize="24sp"
-        android:fontFamily="@font/poppins"
-        android:textColor="@color/beever_blue"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/toDoArchivedRecyclerView"
-        android:layout_below="@id/toDoArchived"
-        android:layout_marginLeft="36dp"
-        android:layout_marginRight="36dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="4dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/toDoAddButton"
@@ -82,8 +60,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginBottom="88dp"
         android:backgroundTint="@color/beever_light_blue"
         android:src="@drawable/ic_baseline_add_40"
         android:contentDescription="@string/to_do" />
