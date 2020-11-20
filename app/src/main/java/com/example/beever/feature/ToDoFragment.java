@@ -1,6 +1,5 @@
 package com.example.beever.feature;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,14 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
-import android.widget.EditText;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ExpandableListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,7 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ToDoFragment extends Fragment implements AdapterView.OnItemSelectedListener, ToDoDialogFragment.ToDoDialogListener {
+public class ToDoFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     public static final String TAG = "ToDoFragment";
     public static final String SPINNER = "Spinner Set-Up Successfully";
@@ -43,11 +40,14 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected FloatingActionButton toDoAddButton;
     protected ExpandableListView toDoArchivedListView;
     protected ExpandableListAdapter toDoArchivedAdapter;
+    protected Button toDoButton;
+    protected CheckBox toDoCheckBox;
 
-    protected List<String> ARCHIVED = new ArrayList<>();
-    protected HashMap<String, List<String>> expandableListDetail = new HashMap<>();
-    protected ArrayList<String> toDoList = new ArrayList<>();
-    protected ArrayList<String> projectList = new ArrayList<>();
+    protected static List<String> ARCHIVED = new ArrayList<>();
+    protected static List<String> archivedList = new ArrayList<>();
+    protected static HashMap<String, List<String>> expandableListDetail = new HashMap<>();
+    protected static ArrayList<String> toDoList = new ArrayList<>();
+    protected static ArrayList<String> projectList = new ArrayList<>();
     protected int scrollPosition = 0;
 
     @Override
@@ -85,7 +85,6 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
      */
     private void initArchivedList() {
         // TODO: get archived list from firebase
-        List<String> archivedList = new ArrayList<>();
         ARCHIVED.add("Archived");
         archivedList.add("Hello World");
         archivedList.add("This is Done");
@@ -111,9 +110,8 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoSpinner.setOnItemSelectedListener(this);
         Log.d(TAG, SPINNER);
 
-        toDoRecyclerView = rootView.findViewById(R.id.toDoRecyclerView);
-
         // set Linear Layout for RecyclerView To Do List
+        toDoRecyclerView = rootView.findViewById(R.id.toDoRecyclerView);
         layoutManager = new LinearLayoutManager(getActivity());
         if (toDoRecyclerView.getLayoutManager() != null) {
             scrollPosition = ((LinearLayoutManager) toDoRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
@@ -121,7 +119,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoRecyclerView.setLayoutManager(layoutManager);
         toDoRecyclerView.scrollToPosition(scrollPosition);
 
-        toDoAdapter = new ToDoAdapter(toDoList);
+        toDoAdapter = new ToDoAdapter(getActivity());
         // set toDoAdapter for RecyclerView
         toDoRecyclerView.setAdapter(toDoAdapter);
         Log.d(TAG, RECYCLERVIEW);
@@ -130,21 +128,13 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoArchivedListView = rootView.findViewById(R.id.toDoArchivedListView);
         toDoArchivedAdapter = new ExpandableListAdapter(this.getContext(), ARCHIVED, expandableListDetail);
         toDoArchivedListView.setAdapter(toDoArchivedAdapter);
-        toDoArchivedListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            @Override
-            public void onGroupExpand(int groupPosition) {
-                Toast.makeText(getContext(), "Archived Expanded.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        toDoArchivedListView.setOnGroupExpandListener(groupPosition -> Toast.makeText(getContext(), "Archived Expanded.", Toast.LENGTH_SHORT).show());
 
         // set To Do Form for FloatingActionButton
         toDoAddButton = rootView.findViewById(R.id.toDoAddButton);
-        toDoAddButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment();
-                toDoDialogFragment.show(getFragmentManager(), ADD_TO_DO);
-            }
+        toDoAddButton.setOnClickListener(v -> {
+            ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment();
+            toDoDialogFragment.show(getFragmentManager(), ADD_TO_DO);
         });
         Log.d(TAG, FAB);
 
@@ -153,8 +143,6 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String spinnerItem = parent.getItemAtPosition(position).toString();
-        Toast.makeText(parent.getContext(), "Selected: " + spinnerItem, Toast.LENGTH_SHORT).show();
         // TODO: get the to do list from firebase according to the project
     }
 
@@ -162,19 +150,4 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     public void onNothingSelected(AdapterView<?> parent) {
     }
 
-    // THIS IS BUGGY AND I HAVEN'T FIGURED IT OUT YET AHHHHHH
-    @Override
-    public void onDialogPositiveClick(ToDoDialogFragment dialogFragment) {
-        // add to do to the list
-        toDoList.add(dialogFragment.toDoDialogTask.getText().toString());
-        for (String s : toDoList) {
-            Log.d("ADD TO DO", s);
-        }
-    }
-
-    @Override
-    public void onDialogNegativeClick(ToDoDialogFragment dialogFragment) {
-        // nothing happens when dialog is cancelled
-        Toast.makeText(this.getContext(), "Add To-Do cancelled", Toast.LENGTH_SHORT).show();
-    }
 }

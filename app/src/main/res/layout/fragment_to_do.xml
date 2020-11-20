@@ -15,7 +15,7 @@
             android:id="@+id/toDoProject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="28sp"
+            android:textSize="30sp"
             android:textColor="@color/beever_blue"
             android:text="@string/project"
             android:textStyle="bold"
