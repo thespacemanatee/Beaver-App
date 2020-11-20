@@ -9,11 +9,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,12 +28,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ToDoFragment extends Fragment implements AdapterView.OnItemSelectedListener{
+public class ToDoFragment extends Fragment implements AdapterView.OnItemSelectedListener, ToDoDialogFragment.ToDoDialogListener {
 
     public static final String TAG = "ToDoFragment";
     public static final String SPINNER = "Spinner Set-Up Successfully";
     public static final String RECYCLERVIEW = "RecyclerView Set-Up Successfully";
     public static final String FAB = "FAB Set-Up Successfully";
+    public static final String ADD_TO_DO = "ADD_TO_DO";
 
     protected RecyclerView toDoRecyclerView;
     protected RecyclerView.LayoutManager layoutManager;
@@ -40,6 +43,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected FloatingActionButton toDoAddButton;
     protected ExpandableListView toDoArchivedListView;
     protected ExpandableListAdapter toDoArchivedAdapter;
+
     protected List<String> ARCHIVED = new ArrayList<>();
     protected HashMap<String, List<String>> expandableListDetail = new HashMap<>();
     protected ArrayList<String> toDoList = new ArrayList<>();
@@ -129,7 +133,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoArchivedListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int groupPosition) {
-                Toast.makeText(getContext(), "Archived Expanded.", Toast.LENGTH_SHORT);
+                Toast.makeText(getContext(), "Archived Expanded.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -138,7 +142,8 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Add TO DO", Toast.LENGTH_SHORT).show();
+                ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment();
+                toDoDialogFragment.show(getFragmentManager(), ADD_TO_DO);
             }
         });
         Log.d(TAG, FAB);
@@ -155,6 +160,21 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+    }
 
+    // THIS IS BUGGY AND I HAVEN'T FIGURED IT OUT YET AHHHHHH
+    @Override
+    public void onDialogPositiveClick(ToDoDialogFragment dialogFragment) {
+        // add to do to the list
+        toDoList.add(dialogFragment.toDoDialogTask.getText().toString());
+        for (String s : toDoList) {
+            Log.d("ADD TO DO", s);
+        }
+    }
+
+    @Override
+    public void onDialogNegativeClick(ToDoDialogFragment dialogFragment) {
+        // nothing happens when dialog is cancelled
+        Toast.makeText(this.getContext(), "Add To-Do cancelled", Toast.LENGTH_SHORT).show();
     }
 }

@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.beever.admin.Login;
 import com.example.beever.R;
+import com.example.beever.feature.ToDoDialogFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,7 +42,7 @@ import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter.OnItemSelectedListener{
+public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter.OnItemSelectedListener, ToDoDialogFragment.ToDoDialogListener {
 
     private static final int POS_DASHBOARD = 0;
     private static final int POS_MY_PROFILE = 1;
@@ -198,5 +199,15 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
         slidingRootNav.closeMenu();
         transaction.commit();
+    }
+
+    @Override
+    public void onDialogPositiveClick(ToDoDialogFragment dialogFragment) {
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(ToDoDialogFragment dialogFragment) {
+
     }
 }

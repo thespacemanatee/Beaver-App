@@ -20,16 +20,17 @@
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="12dp"
             android:button="@drawable/checkbox_selector"
             android:buttonTint="@color/beever_blue" />
 
         <Button
             android:id="@+id/toDoButton"
             android:layout_width="fill_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:text="Hello World"
+            android:layout_marginEnd="6dp"
             android:textAlignment="textStart"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:textColor="@color/beever_blue"
             android:textAllCaps="false"
             android:backgroundTint="@color/white"
