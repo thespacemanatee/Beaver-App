@@ -4,7 +4,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,7 +24,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
      * Provides a reference to the type of views that you are using
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final CheckBox checkBox;
+        private final LinearLayout toDoTaskView;
 
         public ViewHolder(View view) {
             super(view);
@@ -35,11 +36,11 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
                     Log.d(TAG, getAdapterPosition() + " was clicked.");
                 }
             });
-            checkBox = view.findViewById(R.id.toDoCheckbox);
+            toDoTaskView = view.findViewById(R.id.toDoTaskView);
         }
 
-        public CheckBox getCheckBox() {
-            return checkBox;
+        public LinearLayout getToDoTaskView() {
+            return toDoTaskView;
         }
     }
 
@@ -77,7 +78,8 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         // get element from dataset at the specified position and replace
         // the contents of the view with that element
         Log.d(TAG, "To Do List " + position + " set.");
-        holder.getCheckBox().setText(toDoList.get(position));
+       Button toDoButton = holder.getToDoTaskView().findViewById(R.id.toDoButton);
+       toDoButton.setText(toDoList.get(position));
     }
 
     /**

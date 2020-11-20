@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
+import android.widget.ExpandableListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ToDoFragment extends Fragment implements AdapterView.OnItemSelectedListener{
 
@@ -35,6 +38,10 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected ToDoAdapter toDoAdapter;
     protected Spinner toDoSpinner;
     protected FloatingActionButton toDoAddButton;
+    protected ExpandableListView toDoArchivedListView;
+    protected ExpandableListAdapter toDoArchivedAdapter;
+    protected List<String> ARCHIVED = new ArrayList<>();
+    protected HashMap<String, List<String>> expandableListDetail = new HashMap<>();
     protected ArrayList<String> toDoList = new ArrayList<>();
     protected ArrayList<String> projectList = new ArrayList<>();
     protected int scrollPosition = 0;
@@ -46,6 +53,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         // initialise to-do and project list from firebase
         initToDoList();
         initProjectList();
+        initArchivedList();
     }
 
     /**
@@ -66,6 +74,22 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         projectList.add("50.001 1D");
         projectList.add("50.002 1D");
         projectList.add("50.004 2D");
+    }
+
+    /**
+     * initialise archived list with items (of type String) from firebase
+     */
+    private void initArchivedList() {
+        // TODO: get archived list from firebase
+        List<String> archivedList = new ArrayList<>();
+        ARCHIVED.add("Archived");
+        archivedList.add("Hello World");
+        archivedList.add("This is Done");
+        archivedList.add("This is Archived");
+        for (int i = 0; i < 10; i++) {
+            archivedList.add("Done Task " + i);
+        }
+        expandableListDetail.put(ARCHIVED.get(0), archivedList);
     }
 
     @Override
@@ -97,6 +121,17 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         // set toDoAdapter for RecyclerView
         toDoRecyclerView.setAdapter(toDoAdapter);
         Log.d(TAG, RECYCLERVIEW);
+
+        // set Archived to dos for Expandable View
+        toDoArchivedListView = rootView.findViewById(R.id.toDoArchivedListView);
+        toDoArchivedAdapter = new ExpandableListAdapter(this.getContext(), ARCHIVED, expandableListDetail);
+        toDoArchivedListView.setAdapter(toDoArchivedAdapter);
+        toDoArchivedListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                Toast.makeText(getContext(), "Archived Expanded.", Toast.LENGTH_SHORT);
+            }
+        });
 
         // set To Do Form for FloatingActionButton
         toDoAddButton = rootView.findViewById(R.id.toDoAddButton);
