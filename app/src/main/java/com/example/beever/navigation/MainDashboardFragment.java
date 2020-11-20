@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.beever.feature.CalendarFragment;
 import com.example.beever.feature.DashboardFragment;
+import com.example.beever.feature.ExperimentalGapFinderFragment;
 import com.example.beever.feature.GroupsFragment;
 import com.example.beever.R;
 import com.example.beever.feature.ToDoFragment;
@@ -56,7 +57,8 @@ public class MainDashboardFragment extends Fragment {
                         break;
 
                     case R.id.bottom_menu_todo:
-                        fragment = new ToDoFragment();
+                        //fragment = new ToDoFragment();
+                        fragment = new ExperimentalGapFinderFragment();
                         break;
                 }
 
