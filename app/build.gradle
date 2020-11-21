@@ -24,6 +24,7 @@ android {
         }
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -53,6 +54,11 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     implementation 'com.github.shrikanth7698:Collapsible-Calendar-View-Android:v1.0.3'
+    implementation 'com.github.marcohc:robotocalendarview:3.6.1'
+    implementation 'io.github.inflationx:calligraphy3:3.1.1'
+    implementation 'io.github.inflationx:viewpump:2.0.3'
+    implementation 'com.github.kizitonwose:CalendarView:1.0.0'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
 }

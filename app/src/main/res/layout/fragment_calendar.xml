@@ -21,20 +21,26 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center">
 
-        <com.shrikanthravi.collapsiblecalendarview.widget.CollapsibleCalendar
+        <com.kizitonwose.calendarview.CalendarView
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryColor="@color/beever_light_blue_transparent"
-            app:textColor="@android:color/black"
-            app:selectedItem_textColor="@color/beever_dark_blue"
-            app:todayItem_textColor="@android:color/black"
-            app:todayItem_background="@drawable/circle_black_stroke_background"
-            app:selectedItem_background="@drawable/circle_white_solid_background"
-            app:buttonLeft_drawableTintColor="@android:color/white"
-            app:buttonRight_drawableTintColor="@android:color/white"
-            app:expandIconColor="@android:color/white">
-        </com.shrikanthravi.collapsiblecalendarview.widget.CollapsibleCalendar>
+            app:cv_dayViewResource="@layout/calendar_day_layout" />
+
+<!--        <com.shrikanthravi.collapsiblecalendarview.widget.CollapsibleCalendar-->
+<!--            android:id="@+id/calendarView"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:primaryColor="@color/beever_light_blue_transparent"-->
+<!--            app:textColor="@android:color/black"-->
+<!--            app:selectedItem_textColor="@color/beever_dark_blue"-->
+<!--            app:todayItem_textColor="@android:color/black"-->
+<!--            app:todayItem_background="@drawable/circle_black_stroke_background"-->
+<!--            app:selectedItem_background="@drawable/circle_white_solid_background"-->
+<!--            app:buttonLeft_drawableTintColor="@android:color/white"-->
+<!--            app:buttonRight_drawableTintColor="@android:color/white"-->
+<!--            app:expandIconColor="@android:color/white">-->
+<!--        </com.shrikanthravi.collapsiblecalendarview.widget.CollapsibleCalendar>-->
         <!--        <CalendarView-->
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="wrap_content" />-->

@@ -26,6 +26,10 @@ import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.firebase.auth.FirebaseAuth;
 
+import io.github.inflationx.calligraphy3.CalligraphyConfig;
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
+import io.github.inflationx.viewpump.ViewPump;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int NUM_PAGES = 3;
@@ -131,6 +135,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }, SPLASH_TIMEOUT+500);
+
+        ViewPump.init(ViewPump.builder()
+                .addInterceptor(new CalligraphyInterceptor(
+                        new CalligraphyConfig.Builder()
+                                .setDefaultFontPath("fonts/Roboto-RobotoRegular.ttf")
+                                .setFontAttrId(R.attr.fontPath)
+                                .build()))
+                .build());
     }
 
     //Create LiquidPagers
