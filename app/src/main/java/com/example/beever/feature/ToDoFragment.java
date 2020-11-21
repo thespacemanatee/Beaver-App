@@ -50,16 +50,6 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected static ArrayList<String> projectList = new ArrayList<>();
     protected int scrollPosition = 0;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // initialise to-do and project list from firebase
-        initToDoList();
-        initProjectList();
-        initArchivedList();
-    }
-
     /**
      * initialise to do list with items (of type String) from firebase
      */
@@ -101,6 +91,11 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         rootView.setTag(TAG);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("To-Do");
+
+        // initialise to-do and project list from firebase
+        initToDoList();
+        initProjectList();
+        initArchivedList();
 
         // setting Spinner to select Project
         toDoSpinner = rootView.findViewById(R.id.toDoSpinner);
