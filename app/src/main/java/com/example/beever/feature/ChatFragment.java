@@ -26,7 +26,7 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         //Inflate the layout for this fragment
-        ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Chat");
+
         View rootView = inflater.inflate(R.layout.fragment_chat, container, false);
 
         //Receive arguments from GroupFragment
@@ -34,9 +34,11 @@ public class ChatFragment extends Fragment {
         int selectedGrpImg = bundle.getInt("selectedGrpImg");
         String selectedGrpId = bundle.getString("selectedGrpId");
 
+        ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle(selectedGrpId);
+
         //Get chat_id in fragment_chat.xml and setText
         TextView chatId = rootView.findViewById(R.id.chat_id);
-        chatId.setText(selectedGrpId);
+        chatId.setText("Chat");
 
         //Get chat_img in fragment_chat.xml and setImageResource
         ShapeableImageView chatImg = rootView.findViewById(R.id.chat_img);
