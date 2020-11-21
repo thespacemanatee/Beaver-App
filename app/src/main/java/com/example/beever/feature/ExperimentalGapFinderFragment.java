@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.beever.R;
+import com.example.beever.database.GroupEntry;
+import com.example.beever.database.UserEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -64,14 +66,8 @@ public class ExperimentalGapFinderFragment extends Fragment {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
-                                Map<String,Object> data = document.getData();
-                                String setTextMsg = "Username: " + data.get("username") + "\n"
-                                               + "Name: " + data.get("name") + "\n"
-                                               + "Email: " + data.get("email") + "\n"
-                                               + "Groups: " + data.get("groups").toString() + "\n"
-                                               + "Dashboard groups: " + data.get("dashboard_grps").toString() + "\n";
-                                //Log.i("Test2",setTextMsg);
-                                infoDisplay.setText(setTextMsg);
+                                UserEntry user = document.toObject(UserEntry.class);
+                                infoDisplay.setText(user.toString());
                             } else {
                                 Toast.makeText(getActivity(),"Error: user with specified id does not exist.",Toast.LENGTH_SHORT).show();
                                 return;
@@ -104,16 +100,8 @@ public class ExperimentalGapFinderFragment extends Fragment {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
-                                Map<String,Object> data = document.getData();
-                                String setTextMsg = "Name: " + data.get("name") + "\n"
-                                        + "Member list: " + data.get("member_list").toString() + "\n"
-                                        + "Colour: " + data.get("colour") + "\n"
-                                        + "Display picture: " + data.get("display_picture") + "\n"
-                                        + "Group events: " + data.get("group_events").toString() + "\n"
-                                        + "Todo list: " + data.get("todo_list").toString() + "\n"
-                                        + "Chat: " + data.get("chat") + "\n";
-                                //Log.i("Test2",setTextMsg);
-                                infoDisplay.setText(setTextMsg);
+                                GroupEntry groupEntry = document.toObject(GroupEntry.class);
+                                infoDisplay.setText(groupEntry.toString());
                             } else {
                                 Toast.makeText(getActivity(),"Error: group with specified id does not exist.",Toast.LENGTH_SHORT).show();
                                 return;
