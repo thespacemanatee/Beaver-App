@@ -16,12 +16,11 @@ import java.util.ArrayList;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
 
-    private ArrayList<String> name = new ArrayList<>();
-    private ArrayList<String> email = new ArrayList<>();
+    private ArrayList<UserHelperClass> users;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        private final TextView textViewName;
-        private final TextView textViewEmail;
+        private TextView textViewName;
+        private TextView textViewEmail;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -45,11 +44,10 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
      * by RecyclerView.
      */
     public UsersAdapter(ArrayList<UserHelperClass> array) {
+        this.users = array;
         for (UserHelperClass user: array) {
             Log.i("HELLLLO MY NAMES NINO", user.getName());
             Log.i("HELLLLO MY EMAILS NINO", user.getEmail());
-            this.name.add(user.getName());
-            this.email.add(user.getEmail());
         }
     }
 
@@ -62,13 +60,13 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UsersAdapter.ViewHolder holder, int position) {
-        holder.getTextViewName().setText(name.get(position));
-        holder.getTextViewEmail().setText(email.get(position));
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.getTextViewName().setText(users.get(position).getName());
+        holder.getTextViewEmail().setText(users.get(position).getEmail());
     }
 
     @Override
     public int getItemCount() {
-        return name.size();
+        return users.size();
     }
 }

@@ -115,6 +115,7 @@ public class AddUsersFragment extends Fragment {
                         }
                     }
                 }
+                adapter = new UsersAdapter(adaptedUsers);
             }
         });
     }
@@ -124,7 +125,8 @@ public class AddUsersFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         RecyclerView list = view.findViewById(R.id.usersRecyclerView);
-        list.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        list.setLayoutManager(layoutManager);
         adapter = new UsersAdapter(adaptedUsers);
         list.setAdapter(adapter);
     }
