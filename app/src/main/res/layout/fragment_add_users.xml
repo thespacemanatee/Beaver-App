@@ -43,11 +43,28 @@ tools:context=".feature.AddUsersFragment">
         android:layout_height="wrap_content">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/addUsers"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:backgroundTint="@color/white"
             android:hint="@string/email_address_hint"/>
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+        android:id="@+id/addUsersBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:background="@drawable/circular_border_shape"
+        android:text="@string/add_user"
+        android:textColor="@color/white"
+        app:spinning_bar_width="4dp"
+        app:spinning_bar_color="#FFF"
+        app:spinning_bar_padding="6dp"
+        app:initialCornerAngle="1000dp"
+        app:finalCornerAngle="1000dp"/>
 
     <TextView
         android:layout_width="wrap_content"

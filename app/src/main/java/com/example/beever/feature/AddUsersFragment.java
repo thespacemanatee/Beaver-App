@@ -1,5 +1,7 @@
 package com.example.beever.feature;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,18 +22,24 @@ import com.example.beever.R;
 import com.example.beever.admin.UserHelperClass;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
 
 public class AddUsersFragment extends Fragment {
@@ -38,8 +47,12 @@ public class AddUsersFragment extends Fragment {
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+    private SharedPreferences mSharedPref;
+    private String userID;
     private Uri imageUri;
+    private TextInputEditText addUsers;
     private ShapeableImageView chatImg;
+    private CircularProgressButton addUsersBtn;
     private UsersAdapter adapter;
     private String groupImage;
     private String groupName;
@@ -53,6 +66,8 @@ public class AddUsersFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View rootView = inflater.inflate(R.layout.fragment_add_users, container, false);
+        mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
+        userID = fAuth.getCurrentUser().getUid();
 
         Bundle bundle = this.getArguments();
         groupImage = bundle.getString("imageUri");
@@ -61,16 +76,87 @@ public class AddUsersFragment extends Fragment {
 
         imageUri = Uri.parse(groupImage);
         chatImg = rootView.findViewById(R.id.chat_img);
+        addUsers = rootView.findViewById(R.id.addUsers);
+        addUsersBtn = rootView.findViewById(R.id.addUsersBtn);
 
         populateRecyclerView();
-
-
 
         Glide.with(getActivity()).load(imageUri).into(chatImg);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle(groupName);
 
+        addUsersBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String user = addUsers.getText().toString();
+                if (!user.isEmpty()) {
+                    addUserToGroup(user);
+                }
+            }
+        });
+
         return rootView;
+    }
+
+    private void addUserToGroup(String user) {
+        DocumentReference documentReference0 = fStore.collection("groups").document(groupID);
+        DocumentReference documentReference1 = fStore.collection("users").document(userID);
+        Map<String, Object> memberMap = new HashMap<>();
+        List<Map<String, Object>> members = new ArrayList<>();
+        memberMap.put("name", mSharedPref.getString("registeredName", ""));
+        memberMap.put("email", mSharedPref.getString("registeredEmail",""));
+        memberMap.put("user_id", userID);
+        documentReference0.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+
+                    // Update user group list with new group
+                    if (document.exists()) {
+
+                        Toast.makeText(getActivity(), "Added successfully", Toast.LENGTH_SHORT).show();
+                        documentReference0.update("member_list",  FieldValue.arrayUnion(memberMap)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(getActivity(), "SAVED TO REFERENCE 1.5555", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        List<String> groups = new ArrayList<>();
+                        groups.add(groupID);
+                        documentReference1.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+
+                                    // Check if group list exists already, update if exist, if not create new group list
+                                    if (document.exists()) {
+
+                                        documentReference1.update("groups",  FieldValue.arrayUnion(groupID)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Toast.makeText(getActivity(), "ADDED GROUP TO USER LIST", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                    } else {
+                                        documentReference1.set(groups).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Toast.makeText(getActivity(), "CREATE NEW GROUP LIST FOR USER", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        });
+
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private void populateRecyclerView() {
@@ -108,8 +194,6 @@ public class AddUsersFragment extends Fragment {
                         if (name != null && email != null) {
                             Toast.makeText(getActivity(), user.getName(), Toast.LENGTH_SHORT).show();
                             Toast.makeText(getActivity(), user.getEmail(), Toast.LENGTH_SHORT).show();
-//                        Log.i("HELLLLO MY NAMES NINO", user.getName());
-//                        Log.i("HELLLLO MY EMAILS NINO", user.getEmail());
 
                             adaptedUsers.add(user);
                         }
