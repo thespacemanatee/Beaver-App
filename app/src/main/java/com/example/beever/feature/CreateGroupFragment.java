@@ -1,13 +1,16 @@
 package com.example.beever.feature;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.provider.MediaStore;
 import android.util.Log;
@@ -45,6 +48,7 @@ public class CreateGroupFragment extends Fragment {
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+    private SharedPreferences mSharedPref;
     private String userID;
     private String groupName;
     private TextInputEditText groupNameText;
@@ -61,6 +65,7 @@ public class CreateGroupFragment extends Fragment {
         View rootView =  inflater.inflate(R.layout.fragment_create_group, container, false);
 
         //TODO: Let's get this
+        mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
         groupNameText = rootView.findViewById(R.id.group_name_selection);
         groupImageView = rootView.findViewById(R.id.group_picture_selection);
         userID = fAuth.getCurrentUser().getUid();
@@ -125,14 +130,17 @@ public class CreateGroupFragment extends Fragment {
 
     private void uploadToFirebase(String imageUri, String groupName, String groupID) {
         DocumentReference documentReference0 = fStore.collection("groups").document(groupID);
-        DocumentReference documentReference1 = fStore.collection("users").document(userID)
-                .collection("groups").document(groupID);
+        DocumentReference documentReference1 = fStore.collection("users").document(userID);
         Map<String, Object> map0 = new HashMap<>();
-        List<String> members = new ArrayList<>();
-        members.add(userID);
+        Map<String, Object> memberMap = new HashMap<>();
+        List<Map<String, Object>> members = new ArrayList<>();
+        memberMap.put("name", mSharedPref.getString("registeredName", ""));
+        memberMap.put("email", mSharedPref.getString("registeredEmail",""));
+        memberMap.put("user_id", userID);
+        members.add(memberMap);
         map0.put("group_name", groupName);
-        map0.put("image_uri", imageUri);
-        map0.put("members", members);
+        map0.put("display_picture", imageUri);
+        map0.put("member_list", members);
 
         documentReference0.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -142,37 +150,68 @@ public class CreateGroupFragment extends Fragment {
 
                     // Check if group exists already, update if exist, if not create new group
                     if (document.exists()) {
-                        documentReference0.update("members",  FieldValue.arrayUnion(userID)).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(getActivity(), "SAVED TO REFERENCE 1.5555", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+
+                        Toast.makeText(getActivity(), "Group name unavailable", Toast.LENGTH_SHORT).show();
+//                        documentReference0.update("members",  FieldValue.arrayUnion(userID)).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                Toast.makeText(getActivity(), "SAVED TO REFERENCE 1.5555", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
 
                     } else {
                         documentReference0.set(map0).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Toast.makeText(getActivity(), "SAVED TO REFERENCE 1", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "Group creation successful", Toast.LENGTH_SHORT).show();
+                                List<String> groups = new ArrayList<>();
+                                groups.add(groupID);
+                                documentReference1.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot document = task.getResult();
+
+                                            // Check if group exists already, update if exist, if not create new group
+                                            if (document.exists()) {
+
+                                                documentReference1.update("groups",  FieldValue.arrayUnion(groupID)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Toast.makeText(getActivity(), "ADDED GROUP TO USER LIST", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+
+                                            } else {
+                                                documentReference1.set(groups).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Toast.makeText(getActivity(), "CREATE NEW GROUP LIST FOR USER", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                });
+
+                                Bundle bundle = new Bundle();
+                                bundle.putString("imageUri", imageUri);
+                                bundle.putString("groupName", groupName);
+                                bundle.putString("groupID", groupID);
+
+                                AddUsersFragment addUsersFragment = new AddUsersFragment();
+                                addUsersFragment.setArguments(bundle);
+                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                transaction.replace(R.id.fragment_container, addUsersFragment).commit();
                             }
                         });
                     }
-                } else {
-
                 }
             }
         });
 
 
-        Map<String, Object> map1 = new HashMap<>();
-        map1.put("group_name", groupName);
-        documentReference1.set(map1).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d("Log", "Image is set for " + groupName);
-                Toast.makeText(getActivity(), "SAVED TO REFERENCE 2", Toast.LENGTH_SHORT).show();
-            }
-        });
+
         createBtn.revertAnimation();
     }
 }

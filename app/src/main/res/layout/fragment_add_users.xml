@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:background="@color/white"
+android:orientation="vertical"
+android:padding="16dp"
+tools:context=".feature.AddUsersFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_users"
+            android:textSize="40sp"
+            android:fontFamily="@font/poppins_bold"
+            android:textColor="@color/beever_blue"/>
+
+        <com.google.android.material.imageview.ShapeableImageView
+            app:shapeAppearance="@style/roundedImageViewRounded"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:id="@+id/chat_img"
+            android:scaleType="fitCenter"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:background="?android:selectableItemBackground"
+            android:layout_alignParentEnd="true"
+            />
+
+    </RelativeLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="@string/email_address_hint"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/currently_added"
+        android:textSize="36sp"
+        android:fontFamily="@font/poppins_bold"
+        android:textColor="@color/beever_blue"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/usersRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+</LinearLayout>
