@@ -119,13 +119,13 @@ public class MainDashboardFragment extends Fragment {
 //                Fragment fragment = null;
 
                 if (i == R.id.bottom_menu_dashboard) {
-                    viewPager.setCurrentItem(0, false);
+                    viewPager.setCurrentItem(0, true);
                 } else if (i == R.id.bottom_menu_calendar) {
-                    viewPager.setCurrentItem(1, false);
+                    viewPager.setCurrentItem(1, true);
                 } else if (i == R.id.bottom_menu_groups) {
-                    viewPager.setCurrentItem(2, false);
+                    viewPager.setCurrentItem(2, true);
                 } else if (i == R.id.bottom_menu_todo) {
-                    viewPager.setCurrentItem(3, false);
+                    viewPager.setCurrentItem(3, true);
                 }
 
 
