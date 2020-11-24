@@ -1,6 +1,9 @@
 package com.example.beever.database;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 public class UserEntry {
-
     // Object to represent user document. Only group id list, user events and todo lists are mutable
 
     // Store contents of user document as defined in specification
@@ -63,7 +65,11 @@ public class UserEntry {
     }
 
     private void setDashboard_grps(List<Object> dashboard_grps){
-        this.dashboard_grps = (dashboard_grps==null && dashboard_grps.size()==DASHBOARD_GRPS)? new ArrayList<Object>() : dashboard_grps;
+        if (dashboard_grps!=null && dashboard_grps.size()==DASHBOARD_GRPS){
+            this.dashboard_grps = dashboard_grps;
+            return;
+        }
+        this.dashboard_grps = new ArrayList<Object>();
         for (int i=0;i<DASHBOARD_GRPS;i++) this.dashboard_grps.add(null);
     }
 
@@ -194,9 +200,209 @@ public class UserEntry {
                 + "todo_list=" + todo_list.toString() + "})";
     }
 
-    // TODO implement asynchronised method
-    /*
-    public static class getCurrentTodo extends AsyncTask<UserEntry,ArrayList<EventEntry>,ArrayList<EventEntry>>{
+    public abstract static class GetUserEntry extends Thread {
+        private static final String LOG_NAME = "UserEntry.GetUserEntry";
+        private static final int SLEEP_INCREMENT = 10;
+        private UserEntry result = null;
 
+        String userId;
+        Integer timeout;
+        Handler handler;
+
+        public GetUserEntry(String userId,Integer timeout){
+            this.userId = userId;
+            this.timeout = timeout;
+            handler = new Handler();
+        }
+
+        // params: String userId, Integer timeout
+        public void run() {
+
+            UserEntry user[] = {null};
+
+            final boolean[] fail = {false};
+            final boolean[] finish = {false};
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference docRef = db.collection("users").document(userId);
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            user[0] = document.toObject(UserEntry.class);
+                            fail[0] = false;
+                            finish[0] = true;
+
+                        } else {
+                            Log.d(LOG_NAME, "User ID not found");
+                            fail[0] = true;
+                            finish[0] = true;
+                        }
+                    } else {
+                        Log.d(LOG_NAME, "Retrieval error");
+                        fail[0] = true;
+                        finish[0] = true;
+                    }
+                }
+            });
+
+            long now = System.currentTimeMillis();
+            long end = now + timeout;
+            while (now < end) {
+                now = System.currentTimeMillis();
+                if (finish[0]) {
+                    if (fail[0]) return;
+                    else break;
+                }
+            }
+            if (!finish[0]) {
+                Log.d(LOG_NAME, "Timeout");
+                return;
+            }
+            result = user[0];
+
+            handler.post(new Runnable(){
+                public void run(){
+                    onPostExecute();
+                }
+            });
+
+            return;
+        }
+
+        public UserEntry getResult(){
+            return result;
+        }
+
+        public abstract void onPostExecute();
+    }
+
+    // Get UserEntry
+    /*
+    public static class GetUserEntry extends AsyncTask<Object,Boolean,UserEntry> {
+        private static final String LOG_NAME = "UserEntry.GetUserEntry";
+        private static final int SLEEP_INCREMENT = 10;
+
+        // params: String userId, Integer timeout
+        protected UserEntry doInBackground(Object... params) {
+
+            if (params.length != 2) {
+                Log.d(LOG_NAME, "Incorrect number of arguments");
+                return null;
+            }
+            if (!(params[0] instanceof String)) {
+                Log.d(LOG_NAME, "Incompatible 0th argument");
+                return null;
+            }
+            if (!(params[1] instanceof Integer)) {
+                Log.d(LOG_NAME, "Incompatible 1st argument");
+                return null;
+            }
+
+            String userId = (String) params[0];
+            Integer timeout = (Integer) params[1];
+
+            UserEntry user[] = {null};
+
+            final boolean[] fail = {false};
+            final boolean[] finish = {false};
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference docRef = db.collection("users").document(userId);
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            user[0] = document.toObject(UserEntry.class);
+                            fail[0] = false;
+                            finish[0] = true;
+
+                        } else {
+                            Log.d(LOG_NAME, "User ID not found");
+                            fail[0] = true;
+                            finish[0] = true;
+                        }
+                    } else {
+                        Log.d(LOG_NAME, "Retrieval error");
+                        fail[0] = true;
+                        finish[0] = true;
+                    }
+                }
+            });
+
+            long now = System.currentTimeMillis();
+            long end = now + timeout;
+            while (now < end) {
+                try {
+                    Thread.sleep(SLEEP_INCREMENT);
+                } catch (InterruptedException e) {
+                }
+                now = System.currentTimeMillis();
+                if (finish[0]) {
+                    if (fail[0]) return null;
+                    else break;
+                }
+            }
+            if (!finish[0]) {
+                Log.d(LOG_NAME, "Timeout");
+                return null;
+            }
+            return user[0];
+        }
+
+        public void join() {
+            while (getStatus() != Status.FINISHED) {
+                try {
+                    Thread.sleep(SLEEP_INCREMENT);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    }*/
+
+    /*
+    public static class GetUserRelevantEvent extends AsyncTask<Object,Boolean,UserEntry> {
+        private static final String LOG_NAME = "UserEntry.GetUserRelevantEvent";
+        private static final int SLEEP_INCREMENT = 10;
+
+        // params: String userId, Integer timeout
+        @SuppressLint("LongLogTag")
+        protected UserEntry doInBackground(Object... params) {
+
+            if (params.length != 4) {
+                Log.d(LOG_NAME, "Incorrect number of arguments");
+                return null;
+            }
+            if (!(params[0] instanceof UserEntry)) {
+                Log.d(LOG_NAME, "Incompatible 0th argument");
+                return null;
+            }
+            if (!(params[1] instanceof Integer)) {
+                Log.d(LOG_NAME, "Incompatible 1st argument");
+                return null;
+            }
+            if (!(params[2] instanceof Boolean) || !(params[3] instanceof Boolean)) {
+                Log.d(LOG_NAME, "Incompatible 2nd/3rd argument");
+                return null;
+            }
+
+            UserEntry user = (UserEntry) params[0];
+            Integer timeout = (Integer) params[1];
+            boolean getCurrent = (Boolean) params[2];
+            boolean getPast = (Boolean) params[3];
+
+            HashMap<String,GroupEntry.GetGroupEntry> groupEntryGetters = new HashMap<String,GroupEntry.GetGroupEntry>();
+
+            for (Object grp:user.getGroups()){
+                String groupId = (String) grp;
+                GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry();
+                getGroupEntry.execute(groupId,timeout);
+                groupEntryGetters.put(groupid,getGroupEntry);
+            }
+        }
     }*/
 }

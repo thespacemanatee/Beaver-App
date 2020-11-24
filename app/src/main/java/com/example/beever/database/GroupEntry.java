@@ -1,5 +1,17 @@
 package com.example.beever.database;
 
+import android.annotation.SuppressLint;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -154,5 +166,76 @@ public class GroupEntry {
                 + "group_events=" + group_events + ",\n"
                 + "todo_list=" + todo_list.toString() + ",\n"
                 + "chat=" + chat.toString() + "})";
+    }
+
+    public static class GetGroupEntry extends Thread {
+        private static final String LOG_NAME = "UserEntry.GetGroupEntry";
+        private static final int SLEEP_INCREMENT = 10;
+        private GroupEntry result = null;
+
+        String groupId;
+        Integer timeout;
+
+        public GetGroupEntry(String groupId, Integer timeout){
+            this.groupId = groupId;
+            this.timeout = timeout;
+        }
+
+        // params: String userId, Integer timeout
+        public void run(){
+
+            GroupEntry group[] = {null};
+
+            final boolean[] fail = {false};
+            final boolean[] finish = {false};
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference docRef = db.collection("groups").document(groupId);
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            group[0] = document.toObject(GroupEntry.class);
+                            fail[0] = false;
+                            finish[0] = true;
+
+                        } else {
+                            Log.d(LOG_NAME, "Group ID not found");
+                            fail[0] = true;
+                            finish[0] = true;
+                        }
+                    } else {
+                        Log.d(LOG_NAME, "Retrieval error");
+                        fail[0] = true;
+                        finish[0] = true;
+                    }
+                }
+            });
+
+            long now = System.currentTimeMillis();
+            long end = now + timeout;
+            while (now < end) {
+                try {
+                    Thread.sleep(SLEEP_INCREMENT);
+                } catch (InterruptedException e) {
+                }
+                now = System.currentTimeMillis();
+                if (finish[0]) {
+                    if (fail[0]) return;
+                    else break;
+                }
+            }
+            if (!finish[0]) {
+                Log.d(LOG_NAME, "Timeout");
+                return;
+            }
+            result = group[0];
+        }
+
+        public GroupEntry getResult(){
+            return result;
+        }
     }
 }

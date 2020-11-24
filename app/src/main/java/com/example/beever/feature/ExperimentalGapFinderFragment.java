@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,14 +16,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.beever.R;
+import com.example.beever.database.EventEntry;
 import com.example.beever.database.GroupEntry;
+import com.example.beever.database.ThreadAsyncTaskContainer;
 import com.example.beever.database.UserEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class ExperimentalGapFinderFragment extends Fragment {
@@ -58,27 +63,13 @@ public class ExperimentalGapFinderFragment extends Fragment {
                     Toast.makeText(getActivity(),"Please enter a user id.",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                DocumentReference docRef = db.collection("users").document(queryUserId);
-                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                UserEntry user = document.toObject(UserEntry.class);
-                                infoDisplay.setText(user.getUserTodo(false,true).toString());
-                            } else {
-                                Toast.makeText(getActivity(),"Error: user with specified id does not exist.",Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                        } else {
-                            Toast.makeText(getActivity(),"Error: retrieval unsuccessful. Please try again.",Toast.LENGTH_SHORT).show();
-                            return;
-                        }
+                Handler e = new Handler();
+                UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(queryUserId,50000){
+                    public void onPostExecute(){
+                        infoDisplay.setText(getResult().toString());
                     }
-                });
-
+                };
+                getUserEntry.start();
             }
         });
 
