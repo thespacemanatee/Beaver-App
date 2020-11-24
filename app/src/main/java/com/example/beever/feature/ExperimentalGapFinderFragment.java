@@ -67,7 +67,7 @@ public class ExperimentalGapFinderFragment extends Fragment {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                                 UserEntry user = document.toObject(UserEntry.class);
-                                infoDisplay.setText(user.toString());
+                                infoDisplay.setText(user.getUserTodo(false,true).toString());
                             } else {
                                 Toast.makeText(getActivity(),"Error: user with specified id does not exist.",Toast.LENGTH_SHORT).show();
                                 return;
@@ -101,7 +101,7 @@ public class ExperimentalGapFinderFragment extends Fragment {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                                 GroupEntry groupEntry = document.toObject(GroupEntry.class);
-                                infoDisplay.setText(groupEntry.toString());
+                                infoDisplay.setText(groupEntry.getGroupEvents(true,true).toString());
                             } else {
                                 Toast.makeText(getActivity(),"Error: group with specified id does not exist.",Toast.LENGTH_SHORT).show();
                                 return;
