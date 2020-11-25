@@ -1,54 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".feature.ChatFragment"
-    android:orientation="vertical"
-    android:background="@color/white">
+    tools:context=".feature.ChatFragment">
 
-    <RelativeLayout
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:orientation="horizontal"
-        android:padding="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/chat_id"
-            android:fontFamily="@font/poppins_bold"
-            android:textColor="@color/beever_blue"
-            android:textSize="36sp"
-            android:layout_alignParentBottom="true" />
-
-        <com.google.android.material.imageview.ShapeableImageView
-            app:shapeAppearance="@style/roundedImageViewRounded"
-            android:layout_width="68dp"
-            android:layout_height="68dp"
-            android:id="@+id/chat_img"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:background="?android:selectableItemBackground"
-            android:layout_alignParentEnd="true" />
-
-    </RelativeLayout>
-
-    <ListView
-        android:id="@+id/chat_bubbles"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:background="@color/beever_light_blue">
-    </ListView>
+        android:layout_height="match_parent"
+        android:text="Chat here" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:padding="16dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_gravity="bottom">
 
         <EditText
             android:layout_height="wrap_content"
@@ -70,4 +38,4 @@
 
     </RelativeLayout>
 
-</LinearLayout>
+</FrameLayout>

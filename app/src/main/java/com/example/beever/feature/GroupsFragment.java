@@ -29,29 +29,34 @@ import com.example.beever.admin.MainActivity;
 import com.example.beever.navigation.NavigationDrawer;
 import com.example.beever.navigation.SpaceItem;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 
 public class GroupsFragment extends Fragment {
 
+    private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
+
     ArrayList<Integer> grpImages = new ArrayList<>();
     ArrayList<String> grpIds = new ArrayList<>();
+
     //Get grpIds and grpImages from Firebase, and append it here iteratively
     //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
     int addGrpBtnImg = R.drawable.ic_baseline_add_24;
     String addGrpBtnText = "Add group...";
     {
         grpImages.add(addGrpBtnImg);
-//        grpImages.add(R.drawable.profile);
-//        grpImages.add(R.drawable.beever_logo);
-//        grpImages.add(R.drawable.beever_logo_blue);
-//        grpImages.add(R.drawable.beever_logo_only);
+        grpImages.add(R.drawable.profile);
+        grpImages.add(R.drawable.beever_logo);
+        grpImages.add(R.drawable.beever_logo_blue);
+        grpImages.add(R.drawable.beever_logo_only);
 
         grpIds.add(addGrpBtnText);
-//        grpIds.add("Test 1");
-//        grpIds.add("Test 2");
-//        grpIds.add("Test 3");
-//        grpIds.add("Test 4");
+        grpIds.add("Test 1");
+        grpIds.add("Test 2");
+        grpIds.add("Test 3");
+        grpIds.add("Test 4");
     }
 
     @Override
@@ -59,7 +64,9 @@ public class GroupsFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         //Inflate the layout for this fragment
-        ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Chats");
+        ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Groups");
+
+        String userId = fAuth.getCurrentUser().getUid();
 
         //Fade in Nav Bar
         View bottom_menu = getActivity().findViewById(R.id.bottom_menu);
@@ -171,10 +178,10 @@ public class GroupsFragment extends Fragment {
                         utils.fadeOut();
 
                         //Go to ChatFragment
-                        ChatFragment chatFragment = new ChatFragment();
-                        chatFragment.setArguments(bundle);
+                        IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
+                        indivGroupFragment.setArguments(bundle);
                         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.fragment_container, chatFragment, "openChat").addToBackStack(null).commit();
+                        transaction.replace(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack(null).commit();
                     }
                 });
             }
