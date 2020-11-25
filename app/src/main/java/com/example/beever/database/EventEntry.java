@@ -25,10 +25,10 @@ public class EventEntry implements EventTodoEntry {
     }
 
     public EventEntry(String name, String description, Timestamp start_time, Timestamp end_time){
-        this.name = name;
-        this.description = description;
-        this.start_time = start_time;
-        this.end_time = end_time;
+        setName(name);
+        setDescription(description);
+        setStart_time(start_time);
+        setEnd_time(end_time);
     }
 
     private void setName(String name){
@@ -76,7 +76,7 @@ public class EventEntry implements EventTodoEntry {
         if (o==this) return true;
         if (!(o instanceof EventEntry)){return false;}
         EventEntry other = (EventEntry) o;
-        return name.equals(other.name) && description.equals(other.description) && start_time.equals(other.start_time) && end_time.equals(other.end_time);
+        return name.equals(other.getName()) && description.equals(other.getDescription()) && start_time.equals(other.getStart_time()) && end_time.equals(other.getEnd_time());
     }
 
     // Print to string, mostly for debugging

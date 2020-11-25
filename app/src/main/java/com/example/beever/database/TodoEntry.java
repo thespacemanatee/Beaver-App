@@ -61,7 +61,7 @@ public class TodoEntry implements EventTodoEntry {
         if (o==this) return true;
         if (!(o instanceof TodoEntry)){return false;}
         TodoEntry other = (TodoEntry) o;
-        return name.equals(other.name) && description.equals(other.description) && assigned_to.equals(other.assigned_to) && deadline.equals(other.deadline);
+        return name.equals(other.getName()) && description.equals(other.getDescription()) && assigned_to.equals(other.getAssigned_to()) && deadline.equals(other.getDeadline());
     }
 
     public String toString(){
