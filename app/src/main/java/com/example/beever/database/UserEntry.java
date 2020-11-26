@@ -29,7 +29,7 @@ public class UserEntry {
     // Store contents of user document as defined in specification
     private static final int DASHBOARD_GRPS = 6;
 
-    private String username = null, name = null, email = null;
+    private String username = null, name = null, email = null, display_picture = null;
     private List<Object> groups, dashboard_grps;
     private Map<String,Object> user_events, todo_list;
 
@@ -38,10 +38,11 @@ public class UserEntry {
         setDashboard_grps(null);
         setUser_events(null);
         setTodo_list(null);
+        setDisplay_picture(null);
     }
 
     // Constructor for user document based on individual elements
-    public UserEntry(String username, String name, String email, List<Object> groups,
+    public UserEntry(String username, String name, String email, String display_picture, List<Object> groups,
                      List<Object> dashboard_grps, Map<String,Object> user_events, Map<String,Object> todo_list){
         setUsername(username);
         setName(name);
@@ -50,6 +51,7 @@ public class UserEntry {
         setDashboard_grps(dashboard_grps);
         setUser_events(user_events);
         setTodo_list(todo_list);
+        setDisplay_picture(display_picture);
     }
 
     private void setUsername(String username){
@@ -99,6 +101,10 @@ public class UserEntry {
         this.todo_list.put("past",new ArrayList<Object>());
     }
 
+    private void setDisplay_picture(String display_picture){
+        this.display_picture = display_picture;
+    }
+
     public String getUsername(){
         return username;
     }
@@ -109,6 +115,10 @@ public class UserEntry {
 
     public String getEmail(){
         return email;
+    }
+
+    public String getDisplay_picture() {
+        return display_picture;
     }
 
     public List<Object> getGroups(){
@@ -195,13 +205,14 @@ public class UserEntry {
     }
 
     public String toString(){
-        return "UserEntry({username=" + username + ",\n"
-                + "name=" + name + ",\n"
-                + "email=" + email + ",\n"
-                + "groups=" + groups.toString() + ",\n"
-                + "dashboard_grps=" + dashboard_grps.toString() + ",\n"
-                + "user_events=" + user_events.toString() + ",\n"
-                + "todo_list=" + todo_list.toString() + "})";
+        return "UserEntry({\n\tusername=" + username + ",\n"
+                + "\tname=" + name + ",\n"
+                + "\temail=" + email + ",\n"
+                + "\tdisplay_picture=" + display_picture + "\n"
+                + "\tgroups=" + groups.toString() + ",\n"
+                + "\tdashboard_grps=" + dashboard_grps.toString() + ",\n"
+                + "\tuser_events=" + user_events.toString() + ",\n"
+                + "\ttodo_list=" + todo_list.toString() + "\n})";
     }
 
     public abstract static class GetUserEntry extends AsyncGetter {

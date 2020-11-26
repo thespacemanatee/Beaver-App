@@ -180,13 +180,13 @@ public class GroupEntry {
     }
 
     public String toString(){
-        return "GroupEntry({name=" + name + ",\n"
-                + "member_list=" + member_list.toString() + ",\n"
-                + "colour=" + colour + ",\n"
-                + "display_picture=" + display_picture + ",\n"
-                + "group_events=" + group_events + ",\n"
-                + "todo_list=" + todo_list.toString() + ",\n"
-                + "chat=" + chat.toString() + "})";
+        return "GroupEntry({\n\tname=" + name + ",\n"
+                + "\tmember_list=" + member_list.toString() + ",\n"
+                + "\tcolour=" + colour + ",\n"
+                + "\tdisplay_picture=" + display_picture + ",\n"
+                + "\tgroup_events=" + group_events.toString() + ",\n"
+                + "\ttodo_list=" + todo_list.toString() + ",\n"
+                + "\tchat=" + chat.toString() + "\n})";
     }
 
     public abstract static class GetGroupEntry extends AsyncGetter {
