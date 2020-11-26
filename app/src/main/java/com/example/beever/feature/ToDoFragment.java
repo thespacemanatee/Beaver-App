@@ -79,6 +79,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         adapter.setDropDownViewResource(R.layout.spinner_dropdown);
         toDoSpinner.setAdapter(adapter);
         toDoSpinner.setOnItemSelectedListener(this);
+
         Log.d(TAG, SPINNER);
 
         // set Linear Layout for RecyclerView To Do List
@@ -109,12 +110,12 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         });
         Log.d(TAG, FAB);
 
-        populateToDoList();
+        populateProjectList();
 
         return rootView;
     }
 
-    private void populateToDoList() {
+    private void populateProjectList() {
         DocumentReference documentReference = fStore.collection("users").document(userID);
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -122,8 +123,11 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot.exists()) {
-                        projectList = (ArrayList<String>) documentSnapshot.get("groups");
-
+                        if (documentSnapshot.get("groups") != null) {
+                            projectList = (ArrayList<String>) documentSnapshot.get("groups");
+                        } else {
+                            Toast.makeText(getContext(), "No Groups Found :(", Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
             }
@@ -159,8 +163,45 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     public void onNothingSelected(AdapterView<?> parent) {
     }
 
-    private void addNewToDo() {
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "ON START");
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "ON PAUSE");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "ON STOP");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "ON DESTROYVIEW");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "ON DESTROY");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d(TAG, "ON DETACH");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "ON RESUME");
+    }
 }
