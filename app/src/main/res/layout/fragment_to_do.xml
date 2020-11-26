@@ -19,7 +19,7 @@
             android:textColor="@color/beever_blue"
             android:text="@string/project"
             android:textStyle="bold"
-            android:fontFamily="@font/poppins"
+            android:fontFamily="@font/poppins_bold"
             android:layout_marginStart="36dp"
             android:layout_marginEnd="5dp"
             android:layout_marginTop="10dp" />

@@ -40,6 +40,7 @@ public class CalendarFragment extends Fragment {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_calendar, container, false);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Calendar");
+        list.clear();
         list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
         list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
         list.add(new Events(Events.TEXT_TYPE,0,"Hello"));

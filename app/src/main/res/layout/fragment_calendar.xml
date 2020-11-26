@@ -23,6 +23,7 @@
         android:textSize="30dp"
         android:gravity="center"
         android:textColor="@color/beever_blue"
+        android:fontFamily="@font/poppins_bold"
         android:textStyle="bold"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
