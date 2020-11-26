@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".feature.ChatFragment">
+    tools:context=".feature.ChatFragment"
+    android:orientation="vertical">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ListView
+        android:id="@+id/bubbles_area"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Chat here" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@null"
+        android:dividerHeight="8dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:padding="16dp"
         android:orientation="horizontal"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        android:background="@color/white">
 
         <EditText
             android:layout_height="wrap_content"
@@ -38,4 +45,4 @@
 
     </RelativeLayout>
 
-</FrameLayout>
+</LinearLayout>
