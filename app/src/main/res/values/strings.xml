@@ -50,5 +50,12 @@
     <string name="group_fragment">Groups</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="to_do">To-Do</string>
+    <string name="project">Project:</string>
+    <string name="archived">Archived</string>
     <string name="email_address_hint">Email Address</string>
+    <string name="add_a_to_do">Add a To-Do</string>
+    <string name="task">Task</string>
+    <string name="add_due_date">Add Due Date</string>
+    <string name="edit_to_do">Edit To-Do</string>
 </resources>
