@@ -33,10 +33,16 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -44,16 +50,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MyProfileFragment extends Fragment {
 
     //Create variables for each element
-    private TextInputLayout name, email, password;
+    private TextInputLayout name, email;
     private TextView usernameLabel, nameLabel;
     private CircularProgressButton update;
     private CircleImageView profilePic;
     private SharedPreferences mSharedPref;
 
     //Global variables to hold user data inside this activity
-    private static String _USERNAME,_NAME,_EMAIL,_PASSWORD;
-    private final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+    private static String _USERNAME,_NAME,_EMAIL;
+    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
+    private FirebaseUser fUser;
+    private String userID;
     private final String TAG = "Logcat";
 
     @Override
@@ -74,12 +82,12 @@ public class MyProfileFragment extends Fragment {
         nameLabel = root.findViewById(R.id.name_label);
         name = root.findViewById(R.id.name_field);
         email = root.findViewById(R.id.email_field);
-        password = root.findViewById(R.id.password_field);
         update = root.findViewById(R.id.update_button);
         profilePic = root.findViewById(R.id.profile_image);
         FloatingActionButton toOnBoarding = root.findViewById(R.id.to_onboarding);
 
-        FirebaseUser fUser = fAuth.getCurrentUser();
+        fUser = fAuth.getCurrentUser();
+        userID = fUser.getUid();
         if (fUser.getPhotoUrl() != null) {
             Glide.with(getActivity()).load(fUser.getPhotoUrl()).into(profilePic);
         }
@@ -107,10 +115,9 @@ public class MyProfileFragment extends Fragment {
                 update.startAnimation();
 
                 //Call each method to check if user inputs are different from existing values and if not, set them to new values
-                if (isNameChanged() || isPasswordChanged() || isEmailChanged()) {
+                if (isNameChanged()) {
 
                     update.revertAnimation();
-                    Toast.makeText(getActivity(), "Updated Successfully", Toast.LENGTH_SHORT).show();
 
                 } else {
 
@@ -175,76 +182,75 @@ public class MyProfileFragment extends Fragment {
         nameLabel.setText(_NAME);
         name.getEditText().setText(_NAME);
         email.getEditText().setText(_EMAIL);
-        password.getEditText().setText(_PASSWORD);
     }
 
-    private boolean isEmailChanged() {
+//    private boolean isEmailChanged() {
+//
+//        if (!_EMAIL.equals(email.getEditText().getText().toString())) {
+//            String newEmail = email.getEditText().getText().toString();
+//            String validEmail = "[a-zA-z0-9._-]+@[a-z]+\\.+[a-z]+";
+//            if (newEmail.isEmpty()) {
+//                email.setError("Field cannot be empty");
+//                return false;
+//            } else if (!newEmail.matches(validEmail)) {
+//                email.setError("Invalid email address");
+//                return false;
+//
+//            } else {
+//                email.setError(null);
+//                email.setErrorEnabled(false);
+//                reference.child(_USERNAME).child("email").setValue(newEmail);
+//                _EMAIL = newEmail;
+//                SharedPreferences.Editor editor = mSharedPref.edit();
+//                editor.putString("registeredEmail", newEmail);
+//                editor.apply();
+//                return true;
+//            }
+//
+//        } else {
+//            return false;
+//        }
+//    }
 
-        if (!_EMAIL.equals(email.getEditText().getText().toString())) {
-            String newEmail = email.getEditText().getText().toString();
-            String validEmail = "[a-zA-z0-9._-]+@[a-z]+\\.+[a-z]+";
-            if (newEmail.isEmpty()) {
-                email.setError("Field cannot be empty");
-                return false;
-            } else if (!newEmail.matches(validEmail)) {
-                email.setError("Invalid email address");
-                return false;
-
-            } else {
-                email.setError(null);
-                email.setErrorEnabled(false);
-                reference.child(_USERNAME).child("email").setValue(newEmail);
-                _EMAIL = newEmail;
-                SharedPreferences.Editor editor = mSharedPref.edit();
-                editor.putString("registeredEmail", newEmail);
-                editor.apply();
-                return true;
-            }
-
-        } else {
-            return false;
-        }
-    }
-
-    private boolean isPasswordChanged() {
-
-        if (!_PASSWORD.equals(password.getEditText().getText().toString())) {
-            String newPassword = password.getEditText().getText().toString();
-            String validPassword = "^" +
-//                "(?=.*[0-9])" +          //at least 1 digit
-//                "(?=.*[a-z])" +          //at least 1 lower case letter
-//                "(?=.*[A-Z])" +          //at least 1 upper case letter
-                    "(?=.*[a-zA-Z])" +         //any letter
-                    "(?=.*[@#$%^&+=])" +       //at least 1 special character
-                    ".{4,}" +                  //at least 4 characters
-                    "$";
-            if (newPassword.isEmpty()) {
-                password.setError("Field cannot be empty");
-                return false;
-
-            } else if (newPassword.contains(" ")) {
-                password.setError("Spaces not allowed in password");
-                return false;
-
-            } else if (!newPassword.matches(validPassword)) {
-                password.setError("Password is too weak");
-                return false;
-
-            } else {
-                password.setError(null);
-                password.setErrorEnabled(false);
-                reference.child(_USERNAME).child("password").setValue(newPassword);
-                _PASSWORD = newPassword;
-                SharedPreferences.Editor editor = mSharedPref.edit();
-                editor.putString("registeredPassword", newPassword);
-                editor.apply();
-                return true;
-            }
-
-        } else {
-            return false;
-        }
-    }
+//    private boolean isPasswordChanged() {
+//
+//        if (!_PASSWORD.equals(password.getEditText().getText().toString())) {
+//            String newPassword = password.getEditText().getText().toString();
+//            String validPassword = "^" +
+////                "(?=.*[0-9])" +          //at least 1 digit
+////                "(?=.*[a-z])" +          //at least 1 lower case letter
+////                "(?=.*[A-Z])" +          //at least 1 upper case letter
+//                    "(?=.*[a-zA-Z])" +         //any letter
+//                    "(?=.*[@#$%^&+=])" +       //at least 1 special character
+//                    ".{4,}" +                  //at least 4 characters
+//                    "$";
+//            if (newPassword.isEmpty()) {
+//                password.setError("Field cannot be empty");
+//                return false;
+//
+//            } else if (newPassword.contains(" ")) {
+//                password.setError("Spaces not allowed in password");
+//                return false;
+//
+//            } else if (!newPassword.matches(validPassword)) {
+//                password.setError("Password is too weak");
+//                return false;
+//
+//            } else {
+//                password.setError(null);
+//                password.setErrorEnabled(false);
+//                reference.child(_USERNAME).child("password").setValue(newPassword);
+//                _PASSWORD = newPassword;
+//                SharedPreferences.Editor editor = mSharedPref.edit();
+//                editor.putString("registeredPassword", newPassword);
+//                editor.apply();
+//                return true;
+//            }
+//
+//        } else {
+//            return false;
+//        }
+//    }
 
     private boolean isNameChanged() {
 
@@ -256,7 +262,26 @@ public class MyProfileFragment extends Fragment {
             } else {
                 name.setError(null);
                 name.setErrorEnabled(false);
-                reference.child(_USERNAME).child("name").setValue(newName);
+                Map<String, Object> map = new HashMap<>();
+                map.put("name", newName);
+                DocumentReference documentReference = fStore.collection("users").document(userID);
+                documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+
+                            if (document.exists()) {
+                                documentReference.set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(getActivity(), "Name changed successfully!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
                 _NAME = newName;
                 SharedPreferences.Editor editor = mSharedPref.edit();
                 editor.putString("registeredName", newName);
