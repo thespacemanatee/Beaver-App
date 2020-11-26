@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -20,6 +21,7 @@ import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import android.util.Log;
+import android.widget.CalendarView;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
@@ -67,6 +69,14 @@ public class CalendarFragment extends Fragment {
                 Fragment addEventFragment = new AddEventFragment();
                 System.out.println("click");
                 getFragmentManager().beginTransaction().replace(R.id.fragment_container, addEventFragment).addToBackStack(null).commit();
+            }
+        });
+
+        CalendarView calendarView = root.findViewById(R.id.calendar_view);
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener(){
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+
             }
         });
 
