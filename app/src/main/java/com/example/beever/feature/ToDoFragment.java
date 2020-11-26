@@ -144,12 +144,16 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot.exists()) {
-                        map = (Map<String, Object>) documentSnapshot.get("todo_list");
-                        for (Map.Entry<String, Object> entry: map.entrySet()) {
-                            if (entry.getKey().equals("current")) {
+                        if (documentSnapshot.get("tod0_list") != null) {
+                            map = (Map<String, Object>) documentSnapshot.get("todo_list");
+                            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                                if (entry.getKey().equals("current")) {
 //                                toDoList = entry.getValue();
 
+                                }
                             }
+                        } else {
+                            Toast.makeText(getContext(), "You have no todos!", Toast.LENGTH_LONG).show();
                         }
 
                     }
