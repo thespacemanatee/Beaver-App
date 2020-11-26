@@ -401,8 +401,8 @@ public class UserEntry {
         public abstract void onPostExecute();
     }
 
-    public abstract static class GetUserRelevantTodos extends AsyncGetter {
-        private static final String LOG_NAME = "UserEntry.GetUserRelevantTodos";
+    public abstract static class GetUserRelevantTodo extends AsyncGetter {
+        private static final String LOG_NAME = "UserEntry.GetUserRelevantTodo";
         private static final int SLEEP_INCREMENT = 10;
         private ArrayList<TodoEntry> result = null;
 
@@ -411,7 +411,7 @@ public class UserEntry {
         private boolean getCurrent, getPast;
         private String userId;
 
-        public GetUserRelevantTodos(UserEntry userEntry,Integer timeout,boolean getCurrent,boolean getPast,String userId){
+        public GetUserRelevantTodo(UserEntry userEntry,Integer timeout,boolean getCurrent,boolean getPast,String userId){
             this.userEntry = userEntry;
             this.timeout = timeout;
             this.getCurrent = getCurrent;

@@ -62,13 +62,13 @@ public class ExperimentalGapFinderFragment extends Fragment {
                             infoDisplay.setText("Failed0");
                             return;
                         }
-                        UserEntry.GetUserRelevantEvents getUserRelevantEvents = new UserEntry.GetUserRelevantEvents(getResult(),5000,true,true) {
+                        UserEntry.GetUserRelevantTodo getUserRelevantTodos = new UserEntry.GetUserRelevantTodo(getResult(),5000,true,true,queryUserId) {
                             @Override
                             public void onPostExecute() {
                                 infoDisplay.setText(isSuccessful()? getResult().toString():"Failed1");
                             }
                         };
-                        getUserRelevantEvents.start();
+                        getUserRelevantTodos.start();
                     }
                 };
                 getUserEntry.start();
