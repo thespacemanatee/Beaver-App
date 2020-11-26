@@ -15,4 +15,5 @@
     <color name="beever_blue_transparent">#AA587291</color>
     <color name="beever_dark_blue">#585481</color>
     <color name="beever_dark_blue_transparent">#AA585481</color>
+    <color name="grey">#E5E5E5</color>
 </resources>
