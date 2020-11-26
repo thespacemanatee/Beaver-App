@@ -20,6 +20,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,8 +43,9 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected FloatingActionButton toDoAddButton;
     protected ExpandableListView toDoArchivedListView;
     protected ExpandableListAdapter toDoArchivedAdapter;
-    protected Button toDoButton;
-    protected CheckBox toDoCheckBox;
+
+    private FirebaseAuth fAuth = FirebaseAuth.getInstance();
+    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
 
     protected static List<String> ARCHIVED = new ArrayList<>();
     protected static List<String> archivedList = new ArrayList<>();
@@ -50,52 +54,15 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected static ArrayList<String> projectList = new ArrayList<>();
     protected int scrollPosition = 0;
 
-    /**
-     * initialise to do list with items (of type String) from firebase
-     */
-    private void initToDoList() {
-        // TODO: get to do list from firebase
-        for (int i = 0; i < 20; i++) {
-            toDoList.add("This is task number " + String.valueOf(i) + "\nThis is the DueDate");
-        }
-    }
-
-    /**
-     * initialise project list with items (of type String) from firebase
-     */
-    private void initProjectList() {
-        // TODO: get project list from firebase
-        projectList.add("50.001 1D");
-        projectList.add("50.002 1D");
-        projectList.add("50.004 2D");
-    }
-
-    /**
-     * initialise archived list with items (of type String) from firebase
-     */
-    private void initArchivedList() {
-        // TODO: get archived list from firebase
-        ARCHIVED.add("Archived");
-        archivedList.add("Hello World");
-        archivedList.add("This is Done");
-        archivedList.add("This is Archived");
-        for (int i = 0; i < 10; i++) {
-            archivedList.add("Done Task " + i);
-        }
-        expandableListDetail.put(ARCHIVED.get(0), archivedList);
-    }
-
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
+
+        FirebaseUser fUser = fAuth.getCurrentUser();
+
         View rootView = layoutInflater.inflate(R.layout.fragment_to_do, viewGroup, false);
         rootView.setTag(TAG);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("To-Do");
-
-        // initialise to-do and project list from firebase
-        initToDoList();
-        initProjectList();
-        initArchivedList();
 
         // setting Spinner to select Project
         toDoSpinner = rootView.findViewById(R.id.toDoSpinner);
@@ -143,6 +110,10 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+    }
+
+    private void addNewToDo() {
+
     }
 
 }

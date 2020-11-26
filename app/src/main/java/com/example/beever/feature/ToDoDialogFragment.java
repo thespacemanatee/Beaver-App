@@ -20,10 +20,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.beever.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class ToDoDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener{
@@ -38,9 +43,15 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected int year, month, day;
     protected List<String> groupMembers = new ArrayList<>();
 
+    private FirebaseAuth fAuth = FirebaseAuth.getInstance();
+    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+
     protected String assignedTo;
     protected String taskDetails;
     protected String dueDate;
+    protected String TASK_KEY = "taskDetails";
+    protected String ASSIGNED_KEY = "assignedTo";
+    protected String DUE_DATE_KEY = "dueDate";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +72,8 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setIcon(R.drawable.list);
+
+        FirebaseUser fUser = fAuth.getCurrentUser();
 
         // setting the spinner for assigning to group members
         ArrayAdapter<String> adapter = new ArrayAdapter<>(parentView.getContext(), R.layout.spinner_item_dialog, groupMembers);
@@ -96,8 +109,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
                     if (dueDate.isEmpty() || taskDetails.isEmpty() || assignedTo.isEmpty()) {
                         Toast.makeText(getContext(), "All fields must be filled in!", Toast.LENGTH_SHORT).show();
                     } else {
-                        ToDoFragment.toDoList.add(taskDetails + "\n" + assignedTo + "\t\t" + dueDate);
-                        Toast.makeText(getContext(), "To-Do successfully added", Toast.LENGTH_SHORT).show();
+                        addNewToDo(taskDetails, assignedTo, dueDate);
                     }
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
@@ -124,5 +136,14 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    private void addNewToDo(String taskDetails, String assignedTo, String dueDate) {
+        Map<String, String> newToDo = new HashMap<>();
+        newToDo.put(TASK_KEY, taskDetails);
+        newToDo.put(ASSIGNED_KEY, assignedTo);
+        newToDo.put(DUE_DATE_KEY, dueDate);
+        // TODO
+        fStore.collection("groups").document("??").set(newToDo);
     }
 }
