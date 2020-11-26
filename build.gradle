@@ -32,9 +32,13 @@ allprojects {
                     password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
                 }
             }
+            maven {
+                url 'https://jitpack.io'
+            }
         }
     }
 }
+
 
 task clean(type: Delete) {
     delete rootProject.buildDir
