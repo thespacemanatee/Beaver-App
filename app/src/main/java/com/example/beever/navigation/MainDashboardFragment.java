@@ -58,7 +58,7 @@ public class MainDashboardFragment extends Fragment {
 
                     case R.id.bottom_menu_todo:
                         //fragment = new ToDoFragment();
-                        fragment = new ExperimentalGapFinderFragment();
+                        fragment = new ToDoFragment();
                         break;
                 }
 
