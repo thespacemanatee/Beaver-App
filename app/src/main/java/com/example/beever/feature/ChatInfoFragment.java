@@ -1,7 +1,9 @@
 package com.example.beever.feature;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,8 +16,12 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,57 +48,97 @@ public class ChatInfoFragment extends Fragment {
         int selectedGrpImg = bundle.getInt("selectedGrpImg");
         String selectedGrpId = bundle.getString("selectedGrpId");
 
-        //Get chat_info_id in fragment_chat_info.xml and setText
-        TextView chatId = rootView.findViewById(R.id.chat_info_id);
-        chatId.setText(selectedGrpId);
-
         //Get chat_info_img in fragment_chat_info.xml and setImageResource
         ShapeableImageView chatImg = rootView.findViewById(R.id.chat_info_img);
         chatImg.setImageResource(selectedGrpImg);
 
-        //Set ViewPager
-        ViewPager2 viewPager = rootView.findViewById(R.id.chat_info_swipe);
-        viewPager.setAdapter(new ChatInfoStateAdapter(this));
-
-        //Set Tabs
-        ArrayList<Integer> tabTitles = new ArrayList<>();
-        tabTitles.add(R.string.chat_info_media);
-        tabTitles.add(R.string.chat_info_files);
-        tabTitles.add(R.string.chat_info_links);
-        TabLayout tabLayout = rootView.findViewById(R.id.chat_info_tabs);
-        new TabLayoutMediator(tabLayout, viewPager,
-                (tab, position) -> tab.setText(tabTitles.get(position))
-        ).attach();
+        //Set the group members names
+        ListView layout = rootView.findViewById(R.id.chat_info_group_members);
+        layout.setScrollContainer(false);
+        layout.setAdapter(new GroupMemberAdapter(getActivity()));
 
         return rootView;
 
     }
 
-    class ChatInfoStateAdapter extends FragmentStateAdapter {
+    ArrayList<String> grpMembers = new ArrayList<>();
+    ArrayList<Integer> grpMemberImg = new ArrayList<>();
+    {
+        grpMembers.add("Claudia");
+        grpMembers.add("Claudia");
+        grpMembers.add("Claudia");
+        grpMembers.add("Claudia");
+        grpMembers.add("Claudia");
 
-        public ChatInfoStateAdapter(@NonNull Fragment fragment) {
-            super(fragment);
+        grpMemberImg.add(R.drawable.pink_circle);
+        grpMemberImg.add(R.drawable.pink_circle);
+        grpMemberImg.add(R.drawable.pink_circle);
+        grpMemberImg.add(R.drawable.pink_circle);
+        grpMemberImg.add(R.drawable.pink_circle);
+    }
+
+    class GroupMemberAdapter extends BaseAdapter {
+
+        LayoutInflater gridInflater;
+        GroupMemberAdapter(Context c) {
+            gridInflater = LayoutInflater.from(c);
         }
 
-        @NonNull
         @Override
-        public Fragment createFragment(int position) {
-            if (position == 0) {
-                ChatInfoMediaFragment media = new ChatInfoMediaFragment();
-                return media;
-            } else if (position == 1) {
-                ChatInfoFilesFragment files = new ChatInfoFilesFragment();
-                return files;
+        public int getCount() { return grpMembers.size(); }
+
+        @Override
+        public Object getItem(int i) {
+            return i;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        //To reduce reloading of same layout
+        class GrpMemberViewHolder {
+            ShapeableImageView memberImg;
+            TextView member;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+
+            //ViewHolder for smoother scrolling
+            GrpMemberViewHolder viewHolder;
+
+            if (view == null) {
+                //If view (View to populate GridView cells) not loaded before,
+                //create new ViewHolder to hold view
+                viewHolder = new GrpMemberViewHolder();
+
+                //Inflate the layout for GridView cells (created as a Fragment)
+                view = gridInflater.inflate(R.layout.group_member_item, null);
+
+                //Get ImageButton and TextView to populate
+                viewHolder.memberImg = view.findViewById(R.id.grp_member_img);
+                viewHolder.member = view.findViewById(R.id.grp_member);
+
+                //Tag to reference
+                view.setTag(viewHolder);
+
             } else {
-                ChatInfoLinksFragment links = new ChatInfoLinksFragment();
-                return links;
+                //If view loaded before, get view's tag and cast to ViewHolder
+                viewHolder = (GrpMemberViewHolder)view.getTag();
             }
 
+            //Set variables to allow multiple access of same image and text
+            int selectedMemberImg = grpMemberImg.get(i);
+            String selectedMember = grpMembers.get(i);
+
+            //setImageResource for ImageButton and setText for TextView
+            viewHolder.memberImg.setImageResource(selectedMemberImg);
+            viewHolder.member.setText(selectedMember);
+
+            return view;
         }
 
-        @Override
-        public int getItemCount() {
-            return 3;
-        }
     }
 }
