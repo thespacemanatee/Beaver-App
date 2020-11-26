@@ -1,10 +1,15 @@
 package com.example.beever.feature;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.OrientationHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +19,10 @@ import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.shrikanthravi.collapsiblecalendarview.data.Day;
-import com.shrikanthravi.collapsiblecalendarview.widget.CollapsibleCalendar;
 import android.util.Log;
+import android.widget.LinearLayout;
+
+import java.util.ArrayList;
 
 
 public class CalendarFragment extends Fragment {
@@ -30,6 +36,29 @@ public class CalendarFragment extends Fragment {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_calendar, container, false);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Calendar");
+
+        ArrayList<Events> list = new ArrayList<>();
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
+
+        TextEventAdapter adapter = new TextEventAdapter(list, getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
+        RecyclerView mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(adapter);
 
         addEvent = root.findViewById(R.id.addEvent);
         addEvent.setOnClickListener(new View.OnClickListener() {
