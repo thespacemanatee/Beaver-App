@@ -13,7 +13,16 @@
     <CalendarView
         android:id="@+id/calendar_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="300dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="EVENTS"
+        android:textSize="30dp"
+        android:gravity="center"
+        android:textColor="@color/beever_blue"
+        android:textStyle="bold"/>
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
