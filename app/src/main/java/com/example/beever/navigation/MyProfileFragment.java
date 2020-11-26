@@ -115,12 +115,7 @@ public class MyProfileFragment extends Fragment {
                 update.startAnimation();
 
                 //Call each method to check if user inputs are different from existing values and if not, set them to new values
-                if (isNameChanged()) {
-
-                    update.revertAnimation();
-
-                } else {
-
+                if (!isNameChanged()) {
                     update.revertAnimation();
                     Toast.makeText(getActivity(), "Please enter a different value", Toast.LENGTH_SHORT).show();
                 }
@@ -165,7 +160,6 @@ public class MyProfileFragment extends Fragment {
                         if (task.isSuccessful()) {
                             Glide.with(getActivity()).load(imageUri).into(profilePic);
                             Glide.with(getActivity()).load(imageUri).into((CircleImageView) getActivity().findViewById(R.id.profile_nav));
-                            update.revertAnimation();
                             Log.d(TAG, "User profile updated.");
                             Toast.makeText(getActivity(), "Updated profile image", Toast.LENGTH_SHORT).show();
                         } else {
@@ -272,9 +266,12 @@ public class MyProfileFragment extends Fragment {
                             DocumentSnapshot document = task.getResult();
 
                             if (document.exists()) {
-                                documentReference.set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                documentReference.update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
+                                        SharedPreferences.Editor editor = mSharedPref.edit();
+                                        editor.putString("registeredName", newName);
+                                        update.revertAnimation();
                                         Toast.makeText(getActivity(), "Name changed successfully!", Toast.LENGTH_SHORT).show();
                                     }
                                 });
