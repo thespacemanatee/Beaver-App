@@ -43,7 +43,7 @@ public class GroupsFragment extends Fragment {
 
     //Get grpIds and grpImages from Firebase, and append it here iteratively
     //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
-    int addGrpBtnImg = R.drawable.ic_baseline_add_24;
+    int addGrpBtnImg = R.drawable.ic_baseline_add_40;
     String addGrpBtnText = "Add group...";
     {
         grpImages.add(addGrpBtnImg);
