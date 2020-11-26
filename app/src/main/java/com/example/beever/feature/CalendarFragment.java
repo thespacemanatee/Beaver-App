@@ -30,6 +30,8 @@ import java.util.ArrayList;
 public class CalendarFragment extends Fragment {
     FloatingActionButton addEvent;
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
+    ArrayList<Events> list = new ArrayList<>();
+    private final String[] months = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,8 +40,6 @@ public class CalendarFragment extends Fragment {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_calendar, container, false);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Calendar");
-
-        ArrayList<Events> list = new ArrayList<>();
         list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
         list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
         list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
@@ -76,7 +76,14 @@ public class CalendarFragment extends Fragment {
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener(){
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-
+                list.clear();
+                list.add(new Events(Events.TEXT_TYPE,0,"Event for " + dayOfMonth + " " + months[month] + " " + year));
+                TextEventAdapter adapter = new TextEventAdapter(list, getContext());
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
+                RecyclerView mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
+                mRecyclerView.setLayoutManager(linearLayoutManager);
+                mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+                mRecyclerView.setAdapter(adapter);
             }
         });
 

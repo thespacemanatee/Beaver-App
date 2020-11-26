@@ -52,7 +52,6 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
         if (object != null){
             ((TextEventViewHolder) holder).textView.setText(object.text);
         }
-
     }
 
     @Override
