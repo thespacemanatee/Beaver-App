@@ -7,12 +7,34 @@ import com.google.firebase.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class to represent chat entries in the Firestore database.
+ * This class is partly for auto-generation via UserEntry.class and GroupEntry.class.
+ *
+ * Chat entries follow this contract, the ChatEntry contract, in Firestore:
+ * - [Event number in array]: Map<Object>
+ *    - sender: String
+ *    - message: String (nullable)
+ *    - attachment: String (nullable)
+ *    - end_time: Timestamp
+ *
+ * To create an instance of this class manually, use only the 3rd constructor.
+ **/
 public class ChatEntry {
     private String sender = null, message = null, attachment = null;
     private Timestamp time = null;
 
+    /**
+     * No-arg constructor for debugging
+     */
     public ChatEntry(){}
 
+    /**
+     * Constructor to create an ChatEntry from a Map<String,Object>, usually to extract
+     * ChatEntry objects from existing UserEntry/GroupEntry objects. If passed Object is not
+     * a Map, behaviour is mostly the same as the no-arg constructor.
+     * @param o object to convert to EventEntry, must be a Map
+     */
     public ChatEntry(Object o){
         if (!(o instanceof Map)) {
             Log.d("ChatEntry creation","Passed object is not a Map");
@@ -25,6 +47,13 @@ public class ChatEntry {
         setTime((Timestamp) map.get("time"));
     }
 
+    /**
+     * Constructor for manually generating ChatEntry
+     * @param sender sender's user ID
+     * @param message message if any, or null
+     * @param attachment attachment URL if any, or null
+     * @param time time at which message was sent
+     */
     public ChatEntry(String sender, String message, String attachment, Timestamp time){
         setSender(sender);
         setMessage(message);
@@ -32,21 +61,25 @@ public class ChatEntry {
         setTime(time);
     }
 
-    private void setSender(String name){
+    // Setters
+
+    public void setSender(String name){
         this.sender = sender;
     }
 
-    private void setMessage(String message){
+    public void setMessage(String message){
         this.message = message;
     }
 
-    private void setAttachment(String attachment){
+    public void setAttachment(String attachment){
         this.attachment = attachment;
     }
 
-    private void setTime(Timestamp time){
+    public void setTime(Timestamp time){
         this.time = time;
     }
+
+    // Getters
 
     public String getSender(){
         return sender;
@@ -64,6 +97,11 @@ public class ChatEntry {
         return time;
     }
 
+    /**
+     * Get equivalent Map object representation which obeys ChatEntry contract,
+     * for addition to UserEntry/GroupEntry
+     * @return Map object representation
+     */
     public Map<String, Object> getRepresentation(){
         HashMap<String, Object> ret = new HashMap<String, Object>();
         ret.put("sender", sender);
@@ -73,14 +111,22 @@ public class ChatEntry {
         return ret;
     }
 
+    /**
+     * Check if this ChatEntry object equals another object
+     * @param o object to check equality with
+     * @return boolean for whether this object equals the other object
+     */
     public boolean equals(Object o){
         if (o==this) return true;
         if (!(o instanceof ChatEntry)){return false;}
         ChatEntry other = (ChatEntry) o;
-        return sender.equals(other.getSender()) && message.equals(other.getMessage()) && attachment.equals(other.getAttachment()) && time.equals(other.getTime());
+        return getRepresentation().equals(other.getRepresentation());
     }
 
-    // Print to string, mostly for debugging
+    /**
+     * Get string representation of this ChatEntry
+     * @return string representation
+     */
     public String toString(){
         return "EventEntry({sender=" + sender + ",\n"
                 + "message=" + message + ",\n"

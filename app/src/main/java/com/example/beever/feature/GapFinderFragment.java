@@ -55,13 +55,13 @@ public class GapFinderFragment extends Fragment {
                             infoDisplay.setText("Failed0");
                             return;
                         }
-                        UserEntry.GetUserRelevantTodo getUserRelevantTodo = new UserEntry.GetUserRelevantTodo(getResult(),5000,true,true,queryUserId) {
+                        UserEntry.GetUserRelevantTodos getUserRelevantTodos = new UserEntry.GetUserRelevantTodos(getResult(),5000,true,true,queryUserId) {
                             @Override
                             public void onPostExecute() {
                                 infoDisplay.setText(isSuccessful()? getResult().toString():"Failed1");
                             }
                         };
-                        getUserRelevantTodo.start();
+                        getUserRelevantTodos.start();
                     }
                 };
                 getUserEntry.start();
@@ -78,22 +78,17 @@ public class GapFinderFragment extends Fragment {
                     Toast.makeText(getActivity(), "Please enter a group id.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(queryGroupId,5000){
-                    public void onPostExecute(){
-                        if (!isSuccessful()){
-                            infoDisplay.setText("Failed0");
-                            return;
-                        }
-                        GroupEntry.GetGroupRelevantEvents getGroupRelevantEvents = new GroupEntry.GetGroupRelevantEvents(getResult(),5000) {
-                            @Override
-                            public void onPostExecute() {
-                                infoDisplay.setText(isSuccessful()? getResult().toString():"Failed1");
-                            }
-                        };
-                        getGroupRelevantEvents.start();
+                GroupEntry.GroupEntryListener groupEntryListener = new GroupEntry.GroupEntryListener(queryGroupId,5000) {
+                    public void onPreListening(){
+                        infoDisplay.setText(exists()? "Initial retrieval success" : "InitFail");
+                    }
+
+                    @Override
+                    public void onListenerUpdate() {
+                        infoDisplay.setText(exists()? getStateChange().toString() : "Failed");
                     }
                 };
-                getGroupEntry.start();
+                groupEntryListener.start();
 
             }
         });
