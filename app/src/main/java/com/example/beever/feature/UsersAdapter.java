@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
 import com.example.beever.admin.UserHelperClass;
+import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 
@@ -68,5 +69,23 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return users.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    public void remove(int position) {
+        if (position < 0 || position >= users.size()) {
+            return;
+        }
+        users.remove(position);
+        notifyItemRemoved(position);
     }
 }

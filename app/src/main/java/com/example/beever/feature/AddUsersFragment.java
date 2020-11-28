@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,12 +28,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,13 +59,14 @@ public class AddUsersFragment extends Fragment {
     private Uri imageUri;
     private TextInputEditText addUsers;
     private ShapeableImageView chatImg;
-    private CircularProgressButton addUsersBtn;
+    private CircularProgressButton addUsersBtn, confirmUsersBtn;
     private UsersAdapter adapter;
     private String groupImage;
     private String groupName;
     private String groupID;
     private List<Map<String, Object>> users;
     private ArrayList<UserHelperClass> adaptedUsers = new ArrayList<>();
+    private RecyclerView mRecyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,7 +75,6 @@ public class AddUsersFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_add_users, container, false);
         mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
-        userID = fAuth.getCurrentUser().getUid();
 
         Bundle bundle = this.getArguments();
         groupImage = bundle.getString("imageUri");
@@ -78,16 +85,21 @@ public class AddUsersFragment extends Fragment {
         chatImg = rootView.findViewById(R.id.chat_img);
         addUsers = rootView.findViewById(R.id.addUsers);
         addUsersBtn = rootView.findViewById(R.id.addUsersBtn);
-
-        populateRecyclerView();
+        confirmUsersBtn = rootView.findViewById(R.id.confirm_users);
 
         Glide.with(getActivity()).load(imageUri).into(chatImg);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle(groupName);
 
+        UserHelperClass user = new UserHelperClass(mSharedPref.getString("registeredName", ""),
+                mSharedPref.getString("registeredEmail", ""),
+                fAuth.getCurrentUser().getUid());
+        adaptedUsers.add(user);
+
         addUsersBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addUsersBtn.startAnimation();
                 String user = addUsers.getText().toString();
                 if (!user.isEmpty()) {
                     addUserToGroup(user);
@@ -95,74 +107,130 @@ public class AddUsersFragment extends Fragment {
             }
         });
 
+        confirmUsersBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmUsersBtn.startAnimation();
+                Bundle bundle = new Bundle();
+                bundle.putString("selectedGrpId", groupID);
+                //Go to Individual Groups Fragment
+                IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
+                indivGroupFragment.setArguments(bundle);
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, indivGroupFragment, "openChat").commit();
+            }
+        });
+
         return rootView;
     }
 
-    private void addUserToGroup(String user) {
-        DocumentReference documentReference0 = fStore.collection("groups").document(groupID);
-        DocumentReference documentReference1 = fStore.collection("users").document(userID);
+    private void addUserToGroup(String email) {
+        CollectionReference collectionReferenceUsers = fStore.collection("users");
+        CollectionReference collectionReferenceGroups = fStore.collection("groups");
+        Query queryEmail = collectionReferenceUsers.whereEqualTo("email", email);
         Map<String, Object> memberMap = new HashMap<>();
-        List<Map<String, Object>> members = new ArrayList<>();
-        memberMap.put("name", mSharedPref.getString("registeredName", ""));
-        memberMap.put("email", mSharedPref.getString("registeredEmail",""));
-        memberMap.put("user_id", userID);
-        documentReference0.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        queryEmail.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-
-                    // Update user group list with new group
-                    if (document.exists()) {
-
-                        Toast.makeText(getActivity(), "Added successfully", Toast.LENGTH_SHORT).show();
-                        documentReference0.update("member_list",  FieldValue.arrayUnion(memberMap)).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(getActivity(), "SAVED TO REFERENCE 1.5555", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        List<String> groups = new ArrayList<>();
-                        groups.add(groupID);
-                        documentReference1.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    for (QueryDocumentSnapshot document: task.getResult()) {
+                        String name = document.getString("name");
+                        userID = document.getId();
+                        collectionReferenceUsers.document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful()) {
                                     DocumentSnapshot document = task.getResult();
-
-                                    // Check if group list exists already, update if exist, if not create new group list
-                                    if (document.exists()) {
-
-                                        documentReference1.update("groups",  FieldValue.arrayUnion(groupID)).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Toast.makeText(getActivity(), "ADDED GROUP TO USER LIST", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-
+                                    ArrayList<String> groups = (ArrayList<String>) document.get("groups");
+                                    if (groups.contains(groupID)) {
+                                        Toast.makeText(getActivity(), "User already added", Toast.LENGTH_SHORT).show();
                                     } else {
-                                        documentReference1.set(groups).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                                        memberMap.put("name", name);
+                                        memberMap.put("email", email);
+                                        memberMap.put("user_id", userID);
+                                        UserHelperClass user = new UserHelperClass(name, email, userID);
+                                        adaptedUsers.add(user);
+                                        adapter.notifyDataSetChanged();
+
+                                        Toast.makeText(getActivity(), "USER FOUND: " + document.getString("name"), Toast.LENGTH_SHORT).show();
+
+                                        DocumentReference documentReferenceGroups = collectionReferenceGroups.document(groupID);
+                                        DocumentReference documentReferenceUsers = collectionReferenceUsers.document(userID);
+
+                                        documentReferenceGroups.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Toast.makeText(getActivity(), "CREATE NEW GROUP LIST FOR USER", Toast.LENGTH_SHORT).show();
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot document = task.getResult();
+
+                                                    // Update user group list with new group
+                                                    if (document.exists()) {
+
+                                                        Toast.makeText(getActivity(), "Added successfully", Toast.LENGTH_SHORT).show();
+                                                        documentReferenceGroups.update("member_list",  FieldValue.arrayUnion(memberMap)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                Toast.makeText(getActivity(), "USER SAVED TO GROUPS MEMBER LIST", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
+                                                        List<String> groups = new ArrayList<>();
+                                                        groups.add(groupID);
+                                                        documentReferenceUsers.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    DocumentSnapshot document = task.getResult();
+
+                                                                    // Check if group list exists already, update if exist, if not create new group list
+                                                                    if (document.exists()) {
+
+                                                                        documentReferenceUsers.update("groups",  FieldValue.arrayUnion(groupID)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                                Toast.makeText(getActivity(), "ADDED GROUP TO USER LIST", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        });
+
+                                                                    } else {
+                                                                        Map<String, Object> groupMap = new HashMap<>();
+                                                                        groupMap.put("groups", groups);
+                                                                        documentReferenceUsers.set(groupMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                                Toast.makeText(getActivity(), "CREATE NEW GROUP LIST FOR USER", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
+                                                            }
+                                                        });
+
+                                                    }
+                                                }
                                             }
                                         });
+
                                     }
                                 }
+
                             }
                         });
 
+
                     }
                 }
-                adapter.notifyDataSetChanged();
             }
         });
+        addUsersBtn.revertAnimation();
+
+
     }
 
     private void populateRecyclerView() {
 
-
-        DocumentReference documentReference0 = fStore.collection("groups").document(groupID);
+        String currentUserID = fAuth.getCurrentUser().getUid();
+        DocumentReference documentReference0 = fStore.collection("users").document(currentUserID);
         documentReference0.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -171,35 +239,17 @@ public class AddUsersFragment extends Fragment {
 
                     // Check if group exists already, update if exist, if not create new group
                     if (document.exists()) {
+                        String name = document.getString("name");
+                        String email = document.getString("email");
+
+                        UserHelperClass user = new UserHelperClass(name, email, currentUserID);
+                        adaptedUsers.add(user);
+                        adapter.notifyDataSetChanged();
 
                         Toast.makeText(getActivity(), "Group found", Toast.LENGTH_SHORT).show();
-                        users = (List<Map<String, Object>>) document.get("member_list");
 
                     }
                 }
-
-                String name = null;
-                String email = null;
-                for (Map<String, Object> map: users) {
-                    for (Map.Entry<String, Object> entry: map.entrySet()) {
-
-                        if (entry.getKey().equals("name") && entry.getValue() != null) {
-                            name = entry.getValue().toString();
-                        }
-                        if (entry.getKey().equals("email") && entry.getValue() != null) {
-                            email = entry.getValue().toString();
-                        }
-                        UserHelperClass user = new UserHelperClass(name, email);
-
-                        if (name != null && email != null) {
-                            Toast.makeText(getActivity(), user.getName(), Toast.LENGTH_SHORT).show();
-                            Toast.makeText(getActivity(), user.getEmail(), Toast.LENGTH_SHORT).show();
-
-                            adaptedUsers.add(user);
-                        }
-                    }
-                }
-                adapter = new UsersAdapter(adaptedUsers);
             }
         });
     }
@@ -208,10 +258,67 @@ public class AddUsersFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecyclerView list = view.findViewById(R.id.usersRecyclerView);
+        mRecyclerView = view.findViewById(R.id.usersRecyclerView);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        list.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(layoutManager);
         adapter = new UsersAdapter(adaptedUsers);
-        list.setAdapter(adapter);
+        mRecyclerView.setAdapter(adapter);
+        setUpItemTouchHelper();
+    }
+
+    private void setUpItemTouchHelper() {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+
+            @Override
+            public boolean onMove(@NotNull RecyclerView recyclerView, @NotNull RecyclerView.ViewHolder viewHolder, @NotNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                int swipedPosition = viewHolder.getAdapterPosition();
+                adapter.remove(swipedPosition);
+                DocumentReference documentReferenceGroups = fStore.collection("groups").document(groupID);
+                DocumentReference documentReferenceUser = fStore.collection("users")
+                        .document(adaptedUsers.get(swipedPosition).getUserID());
+                documentReferenceUser.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+//                                Map<String, Object> map = new HashMap<>();
+//                                List<String> groups = (ArrayList<String>)document.get("groups");
+//                                groups.remove(groupID);
+//                                map.put("groups", groups);
+                                Map<String, Object> memberMap = new HashMap<>();
+                                String name = document.getString("name");
+                                String email = document.getString("email");
+                                userID = document.getId();
+                                memberMap.put("name", name);
+                                memberMap.put("email", email);
+                                memberMap.put("user_id", userID);
+                                documentReferenceUser.update("groups", FieldValue.arrayRemove(groupID)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(getActivity(), "Removed from group in users ref", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                documentReferenceGroups.update("member_list", FieldValue.arrayRemove(memberMap)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(getActivity(), "Removed from group in groups ref", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            }
+                        }
+                    }
+                });
+            }
+
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 }

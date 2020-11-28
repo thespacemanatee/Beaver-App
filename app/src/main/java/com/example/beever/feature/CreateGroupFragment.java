@@ -64,7 +64,6 @@ public class CreateGroupFragment extends Fragment {
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Create a group");
         View rootView =  inflater.inflate(R.layout.fragment_create_group, container, false);
 
-        //TODO: Let's get this
         mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
         groupNameText = rootView.findViewById(R.id.group_name_selection);
         groupImageView = rootView.findViewById(R.id.group_picture_selection);
@@ -114,7 +113,7 @@ public class CreateGroupFragment extends Fragment {
     }
 
     private String generateGroupID() {
-        return userID + groupName;
+        return userID + groupName.replaceAll("\\s+","");
     }
 
     @Override
@@ -152,12 +151,6 @@ public class CreateGroupFragment extends Fragment {
                     if (document.exists()) {
 
                         Toast.makeText(getActivity(), "Group name unavailable", Toast.LENGTH_SHORT).show();
-//                        documentReference0.update("members",  FieldValue.arrayUnion(userID)).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Toast.makeText(getActivity(), "SAVED TO REFERENCE 1.5555", Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
 
                     } else {
                         documentReference0.set(map0).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -209,8 +202,6 @@ public class CreateGroupFragment extends Fragment {
                 }
             }
         });
-
-
 
         createBtn.revertAnimation();
     }

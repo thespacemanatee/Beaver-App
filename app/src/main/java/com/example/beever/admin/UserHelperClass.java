@@ -2,16 +2,17 @@ package com.example.beever.admin;
 
 public class UserHelperClass {
 
-    private String name, email;
+    private String name, email, userID;
 
     //No-arg constructor
     public UserHelperClass() {
     }
 
     //Constructor that takes in user inputs during registration
-    public UserHelperClass(String name, String email) {
+    public UserHelperClass(String name, String email, String userID) {
         this.name = name;
         this.email = email;
+        this.userID = userID;
     }
 
     //Getters and Setters
@@ -29,5 +30,13 @@ public class UserHelperClass {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 }

@@ -51,20 +51,44 @@ tools:context=".feature.AddUsersFragment">
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
-        android:id="@+id/addUsersBtn"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_gravity="center"
-        android:background="@drawable/circular_border_shape"
-        android:text="@string/add_user"
-        android:textColor="@color/white"
-        app:spinning_bar_width="4dp"
-        app:spinning_bar_color="#FFF"
-        app:spinning_bar_padding="6dp"
-        app:initialCornerAngle="1000dp"
-        app:finalCornerAngle="1000dp"/>
+        android:gravity="center">
+
+        <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+            android:id="@+id/addUsersBtn"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/circular_border_shape"
+            android:text="@string/add_user"
+            android:textColor="@color/white"
+            app:spinning_bar_width="4dp"
+            app:spinning_bar_color="#FFF"
+            app:spinning_bar_padding="6dp"
+            app:initialCornerAngle="1000dp"
+            app:finalCornerAngle="1000dp"/>
+
+        <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+            android:id="@+id/confirm_users"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/circular_border_shape"
+            android:text="@string/confirm_users"
+            android:textColor="@color/white"
+            app:spinning_bar_width="4dp"
+            app:spinning_bar_color="#FFF"
+            app:spinning_bar_padding="6dp"
+            app:initialCornerAngle="1000dp"
+            app:finalCornerAngle="1000dp"
+            android:layout_toEndOf="@+id/addUsersBtn"/>
+
+
+    </RelativeLayout>
 
     <TextView
         android:layout_width="wrap_content"

@@ -67,4 +67,5 @@
     <string name="add_users">Add Users</string>
     <string name="currently_added">Currently Added:</string>
     <string name="add_user">Add User</string>
+    <string name="confirm_users">confirm</string>
 </resources>
