@@ -95,9 +95,17 @@
                 android:layout_height="6dp"
                 android:background="@color/beever_pink"
                 android:layout_marginTop="-10dp"/>
-
-
         </LinearLayout>
+
+        <GridView
+            android:id="@+id/dashboard_groups"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:horizontalSpacing="16dp"
+            android:verticalSpacing="16dp"
+            android:scrollbars="none"
+            android:numColumns="3"/>
 
     </LinearLayout>
 

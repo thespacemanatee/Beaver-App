@@ -15,6 +15,7 @@
         android:dividerHeight="8dp"
         android:orientation="vertical"
         android:padding="16dp"
+        android:stackFromBottom="true"
         />
 
     <RelativeLayout

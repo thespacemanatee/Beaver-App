@@ -79,9 +79,9 @@ public class ChatInfoFragment extends Fragment {
 
     class GroupMemberAdapter extends BaseAdapter {
 
-        LayoutInflater gridInflater;
+        LayoutInflater inflater;
         GroupMemberAdapter(Context c) {
-            gridInflater = LayoutInflater.from(c);
+            inflater = LayoutInflater.from(c);
         }
 
         @Override
@@ -97,12 +97,6 @@ public class ChatInfoFragment extends Fragment {
             return i;
         }
 
-        //To reduce reloading of same layout
-        class GrpMemberViewHolder {
-            ShapeableImageView memberImg;
-            TextView member;
-        }
-
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
 
@@ -115,7 +109,7 @@ public class ChatInfoFragment extends Fragment {
                 viewHolder = new GrpMemberViewHolder();
 
                 //Inflate the layout for GridView cells (created as a Fragment)
-                view = gridInflater.inflate(R.layout.group_member_item, null);
+                view = inflater.inflate(R.layout.group_member_item, null);
 
                 //Get ImageButton and TextView to populate
                 viewHolder.memberImg = view.findViewById(R.id.grp_member_img);
@@ -138,6 +132,12 @@ public class ChatInfoFragment extends Fragment {
             viewHolder.member.setText(selectedMember);
 
             return view;
+        }
+
+        //To reduce reloading of same layout
+        class GrpMemberViewHolder {
+            ShapeableImageView memberImg;
+            TextView member;
         }
 
     }

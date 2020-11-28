@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -26,38 +27,40 @@ import android.widget.Toast;
 
 import com.example.beever.R;
 import com.example.beever.admin.MainActivity;
+import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.example.beever.navigation.SpaceItem;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GroupsFragment extends Fragment {
 
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
+    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private String userID = fAuth.getUid();
 
     ArrayList<Integer> grpImages = new ArrayList<>();
     ArrayList<String> grpIds = new ArrayList<>();
+    {
+        for (int i=0; i<5; i++) {
+            grpIds.add("Test "+ i);
+        }
 
-    //Get grpIds and grpImages from Firebase, and append it here iteratively
-    //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
+        for (int i=0; i<5; i++) {
+            grpImages.add(R.drawable.beever_logo);
+        }
+    }
     int addGrpBtnImg = R.drawable.ic_baseline_add_40;
     String addGrpBtnText = "Add group...";
-    {
-        grpImages.add(addGrpBtnImg);
-        grpImages.add(R.drawable.profile);
-        grpImages.add(R.drawable.beever_logo);
-        grpImages.add(R.drawable.beever_logo_blue);
-        grpImages.add(R.drawable.beever_logo_only);
-
-        grpIds.add(addGrpBtnText);
-        grpIds.add("Test 1");
-        grpIds.add("Test 2");
-        grpIds.add("Test 3");
-        grpIds.add("Test 4");
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,7 +80,9 @@ public class GroupsFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
 
-        //TODO: Retrieve groups from database
+        for (int i=0; i<grpIds.size(); i++) {
+            Log.d("GROUPS", grpIds.get(i));
+        }
 
         //Populate GridView in fragment_groups.xml with Groups
         GridView layout = rootView.findViewById(R.id.groupButtons);
@@ -86,17 +91,23 @@ public class GroupsFragment extends Fragment {
         return rootView;
     }
 
+    //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
+    {
+        grpIds.add(0, addGrpBtnText);
+        grpImages.add(0, addGrpBtnImg);
+    }
+
     //Class to populate GridView
     class GridAdapter extends BaseAdapter {
 
-        LayoutInflater gridInflater;
+        LayoutInflater inflater;
         GridAdapter(Context c) {
-            gridInflater = LayoutInflater.from(c);
+            inflater = LayoutInflater.from(c);
         }
 
         @Override
         public int getCount() {
-            return grpImages.size();
+            return grpIds.size();
         }
 
         @Override
@@ -121,7 +132,7 @@ public class GroupsFragment extends Fragment {
                 viewHolder = new ViewHolder();
 
                 //Inflate the layout for GridView cells (created as a Fragment)
-                view = gridInflater.inflate(R.layout.group_grid_item, null);
+                view = inflater.inflate(R.layout.group_grid_item, null);
 
                 //Get ImageButton and TextView to populate
                 viewHolder.gridImg = view.findViewById(R.id.grid_item_img);

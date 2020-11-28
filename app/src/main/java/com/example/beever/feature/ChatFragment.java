@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageSwitcher;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,6 +21,8 @@ import java.util.ArrayList;
 
 public class ChatFragment extends Fragment {
 
+    ImageButton sendButton;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -28,6 +32,17 @@ public class ChatFragment extends Fragment {
         //Show Chat Bubbles
         ListView layout = rootView.findViewById(R.id.bubbles_area);
         layout.setAdapter(new BubblesAdapter(getContext()));
+
+        //Create Send Button
+        sendButton = rootView.findViewById(R.id.send_button);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                grpMemberImg.add(R.drawable.beever_logo);
+                texts.add("String");
+                layout.setAdapter(new BubblesAdapter(getContext()));
+            }
+        });
 
         return rootView;
     }
@@ -58,9 +73,9 @@ public class ChatFragment extends Fragment {
 
     class BubblesAdapter extends BaseAdapter {
 
-        LayoutInflater gridInflater;
+        LayoutInflater inflater;
         BubblesAdapter(Context c) {
-            gridInflater = LayoutInflater.from(c);
+            inflater = LayoutInflater.from(c);
         }
 
         @Override
@@ -84,7 +99,7 @@ public class ChatFragment extends Fragment {
                 viewHolder = new BubblesViewHolder();
 
                 //Inflate the layout for GridView cells (created as a Fragment)
-                view = gridInflater.inflate(R.layout.chat_bubbles, null);
+                view = inflater.inflate(R.layout.chat_bubbles, null);
 
                 //Get ImageButton and TextView to populate
                 viewHolder.memberImg = view.findViewById(R.id.chat_member_img);
@@ -115,4 +130,6 @@ public class ChatFragment extends Fragment {
             TextView text;
         }
     }
+
+
 }
