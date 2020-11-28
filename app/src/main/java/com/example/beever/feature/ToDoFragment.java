@@ -1,5 +1,6 @@
 package com.example.beever.feature;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,10 +16,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
+import com.example.beever.database.TodoEntry;
+import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,6 +32,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,15 +55,15 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected ExpandableListView toDoArchivedListView;
     protected ExpandableListAdapter toDoArchivedAdapter;
 
-    private FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
+    private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private String userID;
 
-    protected static List<String> ARCHIVED = new ArrayList<>();
-    protected static List<String> archivedList = new ArrayList<>();
-    protected static HashMap<String, List<String>> expandableListDetail = new HashMap<>();
-    protected static ArrayList<String> toDoList = new ArrayList<>();
-    protected static ArrayList<String> projectList = new ArrayList<>();
+    protected List<String> ARCHIVED = new ArrayList<>();
+    protected List<TodoEntry> archivedList = new ArrayList<>();
+    protected HashMap<String, List<TodoEntry>> expandableListDetail = new HashMap<>();
+    protected ArrayList<TodoEntry> toDoList = new ArrayList<>();
+    protected List<String> projectList = new ArrayList<>();
     protected Map<String, Object> map = new HashMap<>();
     protected int scrollPosition = 0;
 
@@ -67,6 +72,8 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
 
         FirebaseUser fUser = fAuth.getCurrentUser();
         userID = fUser.getUid();
+
+        populateProjectList();
 
         View rootView = layoutInflater.inflate(R.layout.fragment_to_do, viewGroup, false);
         rootView.setTag(TAG);
@@ -89,10 +96,11 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
             scrollPosition = ((LinearLayoutManager) toDoRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         }
         toDoRecyclerView.setLayoutManager(layoutManager);
+        toDoRecyclerView.setItemAnimator(new DefaultItemAnimator());
         toDoRecyclerView.scrollToPosition(scrollPosition);
 
-        toDoAdapter = new ToDoAdapter(getActivity());
         // set toDoAdapter for RecyclerView
+        toDoAdapter = new ToDoAdapter(toDoList, getFragmentManager());
         toDoRecyclerView.setAdapter(toDoAdapter);
         Log.d(TAG, RECYCLERVIEW);
 
@@ -110,56 +118,52 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         });
         Log.d(TAG, FAB);
 
-        populateProjectList();
-
         return rootView;
     }
 
     private void populateProjectList() {
-        DocumentReference documentReference = fStore.collection("users").document(userID);
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    if (documentSnapshot.exists()) {
-                        if (documentSnapshot.get("groups") != null) {
-                            projectList = (ArrayList<String>) documentSnapshot.get("groups");
-                        } else {
-                            Toast.makeText(getContext(), "No Groups Found :(", Toast.LENGTH_LONG).show();
-                        }
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    List<Object> groups = getResult().getGroups();
+                    for (Object group : groups) {
+                        Log.d("PROJECT LIST", (String) group);
+                        projectList.add((String) group);
                     }
                 }
             }
-        });
+        };
+
+        getUserEntry.start();
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         // TODO: get the to do list from firebase according to the project
-        DocumentReference documentReference = fStore.collection("groups").document(parent.getItemAtPosition(position).toString());
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        UserEntry.GetUserEntry getter = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    if (documentSnapshot.exists()) {
-                        if (documentSnapshot.get("tod0_list") != null) {
-                            map = (Map<String, Object>) documentSnapshot.get("todo_list");
-                            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                                if (entry.getKey().equals("current")) {
-//                                toDoList = entry.getValue();
-
-                                }
-                            }
-                        } else {
-                            Toast.makeText(getContext(), "You have no todos!", Toast.LENGTH_LONG).show();
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    ArrayList<TodoEntry> currentTodos = getResult().getUserTodo(true, false);
+                    ArrayList<TodoEntry> pastTodos = getResult().getUserTodo(false, true);
+                    for (TodoEntry e : currentTodos) {
+                        if (e.getGroup_id_source().equals(projectList.get(position))) {
+                            toDoList.add(e);
+                            Log.d("CURRENT LIST", e.toString());
                         }
-
+                    }
+                    for (TodoEntry entry : pastTodos) {
+                        if (entry.getGroup_id_source() == projectList.get(position)) {
+                            archivedList.add(entry);
+                            Log.d("PAST LIST", entry.toString());
+                        }
                     }
                 }
             }
-        });
+        };
+
+        getter.start();
 
     }
 

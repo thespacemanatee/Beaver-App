@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.beever.R;
+import com.example.beever.database.TodoEntry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,9 +20,9 @@ import java.util.List;
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     protected Context context;
     protected List<String> expandableListTitle;
-    protected HashMap<String, List<String>> expandableListDetail;
+    protected HashMap<String, List<TodoEntry>> expandableListDetail;
 
-    public ExpandableListAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<String>> expandableListDetail) {
+    public ExpandableListAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<TodoEntry>> expandableListDetail) {
         this.context = context;
         this.expandableListDetail = expandableListDetail;
         this.expandableListTitle = expandableListTitle;
@@ -85,8 +86,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         LinearLayout toDoTaskView = convertView.findViewById(R.id.toDoTaskView);
-        Button toDoButton = toDoTaskView.findViewById(R.id.toDoButton);
-        toDoButton.setText(toDoText);
+        TextView toDoTaskContent = toDoTaskView.findViewById(R.id.toDoTaskContent);
+        toDoTaskContent.setText(toDoText);
 
         return convertView;
     }
