@@ -35,14 +35,16 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
     private final ArrayList<TodoEntry> toDoList;
     private FragmentManager fragmentManager;
+    private String groupID;
 
     /**
      * Initialise the toDoList with strings from Firebase
      * @param toDoList
      */
-    public ToDoAdapter(ArrayList<TodoEntry> toDoList, FragmentManager fragmentManager) {
+    public ToDoAdapter(ArrayList<TodoEntry> toDoList, FragmentManager fragmentManager, String groupID) {
         this.toDoList = toDoList;
         this.fragmentManager = fragmentManager;
+        this.groupID = groupID;
     }
 
     /**
@@ -76,7 +78,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
         @Override
         public void onClick(View v) {
-            ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment();
+            ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID);
             toDoDialogFragment.show(fragmentManager, TAG);
         }
     }

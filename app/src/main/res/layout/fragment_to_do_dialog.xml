@@ -12,7 +12,7 @@
         android:fontFamily="@font/poppins"
         android:paddingTop="16dp"
         android:paddingBottom="4dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="10dp"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textAlignment="center"
@@ -23,15 +23,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/toDoDialogTask"
-        android:hint="@string/task"
+        android:hint="@string/task_title"
         android:layout_marginStart="36dp"
         android:layout_marginEnd="36dp"
         android:paddingTop="10dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:textColor="@color/beever_blue"
         android:fontFamily="@font/poppins"
         android:textSize="20sp"
         android:inputType="text"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/toDoDialogDescription"
+        android:hint="@string/task_description"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/beever_blue"
+        android:fontFamily="@font/poppins"
+        android:textSize="16sp"
+        android:inputType="text" />
 
     <LinearLayout
         android:layout_width="match_parent"

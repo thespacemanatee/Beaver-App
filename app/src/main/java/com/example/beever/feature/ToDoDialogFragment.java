@@ -20,12 +20,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.beever.R;
+import com.example.beever.database.GroupEntry;
+import com.example.beever.database.TodoEntry;
+import com.example.beever.database.UserEntry;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,20 +45,23 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected View parentView;
     protected Spinner toDoDialogSpinner;
     protected EditText toDoDialogTask;
+    protected EditText toDoDialogDescription;
     protected Button toDoDialogDate;
     protected TextView addToDo;
     protected int year, month, day;
-    protected List<String> groupMembers = new ArrayList<>();
+    protected List<String> groupMembers;
 
-    private FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private String groupID;
+    private GroupEntry.GetGroupEntry groupEntry;
 
     protected String assignedTo;
-    protected String taskDetails;
-    protected String dueDate;
-    protected String TASK_KEY = "taskDetails";
-    protected String ASSIGNED_KEY = "assignedTo";
-    protected String DUE_DATE_KEY = "dueDate";
+    protected String taskTitle;
+    protected String taskDescr;
+    protected Date dueDate;
+
+    public ToDoDialogFragment(String groupID) {
+        this.groupID = groupID;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,6 +73,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
         parentView = layoutInflater.inflate(R.layout.fragment_to_do_dialog, null);
         toDoDialogSpinner = parentView.findViewById(R.id.toDoDialogSpinner);
         toDoDialogTask = parentView.findViewById(R.id.toDoDialogTask);
+        toDoDialogDescription = parentView.findViewById(R.id.toDoDialogDescription);
         toDoDialogDate = parentView.findViewById(R.id.toDoDialogDate);
         addToDo = parentView.findViewById(R.id.add_to_do);
     }
@@ -72,8 +83,6 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setIcon(R.drawable.list);
-
-        FirebaseUser fUser = fAuth.getCurrentUser();
 
         // setting the spinner for assigning to group members
         ArrayAdapter<String> adapter = new ArrayAdapter<>(parentView.getContext(), R.layout.spinner_item_dialog, groupMembers);
@@ -93,6 +102,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
                 String setDate = dayOfMonth + "/" + (month + 1) + "/" + year;
                 toDoDialogDate.setText(setDate);
+                dueDate = new GregorianCalendar(year, month - 1, dayOfMonth).getTime();
             }, year, month, day);
 
             // sets minimum date to current day
@@ -103,13 +113,13 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
         builder.setView(parentView)
                 .setPositiveButton("Add", (dialog, which) -> {
-                    dueDate = toDoDialogDate.getText().toString();
-                    taskDetails = toDoDialogTask.getText().toString();
+                    taskTitle = toDoDialogTask.getText().toString();
+                    taskDescr = toDoDialogDescription.getText().toString();
                     assignedTo = toDoDialogSpinner.getSelectedItem().toString();
-                    if (dueDate.isEmpty() || taskDetails.isEmpty() || assignedTo.isEmpty()) {
-                        Toast.makeText(getContext(), "All fields must be filled in!", Toast.LENGTH_SHORT).show();
+                    if (dueDate.toString().isEmpty() || taskTitle.isEmpty() || assignedTo.isEmpty()) {
+                        Toast.makeText(getContext(), "All fields except description must be filled in!", Toast.LENGTH_SHORT).show();
                     } else {
-                        addNewToDo(taskDetails, assignedTo, dueDate);
+                        addNewToDo(taskTitle, taskDescr, assignedTo, dueDate);
                     }
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
@@ -121,11 +131,22 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
     private void initGroupMembers() {
         // TODO: get group members from firebase
-        groupMembers.add("Claudia");
-        groupMembers.add("Chee Kit");
-        groupMembers.add("Jun Hao");
-        groupMembers.add("Sean");
-        groupMembers.add("Xing Yi");
+        Log.d("INIT GROUP MEMBERS", groupID);
+        groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
+            @Override
+            public void onPostExecute() {
+                groupMembers = new ArrayList<>();
+
+                if (isSuccessful()) {
+                    List<Object> member_list = getResult().getMember_list();
+                    for (Object o : member_list) {
+                        groupMembers.add((String) o);
+                    }
+                }
+            }
+        };
+
+        groupEntry.start();
     }
 
     @Override
@@ -138,12 +159,9 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
     }
 
-    private void addNewToDo(String taskDetails, String assignedTo, String dueDate) {
-        Map<String, String> newToDo = new HashMap<>();
-        newToDo.put(TASK_KEY, taskDetails);
-        newToDo.put(ASSIGNED_KEY, assignedTo);
-        newToDo.put(DUE_DATE_KEY, dueDate);
+    private void addNewToDo(String taskTitle, String taskDescr, String assignedTo, Date dueDate) {
+        TodoEntry newToDo = new TodoEntry(taskTitle, taskDescr, assignedTo, new Timestamp(dueDate), groupID);
         // TODO
-        fStore.collection("groups").document("??").set(newToDo);
+        groupEntry.getResult().modifyEventOrTodo(false, true, true, newToDo);
     }
 }
