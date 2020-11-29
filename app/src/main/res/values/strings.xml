@@ -67,4 +67,12 @@
     <string name="add_users">Add Users</string>
     <string name="currently_added">Currently Added:</string>
     <string name="add_user">Add User</string>
+    <string name="add_event">Add Event</string>
+    <string name="title">Title</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="start">START</string>
+    <string name="End">END</string>
+    <string name="dateTime">DATE</string>
+    <string name="description">Description</string>
 </resources>

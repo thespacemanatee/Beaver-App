@@ -1,25 +1,9 @@
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<androidx.cardview.widget.CardView -->
-<!--    xmlns:card_view="http://schemas.android.com/apk/res-auto"-->
-<!--    xmlns:android1="http://schemas.android.com/apk/res/android"-->
-<!--    android1:id="@+id/card_view"-->
-<!--    android1:layout_width="match_parent"-->
-<!--    android1:layout_height="wrap_content"-->
-<!--    card_view:cardElevation="10dp"-->
-<!--    layout_height="">-->
-<!--    <TextView-->
-<!--        android1:id="@+id/type"-->
-<!--        android1:layout_height="wrap_content"-->
-<!--        android1:layout_width="match_parent"-->
-<!--        android1:padding="10dp"/>-->
-
-
-<!--</androidx.cardview.widget.CardView>-->
-
 <androidx.cardview.widget.CardView
     android:id="@+id/card_view"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
+    android:clickable="true"
+    android:focusable="true"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <TextView
         android:id="@+id/textevent"

@@ -1,10 +1,13 @@
 package com.example.beever.feature;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 
 
 public class CalendarFragment extends Fragment {
+    private static final String TAG = "CalendarFragment";
     FloatingActionButton addEvent;
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     ArrayList<Events> list = new ArrayList<>();
@@ -67,9 +71,13 @@ public class CalendarFragment extends Fragment {
         addEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "onClick: opening dialog");
+//                AddEventFragment dialog = new AddEventFragment();
+//                dialog.show(getFragmentManager(),"AddEventDialog");
                 Fragment addEventFragment = new AddEventFragment();
                 System.out.println("click");
                 getFragmentManager().beginTransaction().replace(R.id.fragment_container, addEventFragment).addToBackStack(null).commit();
+//                customDialog("New Event", "Edit new event", "cancel", "save");
             }
         });
 
@@ -88,50 +96,38 @@ public class CalendarFragment extends Fragment {
             }
         });
 
-
-
-//        final CollapsibleCalendar collapsibleCalendar = root.findViewById(R.id.calendarView);
-//        collapsibleCalendar.setCalendarListener(new CollapsibleCalendar.CalendarListener() {
-//            @Override
-//            public void onDaySelect() {
-//                Day day = collapsibleCalendar.getSelectedDay();
-//                Log.i(getClass().getName(), "Selected Day: "
-//                        + day.getYear() + "/" + (day.getMonth() + 1) + "/" + day.getDay());
-//            }
-//
-//            @Override
-//            public void onItemClick(View view) {
-//
-//            }
-//
-//            @Override
-//            public void onDataUpdate() {
-//
-//            }
-//
-//            @Override
-//            public void onMonthChange() {
-//
-//            }
-//
-//            @Override
-//            public void onWeekChange(int i) {
-//
-//            }
-//
-//            @Override
-//            public void onDayChanged() {
-//
-//            }
-//
-//            @Override
-//            public void onClickListener() {
-//
-//            }
-//        });
-
-
         return root;
+    }
+
+    /**
+     * Custom dialog that helps to edit the events
+     * @param title
+     * @param message
+     * @param cancelMethod
+     * @param okMethod
+     */
+
+    public void customDialog(String title, String message, final String cancelMethod, final String okMethod){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(title);
+        builder.setMessage(message);
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.show();
+
     }
 
 

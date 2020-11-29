@@ -20,7 +20,7 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
     Context mContext;
     int total_types;
 
-    public static class TextEventViewHolder extends RecyclerView.ViewHolder{
+    public static class TextEventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView textView;
         CardView cardView;
@@ -29,6 +29,14 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
             super(itemView);
             this.textView = (TextView) itemView.findViewById(R.id.textevent);
             this.cardView = (CardView) itemView.findViewById(R.id.card_view);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            System.out.println("clicked");
+
         }
     }
 
@@ -41,8 +49,8 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
     @NonNull
     @Override
     public TextEventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view;
-        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.text_event,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.text_event,parent,false);
+
         return new TextEventViewHolder(view);
     }
 
@@ -58,4 +66,5 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
     public int getItemCount() {
         return dataSet.size();
     }
+
 }
