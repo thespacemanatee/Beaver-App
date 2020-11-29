@@ -41,7 +41,7 @@
     <ListView
         android:id="@+id/chat_info_group_members"
         android:layout_width="match_parent"
-        android:layout_height="550dp"
+        android:layout_height="400dp"
         android:divider="@null"
         android:dividerHeight="8dp"
         android:orientation="vertical"
@@ -60,6 +60,7 @@
         app:spinning_bar_width="4dp"
         app:spinning_bar_color="#FFF"
         app:spinning_bar_padding="6dp"
+        android:layout_margin="20dp"
         app:initialCornerAngle="1000dp"
         app:finalCornerAngle="1000dp"/>
 
