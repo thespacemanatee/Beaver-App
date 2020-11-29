@@ -27,18 +27,33 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.beever.R;
+import com.example.beever.database.ChatEntry;
+import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
-public class ChatInfoFragment extends Fragment {
+public class ChatInfoFragment extends Fragment implements Populatable{
 
     private CircularProgressButton addUsersBtn;
+    private ArrayList<String> grpMembers = new ArrayList<>();
+    private ArrayList<Integer> grpMemberImg = new ArrayList<>();
+    private GroupMemberAdapter adapter;
+    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    String groupId;
+    String groupName;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,8 +66,8 @@ public class ChatInfoFragment extends Fragment {
         //Receive arguments from ChatFragment
         Bundle bundle = this.getArguments();
         Bitmap selectedGrpImg = bundle.getParcelable("groupImage");
-        String groupName = bundle.getString("groupName");
-        String groupId = bundle.getString("groupId");
+        groupName = bundle.getString("groupName");
+        groupId = bundle.getString("groupId");
 
         addUsersBtn = rootView.findViewById(R.id.addUsersBtn2);
 
@@ -63,7 +78,10 @@ public class ChatInfoFragment extends Fragment {
         //Set the group members names
         ListView layout = rootView.findViewById(R.id.chat_info_group_members);
         layout.setScrollContainer(false);
-        layout.setAdapter(new GroupMemberAdapter(getActivity()));
+        adapter = new GroupMemberAdapter(getActivity());
+        layout.setAdapter(adapter);
+        populateRecyclerView();
+
 
         addUsersBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,20 +102,49 @@ public class ChatInfoFragment extends Fragment {
 
     }
 
-    ArrayList<String> grpMembers = new ArrayList<>();
-    ArrayList<Integer> grpMemberImg = new ArrayList<>();
-    {
-        grpMembers.add("Claudia");
-        grpMembers.add("Claudia");
-        grpMembers.add("Claudia");
-        grpMembers.add("Claudia");
-        grpMembers.add("Claudia");
 
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
+    {
+//        grpMembers.add("Claudia");
+//        grpMembers.add("Claudia");
+//        grpMembers.add("Claudia");
+//        grpMembers.add("Claudia");
+//        grpMembers.add("Claudia");
+//
+//        grpMemberImg.add(R.drawable.pink_circle);
+//        grpMemberImg.add(R.drawable.pink_circle);
+//        grpMemberImg.add(R.drawable.pink_circle);
+//        grpMemberImg.add(R.drawable.pink_circle);
+//        grpMemberImg.add(R.drawable.pink_circle);
+    }
+
+    @Override
+    public void populateRecyclerView() {
+        DocumentReference documentReference = fStore.collection("groups").document(groupId);
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        List<String> members = (List<String>) document.get("member_list");
+                        Toast.makeText(getContext(), "Grabbed members", Toast.LENGTH_SHORT).show();
+                        if (members != null) {
+                            for (String member: members) {
+                                UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(member, 5000) {
+                                    @Override
+                                    public void onPostExecute() {
+                                        grpMembers.add(getResult().getName());
+                                        grpMemberImg.add(R.drawable.pink_circle);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                };
+                                userGetter.start();
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     class GroupMemberAdapter extends BaseAdapter {

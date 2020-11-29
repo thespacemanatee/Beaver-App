@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment implements Populatable{
 
     private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private String groupName;
@@ -70,7 +70,7 @@ public class ChatFragment extends Fragment {
         ListView layout = rootView.findViewById(R.id.bubbles_area);
         adapter = new BubblesAdapter(getContext());
         layout.setAdapter(adapter);
-        populateChats();
+        populateRecyclerView();
 
         //Create Send Button
         ImageButton sendButton = rootView.findViewById(R.id.send_button);
@@ -103,13 +103,14 @@ public class ChatFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Toast.makeText(getContext(), "Chat sent successfully", Toast.LENGTH_SHORT).show();
-                populateChats();
+                populateRecyclerView();
 
             }
         });
     }
 
-    private void populateChats() {
+    @Override
+    public void populateRecyclerView() {
         texts.clear();
         grpMemberImg.clear();
         times.clear();
