@@ -30,6 +30,7 @@ import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -112,7 +113,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoRecyclerView.scrollToPosition(scrollPosition);
 
         // set toDoAdapter for RecyclerView
-        toDoAdapter = new ToDoAdapter(toDoList, getFragmentManager(), groupID);
+        toDoAdapter = new ToDoAdapter(toDoList, getFragmentManager(), groupID, getContext());
         toDoRecyclerView.setAdapter(toDoAdapter);
         Log.d(TAG, RECYCLERVIEW);
 
@@ -129,7 +130,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoAddButton = rootView.findViewById(R.id.toDoAddButton);
         toDoAddButton.setOnClickListener(v -> {
             if (groupID != null) {
-                ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_dialog);
+                ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_dialog, toDoAdapter);
                 assert getFragmentManager() != null;
                 toDoDialogFragment.show(getFragmentManager(), ADD_TO_DO);
             } else {
@@ -242,6 +243,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         };
 
         getGroupEntry.start();*/
+        Snackbar.make(view, "Selected: " + parent.getItemAtPosition(position).toString(), Snackbar.LENGTH_LONG).show();
     }
 
     @Override

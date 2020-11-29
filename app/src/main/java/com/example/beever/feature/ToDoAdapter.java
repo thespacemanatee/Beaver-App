@@ -1,7 +1,10 @@
 package com.example.beever.feature;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,18 +36,20 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
     public static final String TAG = "ToDoAdapter";
 
-    private final ArrayList<TodoEntry> toDoList;
+    private ArrayList<TodoEntry> toDoList = new ArrayList<>();
     private FragmentManager fragmentManager;
     private String groupID;
+    private Context context;
 
     /**
      * Initialise the toDoList with strings from Firebase
      * @param toDoList
      */
-    public ToDoAdapter(ArrayList<TodoEntry> toDoList, FragmentManager fragmentManager, String groupID) {
+    public ToDoAdapter(ArrayList<TodoEntry> toDoList, FragmentManager fragmentManager, String groupID, Context context) {
         this.toDoList = toDoList;
         this.fragmentManager = fragmentManager;
         this.groupID = groupID;
+        this.context = context;
     }
 
     /**
@@ -65,15 +70,6 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             this.toDoAssignedTo = view.findViewById(R.id.toDoAssignedTo);
 
             view.setOnClickListener(this);
-
-            toDoCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
-                        // TODO
-                    }
-                }
-            });
         }
 
         @Override
@@ -85,9 +81,43 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
             String deadlineStr = sf.format(deadline.toDate());
 
-            ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_edit);
-            toDoDialogFragment.show(fragmentManager, TAG);
+            /*ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_edit);
+            toDoDialogFragment.show(fragmentManager, TAG);*/
+
+            showAlertDialog(context, "Delete To-Do?", todoEntry);
         }
+    }
+
+    private void showAlertDialog(Context context, String message, TodoEntry todoEntry) {
+        AlertDialog dialog = new AlertDialog.Builder(context).create();
+        dialog.setMessage(message);
+
+        dialog.setButton(Dialog.BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                removeItem(todoEntry);
+            }
+        });
+
+        dialog.setButton(Dialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void removeItem(TodoEntry todoEntry) {
+        int currPosition = toDoList.indexOf(todoEntry);
+        toDoList.remove(currPosition);
+        notifyItemRemoved(currPosition);
+    }
+
+    public void addItem(TodoEntry todoEntry) {
+        toDoList.add(0, todoEntry);
+        notifyItemInserted(0);
     }
 
     /**
@@ -133,6 +163,15 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         toDoAssignedTo.setText(toDo.getAssigned_to());
 
         toDoCheckBox.setOnCheckedChangeListener(null);
+
+        toDoCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    notifyItemRemoved(position);
+                }
+            }
+        });
     }
 
     /**

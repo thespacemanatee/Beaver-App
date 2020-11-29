@@ -51,6 +51,8 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected int year, month, day;
     protected List<String> groupMembers;
 
+    private ToDoAdapter adapter;
+
     private String groupID;
     private int layoutResource;
 
@@ -59,9 +61,10 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected String taskDescr;
     protected Date dueDate;
 
-    public ToDoDialogFragment(String groupID, int layoutResource) {
+    public ToDoDialogFragment(String groupID, int layoutResource, ToDoAdapter adapter) {
         this.groupID = groupID;
         this.layoutResource = layoutResource;
+        this.adapter = adapter;
     }
 
     @Override
@@ -103,7 +106,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
                 String setDate = dayOfMonth + "/" + (month + 1) + "/" + year;
                 toDoDialogDate.setText(setDate);
-                dueDate = new GregorianCalendar(year, month - 1, dayOfMonth).getTime();
+                dueDate = new GregorianCalendar(year, month, dayOfMonth).getTime();
             }, year, month, day);
 
             // sets minimum date to current day
@@ -179,7 +182,6 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
         };
 
         groupEntry.start();*/
-
-        ToDoFragment.toDoList.add(0, newToDo);
+        adapter.addItem(newToDo);
     }
 }
