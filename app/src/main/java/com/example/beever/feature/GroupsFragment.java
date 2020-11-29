@@ -4,8 +4,14 @@ package com.example.beever.feature;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -27,6 +33,7 @@ import android.widget.Toast;
 
 import com.example.beever.R;
 import com.example.beever.admin.MainActivity;
+import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.example.beever.navigation.SpaceItem;
@@ -38,28 +45,33 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 public class GroupsFragment extends Fragment {
 
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private String userID = fAuth.getUid();
 
-    ArrayList<Integer> grpImages = new ArrayList<>();
+    List<Object> grpObjs;
+    ArrayList<String> grpImages = new ArrayList<>();
     ArrayList<String> grpIds = new ArrayList<>();
-    {
-        for (int i=0; i<5; i++) {
-            grpIds.add("Test "+ i);
-        }
 
-        for (int i=0; i<5; i++) {
-            grpImages.add(R.drawable.beever_logo);
-        }
-    }
-    int addGrpBtnImg = R.drawable.ic_baseline_add_40;
+//    {
+//        for (int i=0; i<5; i++) {
+//            grpIds.add("Test "+ i);
+//            grpImages.add("https://firebasestorage.googleapis.com/v0/b/beaver-app-7998c.appspot.com/o/groups%2FH8DKr5zp34Sf5xHVhwD6TJljIWh2TEST1%2Fgroup_image.jpg?alt=media&token=f44be457-b260-41d9-8429-96c040781257");
+//        }
+//    }
+
+    String addGrpBtnImg = Integer.toString(R.drawable.plus);
     String addGrpBtnText = "Add group...";
 
     @Override
@@ -80,21 +92,48 @@ public class GroupsFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
 
-        for (int i=0; i<grpIds.size(); i++) {
-            Log.d("GROUPS", grpIds.get(i));
-        }
+        UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    Log.d("USER ENTRY", "success");
+                    grpObjs = getResult().getGroups();
+                    for (Object o: grpObjs) {
+                        Log.d("GROUP", (String)o);
+                        GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String)o, 5000) {
+                            @Override
+                            public void onPostExecute() {
+                                if (isSuccessful()) {
+                                    Log.d("GROUP ENTRY", "success");
+                                    Log.d("GROUP RESULT", getResult().toString());
+                                    grpIds.add(getResult().getName());
+                                    if (getResult().getDisplay_picture() == null) {
+                                        grpImages.add("null");
+                                    } else {
+                                        grpImages.add(getResult().getDisplay_picture());
+                                    }
+
+                                }
+                            }
+                        };
+                        groupGetter.start();
+                        Log.d("GROUP NUMBERS", Integer.toString(grpImages.size()));
+                    }
+                }
+            }
+        };
+        userGetter.start();
+
+        //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
+        grpIds.add(0, addGrpBtnText);
+        grpImages.add(0, addGrpBtnImg);
+        Log.d("GROUP NUMBERS AGAIN", Integer.toString(grpImages.size()));
 
         //Populate GridView in fragment_groups.xml with Groups
         GridView layout = rootView.findViewById(R.id.groupButtons);
         layout.setAdapter(new GridAdapter(getActivity()));
 
         return rootView;
-    }
-
-    //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
-    {
-        grpIds.add(0, addGrpBtnText);
-        grpImages.add(0, addGrpBtnImg);
     }
 
     //Class to populate GridView
@@ -147,19 +186,20 @@ public class GroupsFragment extends Fragment {
             }
 
             //Set variables to allow multiple access of same image and text
-            int selectedGrpImg = grpImages.get(i);
+            //Bitmap selectedGrpImg = grpImages.get(i);
+            String selectedGrpImg = grpImages.get(i);
             String selectedGrpId = grpIds.get(i);
 
-            //setImageResource for ImageButton and setText for TextView
-            viewHolder.gridImg.setImageResource(selectedGrpImg);
+            //setText for TextView
             viewHolder.gridTxt.setText(selectedGrpId);
 
             //Set onClick
-            if (selectedGrpImg == addGrpBtnImg && selectedGrpId == addGrpBtnText) {
+            if (selectedGrpImg.equals(addGrpBtnImg) && selectedGrpId.equals(addGrpBtnText)) {
                 //If gridImg is addGrpBtnImg and gridImgText is addGrpBtnText,
-                //Fix colours
-                viewHolder.gridImg.setBackgroundColor(getResources().getColor(R.color.grey));
-                viewHolder.gridImg.setColorFilter(getResources().getColor(R.color.beever_blue));
+
+                //Set image for ShapeableImageView
+                Picasso.get().load(Integer.parseInt(selectedGrpImg)).into(viewHolder.gridImg);
+
                 //Go to AddGroupFragment
                 viewHolder.gridImg.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -176,12 +216,22 @@ public class GroupsFragment extends Fragment {
                 });
             } else {
                 //If gridImg is not addGrpBtnImg and gridImgText is not addGrpBtnText,
+
+                //Set image for ShapeableImageView
+                if (selectedGrpImg.equals("null")) {
+                    Picasso.get().load(R.drawable.pink_circle).fit().into(viewHolder.gridImg);
+                } else {
+                    Picasso.get().load(selectedGrpImg).fit().into(viewHolder.gridImg);
+                }
+
+                //Go to IndivChatFragment
                 viewHolder.gridImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         //Bundle arguments to send to ChatFragment
                         Bundle bundle = new Bundle();
-                        bundle.putInt("selectedGrpImg", selectedGrpImg);
+                        //bundle.putParcelable("selectedGrpImg", selectedGrpImg);
+                        bundle.putString("selectedGrpImg", selectedGrpImg);
                         bundle.putString("selectedGrpId", selectedGrpId);
 
                         //Fade Out Nav Bar
@@ -206,4 +256,5 @@ public class GroupsFragment extends Fragment {
             TextView gridTxt;
         }
     }
+
 }

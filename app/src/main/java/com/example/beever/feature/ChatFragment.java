@@ -5,10 +5,12 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ListView;
@@ -17,11 +19,11 @@ import android.widget.TextView;
 import com.example.beever.R;
 import com.google.android.material.imageview.ShapeableImageView;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class ChatFragment extends Fragment {
-
-    ImageButton sendButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -34,13 +36,20 @@ public class ChatFragment extends Fragment {
         layout.setAdapter(new BubblesAdapter(getContext()));
 
         //Create Send Button
-        sendButton = rootView.findViewById(R.id.send_button);
+        ImageButton sendButton = rootView.findViewById(R.id.send_button);
+        EditText editText = rootView.findViewById(R.id.send_message);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                grpMemberImg.add(R.drawable.beever_logo);
-                texts.add("String");
-                layout.setAdapter(new BubblesAdapter(getContext()));
+                String newText = editText.getText().toString();
+                if (!newText.equals("")) {
+                    grpMemberImg.add(R.drawable.beever_logo);
+                    texts.add(newText);
+                    Log.d("CHECK NEW TEXT", newText);
+                    times.add(new Timestamp(System.currentTimeMillis()));
+                    editText.setText("");
+                    layout.setAdapter(new BubblesAdapter(getContext()));
+                }
             }
         });
 
@@ -49,26 +58,13 @@ public class ChatFragment extends Fragment {
 
     ArrayList<Integer> grpMemberImg = new ArrayList<>();
     ArrayList<String> texts = new ArrayList<>();
+    ArrayList<Timestamp> times = new ArrayList<>();
     {
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-        grpMemberImg.add(R.drawable.pink_circle);
-
-        texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. 1");
-        texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. 2");
-        texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. 3");
-        texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. 4");
-        texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. 5");
-        texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. 6");
-        texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. 7");
-        texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. 8");
-        texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. 9");
+        for (int i=0; i<9; i++) {
+            grpMemberImg.add(R.drawable.pink_circle);
+            texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. "+i);
+            times.add(new Timestamp(System.currentTimeMillis()));
+        }
     }
 
     class BubblesAdapter extends BaseAdapter {
@@ -104,6 +100,7 @@ public class ChatFragment extends Fragment {
                 //Get ImageButton and TextView to populate
                 viewHolder.memberImg = view.findViewById(R.id.chat_member_img);
                 viewHolder.text = view.findViewById(R.id.bubble);
+                viewHolder.time = view.findViewById(R.id.bubble_time);
 
                 //Tag to reference
                 view.setTag(viewHolder);
@@ -116,10 +113,12 @@ public class ChatFragment extends Fragment {
             //Set variables to allow multiple access of same image and text
             int img = grpMemberImg.get(i);
             String txt = texts.get(i);
+            String timestamp = times.get(i).toString().substring(11, 16);
 
             //setImageResource for ImageButton and setText for TextView
             viewHolder.memberImg.setImageResource(img);
             viewHolder.text.setText(txt);
+            viewHolder.time.setText(timestamp);
 
             return view;
         }
@@ -128,6 +127,7 @@ public class ChatFragment extends Fragment {
         class BubblesViewHolder {
             ShapeableImageView memberImg;
             TextView text;
+            TextView time;
         }
     }
 

@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -49,14 +50,14 @@ public class ChatInfoFragment extends Fragment {
 
         //Receive arguments from ChatFragment
         Bundle bundle = this.getArguments();
-        int selectedGrpImg = bundle.getInt("selectedGrpImg");
+        Bitmap selectedGrpImg = bundle.getParcelable("selectedGrpImg");
         String selectedGrpId = bundle.getString("selectedGrpId");
 
         addUsersBtn = rootView.findViewById(R.id.addUsersBtn2);
 
         //Get chat_info_img in fragment_chat_info.xml and setImageResource
         ShapeableImageView chatImg = rootView.findViewById(R.id.chat_info_img);
-        chatImg.setImageResource(selectedGrpImg);
+        chatImg.setImageBitmap(selectedGrpImg);
 
         //Set the group members names
         ListView layout = rootView.findViewById(R.id.chat_info_group_members);
