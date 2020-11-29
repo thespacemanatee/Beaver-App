@@ -30,6 +30,7 @@ public class GroupsFragment extends Fragment {
     private String userID = fAuth.getUid();
 
     ArrayList<String> grpImages = new ArrayList<>();
+    ArrayList<String> grpNames = new ArrayList<>();
     ArrayList<String> grpIds = new ArrayList<>();
 
     String addGrpBtnImg = Integer.toString(R.drawable.plus);
@@ -45,8 +46,6 @@ public class GroupsFragment extends Fragment {
         //Inflate the layout for this fragment
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Groups");
 
-        String userId = fAuth.getCurrentUser().getUid();
-
         //Fade in Nav Bar
         View bottom_menu = getActivity().findViewById(R.id.bottom_menu);
         if (bottom_menu.getVisibility() == View.GONE) {
@@ -55,18 +54,14 @@ public class GroupsFragment extends Fragment {
         }
 
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
-        grpIds.clear();
+        grpNames.clear();
         grpImages.clear();
 
         {
             //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
-            grpIds.add( addGrpBtnText);
+            grpNames.add( addGrpBtnText);
             grpImages.add( addGrpBtnImg);
-
-
-            //Somehow only loads properly when this is here, check it out later
-//            grpIds.add("Test");
-//            grpImages.add("https://firebasestorage.googleapis.com/v0/b/beaver-app-7998c.appspot.com/o/groups%2FH8DKr5zp34Sf5xHVhwD6TJljIWh2TEST1%2Fgroup_image.jpg?alt=media&token=f44be457-b260-41d9-8429-96c040781257");
+            grpIds.add("null");
 
             UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
                 @Override
@@ -79,9 +74,11 @@ public class GroupsFragment extends Fragment {
                                 @Override
                                 public void onPostExecute() {
                                     if (isSuccessful()) {
-                                        Log.d("GROUP ENTRY", "success");
+                                        Log.d("GROUP ENTRY", getResult().getName());
                                         Log.d("GROUP RESULT", getResult().toString());
-                                        grpIds.add(getResult().getName());
+                                        Log.d("GROUP ID", getGroupId());
+                                        grpIds.add(getGroupId());
+                                        grpNames.add(getResult().getName());
                                         adapter.notifyDataSetChanged();
                                         if (getResult().getDisplay_picture() == null) {
                                             grpImages.add("null");
@@ -120,7 +117,7 @@ public class GroupsFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return grpIds.size();
+            return grpNames.size();
         }
 
         @Override
@@ -162,14 +159,15 @@ public class GroupsFragment extends Fragment {
             //Set variables to allow multiple access of same image and text
             //Bitmap selectedGrpImg = grpImages.get(i);
             String selectedGrpImg = grpImages.get(i);
+            String selectedGrpName = grpNames.get(i);
             String selectedGrpId = grpIds.get(i);
 
             //setText for TextView
-            viewHolder.gridTxt.setText(selectedGrpId);
-            Log.d("CURRENTLY ADAPTING", selectedGrpId+" to make it not fail");
+            viewHolder.gridTxt.setText(selectedGrpName);
+            Log.d("CURRENTLY ADAPTING", selectedGrpName + " to make it not fail");
 
             //Set onClick
-            if (selectedGrpImg.equals(addGrpBtnImg) && selectedGrpId.equals(addGrpBtnText)) {
+            if (selectedGrpImg.equals(addGrpBtnImg) && selectedGrpName.equals(addGrpBtnText)) {
                 //If gridImg is addGrpBtnImg and gridImgText is addGrpBtnText,
 
                 //Set image for ShapeableImageView
@@ -206,8 +204,9 @@ public class GroupsFragment extends Fragment {
                         //Bundle arguments to send to ChatFragment
                         Bundle bundle = new Bundle();
                         //bundle.putParcelable("selectedGrpImg", selectedGrpImg);
-                        bundle.putString("selectedGrpImg", selectedGrpImg);
-                        bundle.putString("selectedGrpId", selectedGrpId);
+                        bundle.putString("groupImage", selectedGrpImg);
+                        bundle.putString("groupName", selectedGrpName);
+                        bundle.putString("groupId", selectedGrpId);
 
                         //Fade Out Nav Bar
                         Utils utils = new Utils(getContext());

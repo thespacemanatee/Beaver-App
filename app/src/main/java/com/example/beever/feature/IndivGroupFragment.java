@@ -31,9 +31,11 @@ public class IndivGroupFragment extends Fragment {
 
         //Receive arguments from GroupFragment
         Bundle bundle = this.getArguments();
-        String selectedGrpId = bundle.getString("selectedGrpId");
+        String groupName = bundle.getString("groupName");
+        String groupId = bundle.getString("groupId");
+        String groupImage = bundle.getString("groupImage");
 
-        ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle(selectedGrpId);
+        ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle(groupName);
 
         //Set ViewPager
         ViewPager2 viewPager = rootView.findViewById(R.id.indiv_grp_swipe);
@@ -65,11 +67,9 @@ public class IndivGroupFragment extends Fragment {
         public Fragment createFragment(int position) {
             //Choose between ChatFragment, GapFinderFragment, and ChatInfoFragment
             if (position == 0) {
-                ChatFragment chat = new ChatFragment();
-                return chat;
+                return new ChatFragment();
             } else if (position == 1) {
-                GapFinderFragment gapFinder = new GapFinderFragment();
-                return gapFinder;
+                return new GapFinderFragment();
             } else {
                 ChatInfoFragment chatInfo = new ChatInfoFragment();
                 chatInfo.setArguments(bundle);

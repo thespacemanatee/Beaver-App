@@ -431,6 +431,10 @@ public class GroupEntry {
             return;
         }
 
+        public String getGroupId() {
+            return groupId;
+        }
+
         /**
          * Get query result as a GroupEntry
          * @return requested GroupEntry, if query succeeds, or null otherwise
