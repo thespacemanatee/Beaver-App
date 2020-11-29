@@ -67,9 +67,13 @@ public class IndivGroupFragment extends Fragment {
         public Fragment createFragment(int position) {
             //Choose between ChatFragment, GapFinderFragment, and ChatInfoFragment
             if (position == 0) {
-                return new ChatFragment();
+                ChatFragment chatFragment = new ChatFragment();
+                chatFragment.setArguments(bundle);
+                return chatFragment;
             } else if (position == 1) {
-                return new GapFinderFragment();
+                GapFinderFragment gapFinderFragment = new GapFinderFragment();
+                gapFinderFragment.setArguments(bundle);
+                return gapFinderFragment;
             } else {
                 ChatInfoFragment chatInfo = new ChatInfoFragment();
                 chatInfo.setArguments(bundle);

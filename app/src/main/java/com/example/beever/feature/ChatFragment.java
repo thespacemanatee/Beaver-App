@@ -1,8 +1,10 @@
 package com.example.beever.feature;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -15,15 +17,38 @@ import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.beever.R;
+import com.example.beever.database.ChatEntry;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChatFragment extends Fragment {
+
+    private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private String groupName;
+    private String groupId;
+    private String groupImage;
+    private BubblesAdapter adapter;
+
+    private ArrayList<Integer> grpMemberImg = new ArrayList<>();
+    private ArrayList<String> texts = new ArrayList<>();
+    private ArrayList<Timestamp> times = new ArrayList<>();
+    private SharedPreferences mSharedPref;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,9 +56,21 @@ public class ChatFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_chat, container, false);
 
+        Bundle bundle = this.getArguments();
+        groupName = bundle.getString("groupName");
+        groupId = bundle.getString("groupId");
+        groupImage = bundle.getString("groupImage");
+        mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
+
+        texts.clear();
+        grpMemberImg.clear();
+        times.clear();
+
         //Show Chat Bubbles
         ListView layout = rootView.findViewById(R.id.bubbles_area);
-        layout.setAdapter(new BubblesAdapter(getContext()));
+        adapter = new BubblesAdapter(getContext());
+        layout.setAdapter(adapter);
+        populateChats();
 
         //Create Send Button
         ImageButton sendButton = rootView.findViewById(R.id.send_button);
@@ -43,12 +80,14 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 String newText = editText.getText().toString();
                 if (!newText.equals("")) {
-                    grpMemberImg.add(R.drawable.beever_logo);
-                    texts.add(newText);
+//                    grpMemberImg.add(R.drawable.beever_logo);
+//                    texts.add(newText);
                     Log.d("CHECK NEW TEXT", newText);
-                    times.add(new Timestamp(System.currentTimeMillis()));
+//                    times.add(new Timestamp(new Date()));
+                    addMessage(newText, new Timestamp(new Date()));
                     editText.setText("");
-                    layout.setAdapter(new BubblesAdapter(getContext()));
+//                    adapter = new BubblesAdapter(getContext());
+//                    layout.setAdapter(adapter);
                 }
             }
         });
@@ -56,16 +95,47 @@ public class ChatFragment extends Fragment {
         return rootView;
     }
 
-    ArrayList<Integer> grpMemberImg = new ArrayList<>();
-    ArrayList<String> texts = new ArrayList<>();
-    ArrayList<Timestamp> times = new ArrayList<>();
-    {
-        for (int i=0; i<9; i++) {
-            grpMemberImg.add(R.drawable.pink_circle);
-            texts.add("This is a message! I'm trying to make it really long. Hopefully it spans three lines. "+i);
-            times.add(new Timestamp(System.currentTimeMillis()));
-        }
+    private void addMessage(String text, Timestamp timestamp) {
+        String name = mSharedPref.getString("registeredName", "");
+        ChatEntry chatEntry = new ChatEntry(name, text, null, timestamp);
+        DocumentReference documentReference = fStore.collection("groups").document(groupId);
+        documentReference.update("chat", FieldValue.arrayUnion(chatEntry)).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(getContext(), "Chat sent successfully", Toast.LENGTH_SHORT).show();
+                populateChats();
+
+            }
+        });
     }
+
+    private void populateChats() {
+        texts.clear();
+        grpMemberImg.clear();
+        times.clear();
+        DocumentReference documentReference = fStore.collection("groups").document(groupId);
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        List<Map<String, Object>> chatList = (ArrayList<Map<String, Object>>) document.get("chat");
+                        if (chatList != null) {
+                            for (Object o: chatList) {
+                                ChatEntry chatEntry = new ChatEntry(o);
+                                texts.add(chatEntry.getMessage());
+                                grpMemberImg.add(R.drawable.pink_circle);
+                                times.add(chatEntry.getTime());
+                            }
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 
     class BubblesAdapter extends BaseAdapter {
 

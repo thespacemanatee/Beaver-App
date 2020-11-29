@@ -63,7 +63,7 @@ public class ChatEntry {
 
     // Setters
 
-    public void setSender(String name){
+    public void setSender(String sender){
         this.sender = sender;
     }
 

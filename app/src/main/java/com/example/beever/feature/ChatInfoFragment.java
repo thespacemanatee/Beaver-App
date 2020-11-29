@@ -75,7 +75,7 @@ public class ChatInfoFragment extends Fragment {
                 addUsersBtn.startAnimation();
                 AddUsersFragment addUsersFragment = new AddUsersFragment();
                 addUsersFragment.setArguments(bundle);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
                 transaction.replace(R.id.fragment_container, addUsersFragment).commit();
             }
         });
