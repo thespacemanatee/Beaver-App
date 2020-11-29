@@ -102,21 +102,6 @@ public class ChatInfoFragment extends Fragment implements Populatable{
 
     }
 
-
-    {
-//        grpMembers.add("Claudia");
-//        grpMembers.add("Claudia");
-//        grpMembers.add("Claudia");
-//        grpMembers.add("Claudia");
-//        grpMembers.add("Claudia");
-//
-//        grpMemberImg.add(R.drawable.pink_circle);
-//        grpMemberImg.add(R.drawable.pink_circle);
-//        grpMemberImg.add(R.drawable.pink_circle);
-//        grpMemberImg.add(R.drawable.pink_circle);
-//        grpMemberImg.add(R.drawable.pink_circle);
-    }
-
     @Override
     public void populateRecyclerView() {
         DocumentReference documentReference = fStore.collection("groups").document(groupId);
