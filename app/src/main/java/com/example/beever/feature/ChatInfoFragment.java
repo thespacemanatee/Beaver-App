@@ -33,7 +33,11 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 
+import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
+
 public class ChatInfoFragment extends Fragment {
+
+    private CircularProgressButton addUsersBtn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,6 +52,8 @@ public class ChatInfoFragment extends Fragment {
         int selectedGrpImg = bundle.getInt("selectedGrpImg");
         String selectedGrpId = bundle.getString("selectedGrpId");
 
+        addUsersBtn = rootView.findViewById(R.id.addUsersBtn2);
+
         //Get chat_info_img in fragment_chat_info.xml and setImageResource
         ShapeableImageView chatImg = rootView.findViewById(R.id.chat_info_img);
         chatImg.setImageResource(selectedGrpImg);
@@ -56,6 +62,15 @@ public class ChatInfoFragment extends Fragment {
         ListView layout = rootView.findViewById(R.id.chat_info_group_members);
         layout.setScrollContainer(false);
         layout.setAdapter(new GroupMemberAdapter(getActivity()));
+
+        addUsersBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Bundle bundle = new Bundle();
+//                bundle.putString("groupName", selectedGrpId);
+//                bundle.putInt("imageUri", selectedGrpImg);
+            }
+        });
 
         return rootView;
 

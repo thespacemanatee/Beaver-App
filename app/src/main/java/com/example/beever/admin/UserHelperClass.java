@@ -1,5 +1,7 @@
 package com.example.beever.admin;
 
+import androidx.annotation.NonNull;
+
 public class UserHelperClass {
 
     private String name, email, userID;
@@ -38,5 +40,11 @@ public class UserHelperClass {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return name;
     }
 }

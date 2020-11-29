@@ -91,10 +91,10 @@ public class AddUsersFragment extends Fragment {
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle(groupName);
 
-        UserHelperClass user = new UserHelperClass(mSharedPref.getString("registeredName", ""),
-                mSharedPref.getString("registeredEmail", ""),
-                fAuth.getCurrentUser().getUid());
-        adaptedUsers.add(user);
+//        UserHelperClass user = new UserHelperClass(mSharedPref.getString("registeredName", ""),
+//                mSharedPref.getString("registeredEmail", ""),
+//                fAuth.getCurrentUser().getUid());
+//        adaptedUsers.add(user);
 
         addUsersBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +128,8 @@ public class AddUsersFragment extends Fragment {
         CollectionReference collectionReferenceUsers = fStore.collection("users");
         CollectionReference collectionReferenceGroups = fStore.collection("groups");
         Query queryEmail = collectionReferenceUsers.whereEqualTo("email", email);
-        Map<String, Object> memberMap = new HashMap<>();
+//        List<String> members = new ArrayList<>();
+//        Map<String, Object> memberMap = new HashMap<>();
         queryEmail.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -146,9 +147,9 @@ public class AddUsersFragment extends Fragment {
                                         Toast.makeText(getActivity(), "User already added", Toast.LENGTH_SHORT).show();
                                     } else {
 
-                                        memberMap.put("name", name);
-                                        memberMap.put("email", email);
-                                        memberMap.put("user_id", userID);
+//                                        memberMap.put("name", name);
+//                                        memberMap.put("email", email);
+//                                        members.add(userID);
                                         UserHelperClass user = new UserHelperClass(name, email, userID);
                                         adaptedUsers.add(user);
                                         adapter.notifyDataSetChanged();
@@ -168,12 +169,7 @@ public class AddUsersFragment extends Fragment {
                                                     if (document.exists()) {
 
                                                         Toast.makeText(getActivity(), "Added successfully", Toast.LENGTH_SHORT).show();
-                                                        documentReferenceGroups.update("member_list",  FieldValue.arrayUnion(memberMap)).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                Toast.makeText(getActivity(), "USER SAVED TO GROUPS MEMBER LIST", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        });
+                                                        documentReferenceGroups.update("member_list",  FieldValue.arrayUnion(userID));
                                                         List<String> groups = new ArrayList<>();
                                                         groups.add(groupID);
                                                         documentReferenceUsers.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -185,22 +181,12 @@ public class AddUsersFragment extends Fragment {
                                                                     // Check if group list exists already, update if exist, if not create new group list
                                                                     if (document.exists()) {
 
-                                                                        documentReferenceUsers.update("groups",  FieldValue.arrayUnion(groupID)).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                            @Override
-                                                                            public void onSuccess(Void aVoid) {
-                                                                                Toast.makeText(getActivity(), "ADDED GROUP TO USER LIST", Toast.LENGTH_SHORT).show();
-                                                                            }
-                                                                        });
+                                                                        documentReferenceUsers.update("groups",  FieldValue.arrayUnion(groupID));
 
                                                                     } else {
                                                                         Map<String, Object> groupMap = new HashMap<>();
                                                                         groupMap.put("groups", groups);
-                                                                        documentReferenceUsers.set(groupMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                            @Override
-                                                                            public void onSuccess(Void aVoid) {
-                                                                                Toast.makeText(getActivity(), "CREATE NEW GROUP LIST FOR USER", Toast.LENGTH_SHORT).show();
-                                                                            }
-                                                                        });
+                                                                        documentReferenceUsers.set(groupMap);
                                                                     }
                                                                 }
                                                             }
@@ -229,29 +215,63 @@ public class AddUsersFragment extends Fragment {
 
     private void populateRecyclerView() {
 
-        String currentUserID = fAuth.getCurrentUser().getUid();
-        DocumentReference documentReference0 = fStore.collection("users").document(currentUserID);
-        documentReference0.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        DocumentReference documentReferenceGroups = fStore.collection("groups").document(groupID);
+        documentReferenceGroups.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
 
-                    // Check if group exists already, update if exist, if not create new group
                     if (document.exists()) {
-                        String name = document.getString("name");
-                        String email = document.getString("email");
-
-                        UserHelperClass user = new UserHelperClass(name, email, currentUserID);
-                        adaptedUsers.add(user);
-                        adapter.notifyDataSetChanged();
-
-                        Toast.makeText(getActivity(), "Group found", Toast.LENGTH_SHORT).show();
-
+                        List<String> members = (List<String>) document.get("member_list");
+                        for (String member: members) {
+                            DocumentReference documentReferenceUsers = fStore.collection("users").document(member);
+                            documentReferenceUsers.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        if (document.exists()) {
+                                            String name = document.getString("name");
+                                            String email = document.getString("email");
+                                            String userID = document.getId();
+                                            UserHelperClass user = new UserHelperClass(name, email, userID);
+                                            adaptedUsers.add(user);
+                                            Toast.makeText(getActivity(), user.toString(), Toast.LENGTH_SHORT).show();
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                }
+                            });
+                        }
                     }
                 }
             }
         });
+
+//        String currentUserID = fAuth.getCurrentUser().getUid();
+//        DocumentReference documentReference0 = fStore.collection("users").document(currentUserID);
+//        documentReference0.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    DocumentSnapshot document = task.getResult();
+//
+//                    // Check if group exists already, update if exist, if not create new group
+//                    if (document.exists()) {
+//                        String name = document.getString("name");
+//                        String email = document.getString("email");
+//
+//                        UserHelperClass user = new UserHelperClass(name, email, currentUserID);
+//                        adaptedUsers.add(user);
+//                        adapter.notifyDataSetChanged();
+//
+//                        Toast.makeText(getActivity(), "Group found", Toast.LENGTH_SHORT).show();
+//
+//                    }
+//                }
+//            }
+//        });
     }
 
     @Override
@@ -261,6 +281,7 @@ public class AddUsersFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.usersRecyclerView);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(layoutManager);
+        populateRecyclerView();
         adapter = new UsersAdapter(adaptedUsers);
         mRecyclerView.setAdapter(adapter);
         setUpItemTouchHelper();
@@ -287,24 +308,22 @@ public class AddUsersFragment extends Fragment {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
-//                                Map<String, Object> map = new HashMap<>();
-//                                List<String> groups = (ArrayList<String>)document.get("groups");
-//                                groups.remove(groupID);
-//                                map.put("groups", groups);
-                                Map<String, Object> memberMap = new HashMap<>();
-                                String name = document.getString("name");
-                                String email = document.getString("email");
+//                                Map<String, Object> memberMap = new HashMap<>();
+//                                String name = document.getString("name");
+//                                String email = document.getString("email");
                                 userID = document.getId();
-                                memberMap.put("name", name);
-                                memberMap.put("email", email);
-                                memberMap.put("user_id", userID);
+//                                memberMap.put("name", name);
+//                                memberMap.put("email", email);
+//                                memberMap.put("user_id", userID);
+//                                List<String> members = new ArrayList<>();
+//                                members.add(userID);
                                 documentReferenceUser.update("groups", FieldValue.arrayRemove(groupID)).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         Toast.makeText(getActivity(), "Removed from group in users ref", Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                                documentReferenceGroups.update("member_list", FieldValue.arrayRemove(memberMap)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                documentReferenceGroups.update("member_list", FieldValue.arrayRemove(userID)).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         Toast.makeText(getActivity(), "Removed from group in groups ref", Toast.LENGTH_SHORT).show();
