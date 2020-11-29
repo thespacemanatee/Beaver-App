@@ -61,7 +61,7 @@ public class GroupsFragment extends Fragment {
             //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
             grpNames.add( addGrpBtnText);
             grpImages.add( addGrpBtnImg);
-            grpIds.add("null");
+            grpIds.add(null);
 
             UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
                 @Override
