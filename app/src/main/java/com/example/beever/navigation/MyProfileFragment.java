@@ -162,6 +162,7 @@ public class MyProfileFragment extends Fragment {
                             Glide.with(getActivity()).load(imageUri).into((CircleImageView) getActivity().findViewById(R.id.profile_nav));
                             Log.d(TAG, "User profile updated.");
                             Toast.makeText(getActivity(), "Updated profile image", Toast.LENGTH_SHORT).show();
+                            update.revertAnimation();
                         } else {
                             Toast.makeText(getActivity(), "Failed to update profile image", Toast.LENGTH_SHORT).show();
                         }
