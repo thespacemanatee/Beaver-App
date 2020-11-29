@@ -184,7 +184,7 @@ public class ChatFragment extends Fragment implements Populatable{
             //Set variables to allow multiple access of same image and text
             int img = grpMemberImg.get(i);
             String txt = texts.get(i);
-            String timestamp = times.get(i).toString().substring(11, 16);
+            String timestamp = times.get(i).toDate().toString().replace("GMT 2020", "");
 
             //setImageResource for ImageButton and setText for TextView
             viewHolder.memberImg.setImageResource(img);
