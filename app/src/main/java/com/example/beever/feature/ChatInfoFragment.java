@@ -67,9 +67,14 @@ public class ChatInfoFragment extends Fragment {
         addUsersBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Bundle bundle = new Bundle();
-//                bundle.putString("groupName", selectedGrpId);
+                Bundle bundle = new Bundle();
+                bundle.putString("groupName", selectedGrpId);
 //                bundle.putInt("imageUri", selectedGrpImg);
+                addUsersBtn.startAnimation();
+                AddUsersFragment addUsersFragment = new AddUsersFragment();
+                addUsersFragment.setArguments(bundle);
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, addUsersFragment).commit();
             }
         });
 

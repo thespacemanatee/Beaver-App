@@ -138,7 +138,7 @@ public class CreateGroupFragment extends Fragment {
 //        memberMap.put("email", mSharedPref.getString("registeredEmail",""));
 //        memberMap.put("user_id", userID);
         members.add(userID);
-        map0.put("group_name", groupName);
+        map0.put("name", groupName);
         map0.put("display_picture", imageUri);
         map0.put("member_list", members);
 

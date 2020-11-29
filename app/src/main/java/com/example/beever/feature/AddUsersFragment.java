@@ -61,7 +61,7 @@ public class AddUsersFragment extends Fragment {
     private ShapeableImageView chatImg;
     private CircularProgressButton addUsersBtn, confirmUsersBtn;
     private UsersAdapter adapter;
-    private String groupImage;
+//    private String groupImage;
     private String groupName;
     private String groupID;
     private List<Map<String, Object>> users;
@@ -77,17 +77,17 @@ public class AddUsersFragment extends Fragment {
         mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
         Bundle bundle = this.getArguments();
-        groupImage = bundle.getString("imageUri");
+//        groupImage = bundle.getString("imageUri");
         groupName = bundle.getString("groupName");
         groupID = bundle.getString("groupID");
 
-        imageUri = Uri.parse(groupImage);
-        chatImg = rootView.findViewById(R.id.chat_img);
+//        imageUri = Uri.parse(groupImage);
+//        chatImg = rootView.findViewById(R.id.chat_img);
         addUsers = rootView.findViewById(R.id.addUsers);
         addUsersBtn = rootView.findViewById(R.id.addUsersBtn);
         confirmUsersBtn = rootView.findViewById(R.id.confirm_users);
 
-        Glide.with(getActivity()).load(imageUri).into(chatImg);
+//        Glide.with(getActivity()).load(imageUri).into(chatImg);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle(groupName);
 
@@ -202,8 +202,6 @@ public class AddUsersFragment extends Fragment {
 
                             }
                         });
-
-
                     }
                 }
             }

@@ -24,17 +24,17 @@ tools:context=".feature.AddUsersFragment">
             android:fontFamily="@font/poppins_bold"
             android:textColor="@color/beever_blue"/>
 
-        <com.google.android.material.imageview.ShapeableImageView
-            app:shapeAppearance="@style/roundedImageViewRounded"
-            android:layout_width="68dp"
-            android:layout_height="68dp"
-            android:id="@+id/chat_img"
-            android:scaleType="fitCenter"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:background="?android:selectableItemBackground"
-            android:layout_alignParentEnd="true"
-            />
+<!--        <com.google.android.material.imageview.ShapeableImageView-->
+<!--            app:shapeAppearance="@style/roundedImageViewRounded"-->
+<!--            android:layout_width="68dp"-->
+<!--            android:layout_height="68dp"-->
+<!--            android:id="@+id/chat_img"-->
+<!--            android:scaleType="fitCenter"-->
+<!--            android:gravity="center"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:background="?android:selectableItemBackground"-->
+<!--            android:layout_alignParentEnd="true"-->
+<!--            />-->
 
     </RelativeLayout>
 

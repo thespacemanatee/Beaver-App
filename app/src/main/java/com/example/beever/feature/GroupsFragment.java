@@ -1,60 +1,28 @@
 
 package com.example.beever.feature;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.beever.R;
-import com.example.beever.admin.MainActivity;
 import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
-import com.example.beever.navigation.SpaceItem;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
 
 public class GroupsFragment extends Fragment {
 
@@ -66,46 +34,9 @@ public class GroupsFragment extends Fragment {
 
     String addGrpBtnImg = Integer.toString(R.drawable.plus);
     String addGrpBtnText = "Add group...";
-
-    {
-        //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
-        grpIds.add( addGrpBtnText);
-        grpImages.add( addGrpBtnImg);
+    GridAdapter adapter;
 
 
-        //Somehow only loads properly when this is here, check it out later
-        grpIds.add("Test");
-        grpImages.add("https://firebasestorage.googleapis.com/v0/b/beaver-app-7998c.appspot.com/o/groups%2FH8DKr5zp34Sf5xHVhwD6TJljIWh2TEST1%2Fgroup_image.jpg?alt=media&token=f44be457-b260-41d9-8429-96c040781257");
-
-        UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
-            @Override
-            public void onPostExecute() {
-                if (isSuccessful()) {
-                    Log.d("USER ENTRY", "success");
-                    for (Object o: getResult().getGroups()) {
-                        Log.d("GROUP", (String)o);
-                        GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String)o, 5000) {
-                            @Override
-                            public void onPostExecute() {
-                                if (isSuccessful()) {
-                                    Log.d("GROUP ENTRY", "success");
-                                    Log.d("GROUP RESULT", getResult().toString());
-                                    grpIds.add(getResult().getName());
-                                    if (getResult().getDisplay_picture() == null) {
-                                        grpImages.add("null");
-                                    } else {
-                                        grpImages.add(getResult().getDisplay_picture());
-                                    }
-                                }
-                            }
-                        };
-                        groupGetter.start();
-                    }
-                }
-            }
-        };
-        userGetter.start();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -124,10 +55,55 @@ public class GroupsFragment extends Fragment {
         }
 
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
+        grpIds.clear();
+        grpImages.clear();
+
+        {
+            //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
+            grpIds.add( addGrpBtnText);
+            grpImages.add( addGrpBtnImg);
+
+
+            //Somehow only loads properly when this is here, check it out later
+//            grpIds.add("Test");
+//            grpImages.add("https://firebasestorage.googleapis.com/v0/b/beaver-app-7998c.appspot.com/o/groups%2FH8DKr5zp34Sf5xHVhwD6TJljIWh2TEST1%2Fgroup_image.jpg?alt=media&token=f44be457-b260-41d9-8429-96c040781257");
+
+            UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
+                @Override
+                public void onPostExecute() {
+                    if (isSuccessful()) {
+                        Log.d("USER ENTRY", "success");
+                        for (Object o: getResult().getGroups()) {
+                            Log.d("GROUP", (String)o);
+                            GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String)o, 5000) {
+                                @Override
+                                public void onPostExecute() {
+                                    if (isSuccessful()) {
+                                        Log.d("GROUP ENTRY", "success");
+                                        Log.d("GROUP RESULT", getResult().toString());
+                                        grpIds.add(getResult().getName());
+                                        adapter.notifyDataSetChanged();
+                                        if (getResult().getDisplay_picture() == null) {
+                                            grpImages.add("null");
+                                        } else {
+                                            grpImages.add(getResult().getDisplay_picture());
+                                        }
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+                            };
+                            groupGetter.start();
+                        }
+                    }
+                }
+            };
+            userGetter.start();
+        }
 
         //Populate GridView in fragment_groups.xml with Groups
         GridView layout = rootView.findViewById(R.id.groupButtons);
-        layout.setAdapter(new GridAdapter(getActivity()));
+        adapter = new GridAdapter(getActivity());
+        layout.setAdapter(adapter);
 
         return rootView;
     }
