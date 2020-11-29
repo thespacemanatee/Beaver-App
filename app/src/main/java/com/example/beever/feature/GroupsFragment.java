@@ -24,7 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
-public class GroupsFragment extends Fragment {
+public class GroupsFragment extends Fragment implements Populatable{
 
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userID = fAuth.getUid();
@@ -62,47 +62,51 @@ public class GroupsFragment extends Fragment {
             grpNames.add( addGrpBtnText);
             grpImages.add( addGrpBtnImg);
             grpIds.add(null);
-
-            UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
-                @Override
-                public void onPostExecute() {
-                    if (isSuccessful()) {
-                        Log.d("USER ENTRY", "success");
-                        for (Object o: getResult().getGroups()) {
-                            Log.d("GROUP", (String)o);
-                            GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String)o, 5000) {
-                                @Override
-                                public void onPostExecute() {
-                                    if (isSuccessful()) {
-                                        Log.d("GROUP ENTRY", getResult().getName());
-                                        Log.d("GROUP RESULT", getResult().toString());
-                                        Log.d("GROUP ID", getGroupId());
-                                        grpIds.add(getGroupId());
-                                        grpNames.add(getResult().getName());
-                                        adapter.notifyDataSetChanged();
-                                        if (getResult().getDisplay_picture() == null) {
-                                            grpImages.add("null");
-                                        } else {
-                                            grpImages.add(getResult().getDisplay_picture());
-                                        }
-                                        adapter.notifyDataSetChanged();
-                                    }
-                                }
-                            };
-                            groupGetter.start();
-                        }
-                    }
-                }
-            };
-            userGetter.start();
         }
 
         //Populate GridView in fragment_groups.xml with Groups
         GridView layout = rootView.findViewById(R.id.groupButtons);
         adapter = new GridAdapter(getActivity());
         layout.setAdapter(adapter);
+        populateRecyclerView();
 
         return rootView;
+    }
+
+    @Override
+    public void populateRecyclerView() {
+        UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    Log.d("USER ENTRY", "success");
+                    for (Object o: getResult().getGroups()) {
+                        Log.d("GROUP", (String)o);
+                        GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String)o, 5000) {
+                            @Override
+                            public void onPostExecute() {
+                                if (isSuccessful()) {
+                                    Log.d("GROUP ENTRY", getResult().getName());
+                                    Log.d("GROUP RESULT", getResult().toString());
+                                    Log.d("GROUP ID", getGroupId());
+                                    grpIds.add(getGroupId());
+                                    grpNames.add(getResult().getName());
+                                    adapter.notifyDataSetChanged();
+                                    if (getResult().getDisplay_picture() == null) {
+                                        grpImages.add("null");
+                                    } else {
+                                        grpImages.add(getResult().getDisplay_picture());
+                                    }
+                                    adapter.notifyDataSetChanged();
+                                }
+                            }
+                        };
+                        groupGetter.start();
+                    }
+                }
+            }
+        };
+        userGetter.start();
     }
 
     //Class to populate GridView
