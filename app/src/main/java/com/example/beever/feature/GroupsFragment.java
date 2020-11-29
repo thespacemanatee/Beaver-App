@@ -31,6 +31,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.admin.MainActivity;
 import com.example.beever.database.GroupEntry;
@@ -60,7 +61,6 @@ public class GroupsFragment extends Fragment {
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userID = fAuth.getUid();
 
-    List<Object> grpObjs;
     ArrayList<String> grpImages = new ArrayList<>();
     ArrayList<String> grpIds = new ArrayList<>();
 
@@ -82,8 +82,7 @@ public class GroupsFragment extends Fragment {
             public void onPostExecute() {
                 if (isSuccessful()) {
                     Log.d("USER ENTRY", "success");
-                    grpObjs = getResult().getGroups();
-                    for (Object o: grpObjs) {
+                    for (Object o: getResult().getGroups()) {
                         Log.d("GROUP", (String)o);
                         GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String)o, 5000) {
                             @Override
@@ -136,8 +135,10 @@ public class GroupsFragment extends Fragment {
     //Class to populate GridView
     class GridAdapter extends BaseAdapter {
 
+        Context context;
         LayoutInflater inflater;
         GridAdapter(Context c) {
+            context = c;
             inflater = LayoutInflater.from(c);
         }
 
@@ -196,7 +197,7 @@ public class GroupsFragment extends Fragment {
                 //If gridImg is addGrpBtnImg and gridImgText is addGrpBtnText,
 
                 //Set image for ShapeableImageView
-                Picasso.get().load(Integer.parseInt(selectedGrpImg)).into(viewHolder.gridImg);
+                Glide.with(context).load(Integer.parseInt(selectedGrpImg)).into(viewHolder.gridImg);
 
                 //Go to CreateGroupFragment
                 viewHolder.gridImg.setOnClickListener(new View.OnClickListener() {
@@ -217,9 +218,9 @@ public class GroupsFragment extends Fragment {
 
                 //Set image for ShapeableImageView
                 if (selectedGrpImg.equals("null")) {
-                    Picasso.get().load(R.drawable.pink_circle).fit().into(viewHolder.gridImg);
+                    Glide.with(context).load(R.drawable.pink_circle).centerCrop().into(viewHolder.gridImg);
                 } else {
-                    Picasso.get().load(selectedGrpImg).fit().into(viewHolder.gridImg);
+                    Glide.with(context).load(selectedGrpImg).centerCrop().into(viewHolder.gridImg);
                 }
 
                 //Go to IndivChatFragment

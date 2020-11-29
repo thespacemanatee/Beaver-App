@@ -3,6 +3,7 @@ package com.example.beever.feature;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +15,16 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
 import com.example.beever.R;
+import com.example.beever.database.GroupEntry;
+import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,6 +32,7 @@ import java.util.Calendar;
 public class DashboardFragment extends Fragment {
 
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
+    private String userID = fAuth.getUid();
     int currentTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
     private SharedPreferences mSharedPref;
     TextView greeting, name;
@@ -67,22 +73,47 @@ public class DashboardFragment extends Fragment {
         return root;
     }
 
-    ArrayList<Integer> dbGrpImgs = new ArrayList<>();
+    ArrayList<String> dbGrpImgs = new ArrayList<>();
     ArrayList<String> dbGrpIds = new ArrayList<>();
     {
-        dbGrpImgs.add(R.drawable.profile);
-        dbGrpImgs.add(R.drawable.beever_logo);
-        dbGrpImgs.add(R.drawable.beever_logo_blue);
-
-        dbGrpIds.add("Test 1");
-        dbGrpIds.add("Test 2");
-        dbGrpIds.add("Test 3");
+        UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    Log.d("USER ENTRY", "success");
+                    for (Object o: getResult().getDashboard_grps()) {
+                        if (o != null) {
+                            Log.d("GROUP", (String) o);
+                            GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String) o, 5000) {
+                                @Override
+                                public void onPostExecute() {
+                                    if (isSuccessful()) {
+                                        Log.d("GROUP ENTRY", "success");
+                                        Log.d("GROUP RESULT", getResult().toString());
+                                        dbGrpIds.add(getResult().getName());
+                                        if (getResult().getDisplay_picture() == null) {
+                                            dbGrpImgs.add("null");
+                                        } else {
+                                            dbGrpImgs.add(getResult().getDisplay_picture());
+                                        }
+                                    }
+                                }
+                            };
+                            groupGetter.start();
+                        }
+                    }
+                }
+            }
+        };
+        userGetter.start();
     }
 
     class DashBoardGroupsAdapter extends BaseAdapter {
 
+        Context context;
         LayoutInflater inflater;
         DashBoardGroupsAdapter(Context c) {
+            context = c;
             inflater = LayoutInflater.from(c);
         }
 
@@ -127,11 +158,15 @@ public class DashboardFragment extends Fragment {
             }
 
             //Set variables to allow multiple access of same image and text
-            int selectedGrpImg = dbGrpImgs.get(i);
+            String selectedGrpImg = dbGrpImgs.get(i);
             String selectedGrpId = dbGrpIds.get(i);
 
             //setImageResource for ImageButton and setText for TextView
-            viewHolder.gridImg.setImageResource(selectedGrpImg);
+            if (selectedGrpImg.equals("null")) {
+                Glide.with(context).load(R.drawable.pink_circle).fitCenter().into(viewHolder.gridImg);
+            } else {
+                Glide.with(context).load(selectedGrpImg).into(viewHolder.gridImg);
+            }
             viewHolder.gridTxt.setText(selectedGrpId);
 
             //Set onClick
@@ -140,7 +175,7 @@ public class DashboardFragment extends Fragment {
                 public void onClick(View v) {
                     //Bundle arguments to send to ChatFragment
                     Bundle bundle = new Bundle();
-                    bundle.putInt("selectedGrpImg", selectedGrpImg);
+                    bundle.putString("selectedGrpImg", selectedGrpImg);
                     bundle.putString("selectedGrpId", selectedGrpId);
 
                     //Fade Out Nav Bar
