@@ -51,7 +51,8 @@ public class ChatInfoFragment extends Fragment {
         //Receive arguments from ChatFragment
         Bundle bundle = this.getArguments();
         Bitmap selectedGrpImg = bundle.getParcelable("groupImage");
-        String selectedGrpId = bundle.getString("groupName");
+        String groupName = bundle.getString("groupName");
+        String groupId = bundle.getString("groupId");
 
         addUsersBtn = rootView.findViewById(R.id.addUsersBtn2);
 
@@ -68,7 +69,8 @@ public class ChatInfoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putString("groupName", selectedGrpId);
+                bundle.putString("groupName", groupName);
+                bundle.putString("groupId", groupId);
 //                bundle.putInt("imageUri", selectedGrpImg);
                 addUsersBtn.startAnimation();
                 AddUsersFragment addUsersFragment = new AddUsersFragment();

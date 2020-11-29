@@ -79,7 +79,7 @@ public class AddUsersFragment extends Fragment {
         Bundle bundle = this.getArguments();
 //        groupImage = bundle.getString("imageUri");
         groupName = bundle.getString("groupName");
-        groupID = bundle.getString("groupID");
+        groupID = bundle.getString("groupId");
 
 //        imageUri = Uri.parse(groupImage);
 //        chatImg = rootView.findViewById(R.id.chat_img);
@@ -235,7 +235,6 @@ public class AddUsersFragment extends Fragment {
                                             String userID = document.getId();
                                             UserHelperClass user = new UserHelperClass(name, email, userID);
                                             adaptedUsers.add(user);
-                                            Toast.makeText(getActivity(), user.toString(), Toast.LENGTH_SHORT).show();
                                             adapter.notifyDataSetChanged();
                                         }
                                     }
@@ -246,30 +245,6 @@ public class AddUsersFragment extends Fragment {
                 }
             }
         });
-
-//        String currentUserID = fAuth.getCurrentUser().getUid();
-//        DocumentReference documentReference0 = fStore.collection("users").document(currentUserID);
-//        documentReference0.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    DocumentSnapshot document = task.getResult();
-//
-//                    // Check if group exists already, update if exist, if not create new group
-//                    if (document.exists()) {
-//                        String name = document.getString("name");
-//                        String email = document.getString("email");
-//
-//                        UserHelperClass user = new UserHelperClass(name, email, currentUserID);
-//                        adaptedUsers.add(user);
-//                        adapter.notifyDataSetChanged();
-//
-//                        Toast.makeText(getActivity(), "Group found", Toast.LENGTH_SHORT).show();
-//
-//                    }
-//                }
-//            }
-//        });
     }
 
     @Override
