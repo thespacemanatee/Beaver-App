@@ -10,12 +10,19 @@ import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import com.example.beever.R;
 import com.example.beever.database.TodoEntry;
+import com.google.firebase.Timestamp;
 
+import org.w3c.dom.Text;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     protected Context context;
@@ -79,15 +86,25 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final String toDoText = (String) getChild(groupPosition, childPosition);
+        final TodoEntry todoEntry = (TodoEntry) getChild(groupPosition, childPosition);
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.fragment_to_do_task_, null);
         }
 
-        LinearLayout toDoTaskView = convertView.findViewById(R.id.toDoTaskView);
+        ConstraintLayout toDoTaskView = convertView.findViewById(R.id.toDoTaskView);
         TextView toDoTaskContent = toDoTaskView.findViewById(R.id.toDoTaskContent);
-        toDoTaskContent.setText(toDoText);
+        TextView toDoAssignedTo = toDoTaskView.findViewById(R.id.toDoAssignedTo);
+        TextView toDoDeadline = toDoTaskView.findViewById(R.id.toDoDeadline);
+
+        Timestamp deadline = todoEntry.getDeadline();
+        SimpleDateFormat sf = new SimpleDateFormat("dd-MM");
+        sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+        String deadlineStr = sf.format(deadline.toDate());
+
+        toDoTaskContent.setText(todoEntry.getName());
+        toDoAssignedTo.setText(todoEntry.getAssigned_to());
+        toDoDeadline.setText(deadlineStr);
 
         return convertView;
     }

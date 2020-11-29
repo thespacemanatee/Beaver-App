@@ -78,7 +78,14 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
         @Override
         public void onClick(View v) {
-            ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID);
+            int position = getLayoutPosition();
+            TodoEntry todoEntry = toDoList.get(position);
+            Timestamp deadline = todoEntry.getDeadline();
+            SimpleDateFormat sf = new SimpleDateFormat("dd-MM");
+            sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+            String deadlineStr = sf.format(deadline.toDate());
+
+            ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_edit);
             toDoDialogFragment.show(fragmentManager, TAG);
         }
     }

@@ -52,15 +52,16 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected List<String> groupMembers;
 
     private String groupID;
-    private GroupEntry.GetGroupEntry groupEntry;
+    private int layoutResource;
 
     protected String assignedTo;
     protected String taskTitle;
     protected String taskDescr;
     protected Date dueDate;
 
-    public ToDoDialogFragment(String groupID) {
+    public ToDoDialogFragment(String groupID, int layoutResource) {
         this.groupID = groupID;
+        this.layoutResource = layoutResource;
     }
 
     @Override
@@ -70,7 +71,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
         LayoutInflater layoutInflater = requireActivity().getLayoutInflater();
         initGroupMembers();
 
-        parentView = layoutInflater.inflate(R.layout.fragment_to_do_dialog, null);
+        parentView = layoutInflater.inflate(layoutResource, null);
         toDoDialogSpinner = parentView.findViewById(R.id.toDoDialogSpinner);
         toDoDialogTask = parentView.findViewById(R.id.toDoDialogTask);
         toDoDialogDescription = parentView.findViewById(R.id.toDoDialogDescription);
@@ -131,7 +132,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
     private void initGroupMembers() {
         // TODO: get group members from firebase
-        Log.d("INIT GROUP MEMBERS", groupID);
+        /*Log.d("INIT GROUP MEMBERS", groupID);
         groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
             @Override
             public void onPostExecute() {
@@ -146,7 +147,13 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
             }
         };
 
-        groupEntry.start();
+        groupEntry.start();*/
+        groupMembers = new ArrayList<>();
+        groupMembers.add("Claudia");
+        groupMembers.add("Chee Kit");
+        groupMembers.add("Jun Hao");
+        groupMembers.add("Sean");
+        groupMembers.add("Xing Yi");
     }
 
     @Override
@@ -162,6 +169,17 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     private void addNewToDo(String taskTitle, String taskDescr, String assignedTo, Date dueDate) {
         TodoEntry newToDo = new TodoEntry(taskTitle, taskDescr, assignedTo, new Timestamp(dueDate), groupID);
         // TODO
-        groupEntry.getResult().modifyEventOrTodo(false, true, true, newToDo);
+        /*GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    getResult().modifyEventOrTodo(false, true, true, newToDo);
+                }
+            }
+        };
+
+        groupEntry.start();*/
+
+        ToDoFragment.toDoList.add(0, newToDo);
     }
 }
