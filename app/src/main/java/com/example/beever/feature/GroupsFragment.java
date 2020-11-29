@@ -64,33 +64,18 @@ public class GroupsFragment extends Fragment {
     ArrayList<String> grpImages = new ArrayList<>();
     ArrayList<String> grpIds = new ArrayList<>();
 
-//    {
-//        for (int i=0; i<5; i++) {
-//            grpIds.add("Test "+ i);
-//            grpImages.add("https://firebasestorage.googleapis.com/v0/b/beaver-app-7998c.appspot.com/o/groups%2FH8DKr5zp34Sf5xHVhwD6TJljIWh2TEST1%2Fgroup_image.jpg?alt=media&token=f44be457-b260-41d9-8429-96c040781257");
-//        }
-//    }
-
     String addGrpBtnImg = Integer.toString(R.drawable.plus);
     String addGrpBtnText = "Add group...";
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    {
+        //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
+        grpIds.add( addGrpBtnText);
+        grpImages.add( addGrpBtnImg);
 
-        //Inflate the layout for this fragment
-        ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Groups");
 
-        String userId = fAuth.getCurrentUser().getUid();
-
-        //Fade in Nav Bar
-        View bottom_menu = getActivity().findViewById(R.id.bottom_menu);
-        if (bottom_menu.getVisibility() == View.GONE) {
-            Utils utils = new Utils(getContext());
-            utils.fadeIn();
-        }
-
-        View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
+        //Somehow only loads properly when this is here, check it out later
+        grpIds.add("Test");
+        grpImages.add("https://firebasestorage.googleapis.com/v0/b/beaver-app-7998c.appspot.com/o/groups%2FH8DKr5zp34Sf5xHVhwD6TJljIWh2TEST1%2Fgroup_image.jpg?alt=media&token=f44be457-b260-41d9-8429-96c040781257");
 
         UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
@@ -112,22 +97,34 @@ public class GroupsFragment extends Fragment {
                                     } else {
                                         grpImages.add(getResult().getDisplay_picture());
                                     }
-
                                 }
                             }
                         };
                         groupGetter.start();
-                        Log.d("GROUP NUMBERS", Integer.toString(grpImages.size()));
                     }
                 }
             }
         };
         userGetter.start();
+    }
 
-        //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
-        grpIds.add(0, addGrpBtnText);
-        grpImages.add(0, addGrpBtnImg);
-        Log.d("GROUP NUMBERS AGAIN", Integer.toString(grpImages.size()));
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        //Inflate the layout for this fragment
+        ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Groups");
+
+        String userId = fAuth.getCurrentUser().getUid();
+
+        //Fade in Nav Bar
+        View bottom_menu = getActivity().findViewById(R.id.bottom_menu);
+        if (bottom_menu.getVisibility() == View.GONE) {
+            Utils utils = new Utils(getContext());
+            utils.fadeIn();
+        }
+
+        View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
 
         //Populate GridView in fragment_groups.xml with Groups
         GridView layout = rootView.findViewById(R.id.groupButtons);
@@ -192,6 +189,7 @@ public class GroupsFragment extends Fragment {
 
             //setText for TextView
             viewHolder.gridTxt.setText(selectedGrpId);
+            Log.d("CURRENTLY ADAPTING", selectedGrpId+" to make it not fail");
 
             //Set onClick
             if (selectedGrpImg.equals(addGrpBtnImg) && selectedGrpId.equals(addGrpBtnText)) {
@@ -200,7 +198,7 @@ public class GroupsFragment extends Fragment {
                 //Set image for ShapeableImageView
                 Picasso.get().load(Integer.parseInt(selectedGrpImg)).into(viewHolder.gridImg);
 
-                //Go to AddGroupFragment
+                //Go to CreateGroupFragment
                 viewHolder.gridImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -208,7 +206,7 @@ public class GroupsFragment extends Fragment {
                         Utils utils = new Utils(getContext());
                         utils.fadeOut();
 
-                        //Go to ChatFragment
+                        //Go to CreateGroupFragment
                         CreateGroupFragment fragment = new CreateGroupFragment();
                         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                         transaction.replace(R.id.fragment_container, fragment, "openChat").addToBackStack(null).commit();
@@ -238,7 +236,7 @@ public class GroupsFragment extends Fragment {
                         Utils utils = new Utils(getContext());
                         utils.fadeOut();
 
-                        //Go to ChatFragment
+                        //Go to IndivChatFragment
                         IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
                         indivGroupFragment.setArguments(bundle);
                         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
