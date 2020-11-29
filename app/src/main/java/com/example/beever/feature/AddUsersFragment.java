@@ -112,7 +112,8 @@ public class AddUsersFragment extends Fragment {
             public void onClick(View v) {
                 confirmUsersBtn.startAnimation();
                 Bundle bundle = new Bundle();
-                bundle.putString("selectedGrpId", groupID);
+                bundle.putString("groupId", groupID);
+                bundle.putString("groupName", groupName);
                 //Go to Individual Groups Fragment
                 IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
                 indivGroupFragment.setArguments(bundle);
