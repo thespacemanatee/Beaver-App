@@ -36,6 +36,7 @@ public class GroupsFragment extends Fragment implements Populatable{
     String addGrpBtnImg = Integer.toString(R.drawable.plus);
     String addGrpBtnText = "Add group...";
     GridAdapter adapter;
+    View bottom_menu;
 
 
 
@@ -47,7 +48,7 @@ public class GroupsFragment extends Fragment implements Populatable{
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Groups");
 
         //Fade in Nav Bar
-        View bottom_menu = getActivity().findViewById(R.id.bottom_menu);
+        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
         if (bottom_menu.getVisibility() == View.GONE) {
             Utils utils = new Utils(getContext());
             utils.fadeIn();
@@ -188,7 +189,7 @@ public class GroupsFragment extends Fragment implements Populatable{
                         //Go to CreateGroupFragment
                         CreateGroupFragment fragment = new CreateGroupFragment();
                         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.fragment_container, fragment, "openChat").addToBackStack(null).commit();
+                        transaction.add(R.id.fragment_container, fragment, "openChat").addToBackStack(null).commit();
                     }
                 });
             } else {
@@ -220,7 +221,7 @@ public class GroupsFragment extends Fragment implements Populatable{
                         IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
                         indivGroupFragment.setArguments(bundle);
                         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack(null).commit();
+                        transaction.add(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack(null).commit();
                     }
                 });
             }

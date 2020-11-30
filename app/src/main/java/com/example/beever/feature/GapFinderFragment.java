@@ -32,7 +32,7 @@ public class GapFinderFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_experimental_gap_finder, container, false);
+        View v = inflater.inflate(R.layout.fragment_gap_finder, container, false);
         userId = v.findViewById(R.id.edittext_experimental_user_id);
         userQueryButton = v.findViewById(R.id.button_experimental_user_id);
         groupId = v.findViewById(R.id.edittext_experimental_group_id);

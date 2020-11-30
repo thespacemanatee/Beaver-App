@@ -86,4 +86,11 @@ public class IndivGroupFragment extends Fragment {
             return 3;
         }
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Utils utils = new Utils(getContext());
+        utils.fadeIn();
+    }
 }
