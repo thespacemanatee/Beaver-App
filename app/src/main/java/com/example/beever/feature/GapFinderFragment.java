@@ -5,13 +5,14 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.ArraySet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -19,17 +20,19 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
+import com.example.beever.database.EventEntry;
+import com.example.beever.database.GroupEntry;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.jetbrains.annotations.NotNull;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
@@ -44,6 +47,13 @@ public class GapFinderFragment extends Fragment implements Populatable{
     private CircularProgressButton searchBtn;
     private TextView currentTime;
     private static Calendar combinedCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+    private ArrayList<Timestamp> timestamps = new ArrayList<>();
+    private ArrayList<Timestamp> startTimes = new ArrayList<>();
+    private ArrayList<Timestamp> endTimes = new ArrayList<>();
+//    private List<Object> members = new ArrayList<>();
+//    private Set<String> uniqueGroups = new ArraySet<>();
+    private GroupEntry groupEntry;
+    private ArrayList<EventEntry> groupEntries = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,6 +72,9 @@ public class GapFinderFragment extends Fragment implements Populatable{
         preferredTime = rootView.findViewById(R.id.preferred_time);
         searchBtn = rootView.findViewById(R.id.search_button);
         currentTime = rootView.findViewById(R.id.current_preferred_text);
+
+//        getListOfMembers();
+        getListOfEvents();
 
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +100,26 @@ public class GapFinderFragment extends Fragment implements Populatable{
         });
 
         return rootView;
+    }
+
+    private void getListOfEvents() {
+        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
+
+            @Override
+            public void onPostExecute() {
+                groupEntry = getResult();
+                GroupEntry.GetGroupRelevantEvents groupRelevantEvents = new GroupEntry.GetGroupRelevantEvents(groupEntry, 5000) {
+
+                    @Override
+                    public void onPostExecute() {
+                        groupEntries = getResult();
+                        Log.d("RELEVANT EVENTS", groupEntries.toString());
+                    }
+                };
+                groupRelevantEvents.start();
+            }
+        };
+        getGroupEntry.start();
     }
 
     @Override
