@@ -21,7 +21,8 @@
             android:id="@+id/preferred_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:textSize="12sp"
+            android:layout_marginEnd="5dp"
             android:text="@string/preferred_date"
             android:onClick="showDatePickerDialog"/>
 
@@ -29,8 +30,9 @@
             android:id="@+id/preferred_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_toRightOf="@+id/preferred_date"
+            android:textSize="12sp"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/preferred_date"
             android:text="@string/preferred_time"
             android:onClick="showTimePickerDialog"/>
 
