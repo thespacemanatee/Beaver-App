@@ -34,7 +34,6 @@
             android:text="@string/preferred_time"
             android:onClick="showTimePickerDialog"/>
 
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -61,12 +60,38 @@
 
     </RelativeLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/event_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/event_name"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/event_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/description"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
     <TextView
         android:id="@+id/current_preferred_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_bold"
         android:textSize="16sp"
+        android:layout_marginTop="10dp"
         android:text="@string/current_preferred_time"/>
 
     <br.com.simplepass.loadingbutton.customViews.CircularProgressButton

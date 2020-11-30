@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.ramotion.foldingcell.FoldingCell
-    android:id="@+id/folding_cell"
+<LinearLayout
+    android:id="@+id/timestamp_cell"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_margin="10dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/cell_content_view"
+<!--    <FrameLayout-->
+<!--        android:id="@+id/cell_content_view"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="@drawable/gapfinder_content"-->
+<!--        android:visibility="gone">-->
+<!--        <TextView-->
+<!--            android:id="@+id/timestamp_text_content"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="50dp" />-->
+<!--    </FrameLayout>-->
+
+
+    <TextView
+        android:id="@+id/timestamp_text_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/gapfinder_content"
-        android:visibility="visible">
-        <TextView
-            android:id="@+id/timestamp_text_content"
-            android:layout_width="match_parent"
-            android:layout_height="50dp" />
-    </FrameLayout>
+        android:layout_height="50dp"
+        android:background="@drawable/circular_border_shape"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:layout_gravity="center" />
 
-    <FrameLayout
-        android:id="@+id/cell_title_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/timestamp_text_title"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/circular_border_shape"
-            android:layout_gravity="center" />
-    </FrameLayout>
 
-</com.ramotion.foldingcell.FoldingCell>
+</LinearLayout>

@@ -18,14 +18,18 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
 import com.example.beever.database.EventEntry;
 import com.example.beever.database.GroupEntry;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -33,10 +37,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
-public class GapFinderFragment extends Fragment implements AdapterView.OnItemSelectedListener, Populatable{
+public class GapFinderFragment extends Fragment implements AdapterView.OnItemSelectedListener, GapAdapter.OnTimestampListener {
 
     private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private RecyclerView mRecyclerView;
@@ -45,6 +50,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private MaterialButton preferredDate, preferredTime;
     private CircularProgressButton searchBtn;
     private TextView currentTime, result;
+    private TextInputLayout eventName, eventDesc;
     private Spinner spin;
     private static Calendar combinedCal = Calendar.getInstance();
     private ArrayList<Timestamp> timestamps = new ArrayList<>();
@@ -53,6 +59,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private ArrayList<EventEntry> groupEntries = new ArrayList<>();
     private Integer[] durations = new Integer[10];
     private int chosenDuration;
+    private GapAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,7 +80,16 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         currentTime = rootView.findViewById(R.id.current_preferred_text);
         result = rootView.findViewById(R.id.gap_result);
         spin = rootView.findViewById(R.id.spinner);
+        eventName = rootView.findViewById(R.id.event_name);
+        eventDesc = rootView.findViewById(R.id.event_description);
+
         spin.setOnItemSelectedListener(this);
+
+        mRecyclerView = rootView.findViewById(R.id.gap_finder_recycler);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(layoutManager);
+        adapter = new GapAdapter(timestamps, this);
+        mRecyclerView.setAdapter(adapter);
 
         for (int i = 0; i < 10; i++) {
             durations[i] = (i+1)*15;
@@ -121,12 +137,42 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
             Log.d("GAP TEST END", String.valueOf(endTimes.get(i).getSeconds()));
             Log.d("GAP TEST CHOSEN", String.valueOf(timestamp.getSeconds()));
             if (timestamp.getSeconds() > startTimes.get(i).getSeconds()
-                    && timestamp.getSeconds() < endTimes.get(i).getSeconds()) {
+                    && timestamp.getSeconds() < endTimes.get(i).getSeconds()
+                    || timestamp.getSeconds() < startTimes.get(i).getSeconds()
+                    && (timestamp.getSeconds() + chosenDuration*60) > startTimes.get(i).getSeconds()) {
 
-            result.setText("Result: Timeslot is unavailable!");
-            searchBtn.revertAnimation();
+                timestamps.clear();
+                result.setText("Result: Timeslot is unavailable!\nHow about: ");
+                findAlternativeTimings(timestamp);
+                searchBtn.revertAnimation();
+                break;
+            } else {
+                timestamps.clear();
+                result.setText("Result: " + combinedCal.getTime().toString().substring(0, 16) + " is available!");
+                timestamps.add(timestamp);
+                adapter.notifyDataSetChanged();
             }
         }
+        searchBtn.revertAnimation();
+    }
+
+    private void findAlternativeTimings(Timestamp timestamp) {
+        int counter = 0;
+        long time = timestamp.getSeconds();
+        while (counter < 3) {
+            time -= chosenDuration*60;
+            for (int i = 0; i < startTimes.size(); i++) {
+                if (time > startTimes.get(i).getSeconds()
+                        && time < endTimes.get(i).getSeconds()
+                        || time < startTimes.get(i).getSeconds()
+                        && (time + chosenDuration*60) > startTimes.get(i).getSeconds()) {
+
+                } else {
+                    timestamps.add(new Timestamp(new Date(time)));
+                    counter++;
+                }
+            }
+        }adapter.notifyDataSetChanged();
     }
 
     private void getListOfEvents() {
@@ -159,10 +205,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         Log.d("END TIMES", endTimes.toString());
     }
 
-    @Override
-    public void populateRecyclerView() {
-
-    }
 
     public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment();
@@ -184,57 +226,26 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
 
     }
 
-    static class GapAdapter extends RecyclerView.Adapter<GapAdapter.ViewHolder> {
-        private ArrayList<Timestamp> timestamps;
-        public static class ViewHolder extends RecyclerView.ViewHolder{
-            private TextView timestampTitle;
-            private TextView timestampContent;
-
-
-            public ViewHolder(@NonNull View itemView) {
-                super(itemView);
-                timestampTitle = itemView.findViewById(R.id.timestamp_text_title);
-                timestampContent = itemView.findViewById(R.id.timestamp_text_content);
-            }
-
-            public TextView getTimestampTitle() {
-                return timestampTitle;
-            }
-
-            public TextView getTimestampContent() {
-                return timestampContent;
-            }
+    @Override
+    public void onTimestampClick(int position) {
+        String name = eventName.getEditText().getText().toString();
+        String description = eventDesc.getEditText().getText().toString();
+        if (!name.isEmpty()) {
+            name = eventName.getEditText().getText().toString();
+            eventName.setError(null);
+            eventName.setErrorEnabled(false);
+        } else {
+            eventName.setError("Please enter an event name!");
+        }
+        if (!description.isEmpty()) {
+            description = eventDesc.getEditText().getText().toString();
+            eventDesc.setError(null);
+            eventDesc.setErrorEnabled(false);
+        } else {
+            eventDesc.setError("Please enter an event name!");
         }
 
-        /**
-         * Initialize the dataset of the Adapter.
-         *
-         * @param timestamps ArrayList<Timestamp> containing the data to populate views to be used
-         * by RecyclerView.
-         */
-        public GapAdapter(ArrayList<Timestamp> timestamps) {
 
-        }
-
-        @NonNull
-        @Override
-        public GapAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.gap_finder_cells, parent, false);
-
-            return new GapAdapter.ViewHolder(itemView);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull GapAdapter.ViewHolder holder, int position) {
-            holder.getTimestampTitle().setText(timestamps.get(position).toString());
-            holder.getTimestampContent().setText(timestamps.get(position).toString());
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return 0;
-        }
     }
 
     public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
