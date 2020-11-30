@@ -57,11 +57,12 @@ public class GroupsFragment extends Fragment implements Populatable{
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
         grpNames.clear();
         grpImages.clear();
+        grpIds.clear();
 
         {
             //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
-            grpNames.add( addGrpBtnText);
-            grpImages.add( addGrpBtnImg);
+            grpNames.add(addGrpBtnText);
+            grpImages.add(addGrpBtnImg);
             grpIds.add(null);
         }
 
