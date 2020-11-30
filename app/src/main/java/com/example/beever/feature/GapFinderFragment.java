@@ -1,98 +1,115 @@
 package com.example.beever.feature;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
-import com.example.beever.database.GroupEntry;
-import com.example.beever.database.UserEntry;
+import com.example.beever.admin.UserHelperClass;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-public class GapFinderFragment extends Fragment {
+import java.util.ArrayList;
 
-    EditText userId;
-    Button userQueryButton;
-    EditText groupId;
-    Button groupQueryButton;
-    TextView infoDisplay;
+import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
-    public GapFinderFragment() {
-        // Required empty public constructor
-    }
+public class GapFinderFragment extends Fragment implements Populatable{
+
+    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private RecyclerView mRecyclerView;
+    private String groupName;
+    private String groupID;
+    private TextInputEditText preferredTimeText;
+    private CircularProgressButton searchBtn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_gap_finder, container, false);
-        userId = v.findViewById(R.id.edittext_experimental_user_id);
-        userQueryButton = v.findViewById(R.id.button_experimental_user_id);
-        groupId = v.findViewById(R.id.edittext_experimental_group_id);
-        groupQueryButton = v.findViewById(R.id.button_experimental_group_id);
-        infoDisplay = v.findViewById(R.id.textview_experimental_info);
+        View rootView = inflater.inflate(R.layout.fragment_gap_finder, container, false);
 
-        userQueryButton.setOnClickListener(new View.OnClickListener(){
+        Bundle bundle = this.getArguments();
+//        groupImage = bundle.getString("imageUri");
+        groupName = bundle.getString("groupName");
+        groupID = bundle.getString("groupId");
 
+        mRecyclerView = rootView.findViewById(R.id.gap_finder_recycler);
+        preferredTimeText = rootView.findViewById(R.id.preferred_text);
+        searchBtn = rootView.findViewById(R.id.search_button);
+
+        searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                String queryUserId = userId.getText().toString();
-                //Log.i("Test",queryUserId);
-                if (queryUserId.equals("")) {
-                    Toast.makeText(getActivity(),"Please enter a user id.",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(queryUserId,5000){
-                    public void onPostExecute(){
-                        if (!isSuccessful()){
-                            infoDisplay.setText("Failed0");
-                            return;
-                        }
-                        UserEntry.GetUserRelevantTodos getUserRelevantTodos = new UserEntry.GetUserRelevantTodos(getResult(),5000,true,true,queryUserId) {
-                            @Override
-                            public void onPostExecute() {
-                                infoDisplay.setText(isSuccessful()? getResult().toString():"Failed1");
-                            }
-                        };
-                        getUserRelevantTodos.start();
-                    }
-                };
-                getUserEntry.start();
+            public void onClick(View v) {
+                searchBtn.startAnimation();
             }
         });
 
-        groupQueryButton.setOnClickListener(new View.OnClickListener(){
+        return rootView;
+    }
 
-            @Override
-            public void onClick(View v){
-                String queryGroupId = groupId.getText().toString();
-                //Log.i("Test",queryUserId);
-                if (queryGroupId.equals("")) {
-                    Toast.makeText(getActivity(), "Please enter a group id.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                GroupEntry.GroupEntryListener groupEntryListener = new GroupEntry.GroupEntryListener(queryGroupId,5000) {
-                    public void onPreListening(){
-                        infoDisplay.setText(exists()? "Initial retrieval success" : "InitFail");
-                    }
+    @Override
+    public void populateRecyclerView() {
 
-                    @Override
-                    public void onListenerUpdate() {
-                        infoDisplay.setText(exists()? getStateChange().toString() : "Failed");
-                    }
-                };
-                groupEntryListener.start();
+    }
 
+    static class GapAdapter extends RecyclerView.Adapter<GapAdapter.ViewHolder> {
+        private ArrayList<Timestamp> timestamps;
+        public static class ViewHolder extends RecyclerView.ViewHolder{
+            private TextView timestampTitle;
+            private TextView timestampContent;
+
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                timestampTitle = itemView.findViewById(R.id.timestamp_text_title);
+                timestampContent = itemView.findViewById(R.id.timestamp_text_content);
             }
-        });
 
-        return v;
+            public TextView getTimestampTitle() {
+                return timestampTitle;
+            }
+
+            public TextView getTimestampContent() {
+                return timestampContent;
+            }
+        }
+
+        /**
+         * Initialize the dataset of the Adapter.
+         *
+         * @param timestamps ArrayList<Timestamp> containing the data to populate views to be used
+         * by RecyclerView.
+         */
+        public GapAdapter(ArrayList<Timestamp> timestamps) {
+
+        }
+
+        @NonNull
+        @Override
+        public GapAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.gap_finder_cells, parent, false);
+
+            return new GapAdapter.ViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull GapAdapter.ViewHolder holder, int position) {
+            holder.getTimestampTitle().setText(timestamps.get(position).toString());
+            holder.getTimestampContent().setText(timestamps.get(position).toString());
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return 0;
+        }
     }
 }

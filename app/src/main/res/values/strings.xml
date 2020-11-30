@@ -68,4 +68,6 @@
     <string name="currently_added">Currently Added:</string>
     <string name="add_user">Add User</string>
     <string name="confirm_users">confirm</string>
+    <string name="enter_your_preferred_timing">Enter your preferred timing</string>
+    <string name="search">Search</string>
 </resources>

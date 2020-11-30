@@ -24,7 +24,6 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Calendar;

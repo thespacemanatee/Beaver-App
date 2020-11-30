@@ -58,8 +58,8 @@ dependencies {
     implementation 'io.github.inflationx:calligraphy3:3.1.1'
     implementation 'io.github.inflationx:viewpump:2.0.3'
     implementation 'com.github.kizitonwose:CalendarView:1.0.0'
+    implementation 'com.ramotion.foldingcell:folding-cell:1.2.3'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
-    implementation 'com.squareup.picasso:picasso:2.71828'
 
 }

@@ -53,7 +53,6 @@ public class AddUsersFragment extends Fragment {
 
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
-    private final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
     private SharedPreferences mSharedPref;
     private String userID;
     private Uri imageUri;
@@ -129,8 +128,6 @@ public class AddUsersFragment extends Fragment {
         CollectionReference collectionReferenceUsers = fStore.collection("users");
         CollectionReference collectionReferenceGroups = fStore.collection("groups");
         Query queryEmail = collectionReferenceUsers.whereEqualTo("email", email);
-//        List<String> members = new ArrayList<>();
-//        Map<String, Object> memberMap = new HashMap<>();
         queryEmail.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

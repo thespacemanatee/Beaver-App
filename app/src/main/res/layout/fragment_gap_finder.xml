@@ -3,65 +3,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_gravity="center"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:background="@color/white"
+    android:padding="20dp"
     tools:context=".feature.GapFinderFragment">
 
-    <LinearLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/preferred_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/enter_your_preferred_timing"
+            android:inputType="text"
+            android:maxLines="1"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+        android:id="@+id/search_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_gravity="center"
-        tools:context=".feature.ExperimentalGapFinderFragment">
+        android:background="@drawable/circular_border_shape"
+        android:text="@string/search"
+        android:textColor="@color/white"
+        app:spinning_bar_width="4dp"
+        app:spinning_bar_color="#FFF"
+        app:spinning_bar_padding="6dp"
+        app:initialCornerAngle="1000dp"
+        app:finalCornerAngle="1000dp"/>
 
-        <EditText
-            android:id="@+id/edittext_experimental_user_id"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="2"
-            android:text=""
-            android:hint="User id"/>
-
-        <Button
-            android:id="@+id/button_experimental_user_id"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:text="Query" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/gap_finder_recycler"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center"
-        tools:context=".feature.ExperimentalGapFinderFragment">
+        android:layout_height="wrap_content"/>
 
-        <EditText
-            android:id="@+id/edittext_experimental_group_id"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="2"
-            android:text=""
-            android:hint="Group id"/>
-
-        <Button
-            android:id="@+id/button_experimental_group_id"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:text="Query" />
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/textview_experimental_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Info shown here" />
 </LinearLayout>
