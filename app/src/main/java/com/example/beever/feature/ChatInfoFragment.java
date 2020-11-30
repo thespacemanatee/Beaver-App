@@ -69,6 +69,9 @@ public class ChatInfoFragment extends Fragment implements Populatable{
         groupName = bundle.getString("groupName");
         groupId = bundle.getString("groupId");
 
+        grpMembers.clear();
+        grpMemberImg.clear();
+
         addUsersBtn = rootView.findViewById(R.id.addUsersBtn2);
 
         //Get chat_info_img in fragment_chat_info.xml and setImageResource

@@ -36,6 +36,7 @@ public class DashboardFragment extends Fragment {
     int currentTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
     private SharedPreferences mSharedPref;
     TextView greeting, name;
+    DashBoardGroupsAdapter adapter;
 
 
     @Override
@@ -66,16 +67,23 @@ public class DashboardFragment extends Fragment {
             greeting.setText(R.string.greetings_evening);
         }
 
+        dbGrpIds.clear();
+        dbGrpImgs.clear();
+        dbGrpNames.clear();
+
         //Populate GridView in dashboard_fragment.xml with Groups
         GridView layout = root.findViewById(R.id.dashboard_groups);
-        layout.setAdapter(new DashBoardGroupsAdapter(getActivity()));
+        adapter = new DashBoardGroupsAdapter(getActivity());
+        layout.setAdapter(adapter);
+        populateRecyclerView();
 
         return root;
     }
 
     ArrayList<String> dbGrpImgs = new ArrayList<>();
+    ArrayList<String> dbGrpNames = new ArrayList<>();
     ArrayList<String> dbGrpIds = new ArrayList<>();
-    {
+    public void populateRecyclerView() {
         UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
             public void onPostExecute() {
@@ -90,12 +98,15 @@ public class DashboardFragment extends Fragment {
                                     if (isSuccessful()) {
                                         Log.d("GROUP ENTRY", "success");
                                         Log.d("GROUP RESULT", getResult().toString());
-                                        dbGrpIds.add(getResult().getName());
+                                        dbGrpIds.add(getGroupId());
+                                        dbGrpNames.add(getResult().getName());
+                                        adapter.notifyDataSetChanged();
                                         if (getResult().getDisplay_picture() == null) {
                                             dbGrpImgs.add("null");
                                         } else {
                                             dbGrpImgs.add(getResult().getDisplay_picture());
                                         }
+                                        adapter.notifyDataSetChanged();
                                     }
                                 }
                             };
@@ -159,15 +170,16 @@ public class DashboardFragment extends Fragment {
 
             //Set variables to allow multiple access of same image and text
             String selectedGrpImg = dbGrpImgs.get(i);
+            String selectedGrpName = dbGrpNames.get(i);
             String selectedGrpId = dbGrpIds.get(i);
 
             //setImageResource for ImageButton and setText for TextView
             if (selectedGrpImg.equals("null")) {
-                Glide.with(context).load(R.drawable.pink_circle).fitCenter().into(viewHolder.gridImg);
+                Glide.with(context).load(R.drawable.pink_circle).centerCrop().into(viewHolder.gridImg);
             } else {
-                Glide.with(context).load(selectedGrpImg).into(viewHolder.gridImg);
+                Glide.with(context).load(selectedGrpImg).centerCrop().into(viewHolder.gridImg);
             }
-            viewHolder.gridTxt.setText(selectedGrpId);
+            viewHolder.gridTxt.setText(selectedGrpName);
 
             //Set onClick
             viewHolder.gridImg.setOnClickListener(new View.OnClickListener() {
@@ -175,8 +187,9 @@ public class DashboardFragment extends Fragment {
                 public void onClick(View v) {
                     //Bundle arguments to send to ChatFragment
                     Bundle bundle = new Bundle();
-                    bundle.putString("selectedGrpImg", selectedGrpImg);
-                    bundle.putString("selectedGrpId", selectedGrpId);
+                    bundle.putString("groupImage", selectedGrpImg);
+                    bundle.putString("groupName", selectedGrpName);
+                    bundle.putString("groupId", selectedGrpId);
 
                     //Fade Out Nav Bar
                     Utils utils = new Utils(getContext());
