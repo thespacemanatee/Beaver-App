@@ -73,4 +73,7 @@
     <string name="preferred_time">Preferred Time</string>
     <string name="preferred_date">Preferred Date</string>
     <string name="current_preferred_time">Current preferred time:</string>
+    <string name="result">Result:</string>
+    <string name="enter_the_duration_of_your_meeting">Enter the duration of your meeting</string>
+    <string name="duration_of_meeting">Duration of meeting (min)</string>
 </resources>

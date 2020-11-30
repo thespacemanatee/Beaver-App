@@ -5,14 +5,17 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.ArraySet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -30,14 +33,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
-public class GapFinderFragment extends Fragment implements Populatable{
+public class GapFinderFragment extends Fragment implements AdapterView.OnItemSelectedListener, Populatable{
 
     private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private RecyclerView mRecyclerView;
@@ -45,15 +44,15 @@ public class GapFinderFragment extends Fragment implements Populatable{
     private String groupID;
     private MaterialButton preferredDate, preferredTime;
     private CircularProgressButton searchBtn;
-    private TextView currentTime;
-    private static Calendar combinedCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+    private TextView currentTime, result;
+    private Spinner spin;
+    private static Calendar combinedCal = Calendar.getInstance();
     private ArrayList<Timestamp> timestamps = new ArrayList<>();
     private ArrayList<Timestamp> startTimes = new ArrayList<>();
     private ArrayList<Timestamp> endTimes = new ArrayList<>();
-//    private List<Object> members = new ArrayList<>();
-//    private Set<String> uniqueGroups = new ArraySet<>();
-    private GroupEntry groupEntry;
     private ArrayList<EventEntry> groupEntries = new ArrayList<>();
+    private Integer[] durations = new Integer[10];
+    private int chosenDuration;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,8 +71,19 @@ public class GapFinderFragment extends Fragment implements Populatable{
         preferredTime = rootView.findViewById(R.id.preferred_time);
         searchBtn = rootView.findViewById(R.id.search_button);
         currentTime = rootView.findViewById(R.id.current_preferred_text);
+        result = rootView.findViewById(R.id.gap_result);
+        spin = rootView.findViewById(R.id.spinner);
+        spin.setOnItemSelectedListener(this);
 
-//        getListOfMembers();
+        for (int i = 0; i < 10; i++) {
+            durations[i] = (i+1)*15;
+        }
+
+        ArrayAdapter aa = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, durations);
+        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        spin.setAdapter(aa);
+
         getListOfEvents();
 
         searchBtn.setOnClickListener(new View.OnClickListener() {
@@ -82,6 +92,9 @@ public class GapFinderFragment extends Fragment implements Populatable{
                 searchBtn.startAnimation();
                 currentTime.setText("Current preferred time: " + combinedCal.getTime().toString().substring(0, 16));
                 Timestamp timestamp = new Timestamp(combinedCal.getTime());
+                Log.d("TIME SELECTED", combinedCal.getTime().toString());
+                Log.d("TIME SELECTED", timestamp.toString());
+                gapFinder(timestamp);
             }
         });
 
@@ -102,24 +115,48 @@ public class GapFinderFragment extends Fragment implements Populatable{
         return rootView;
     }
 
+    private void gapFinder(Timestamp timestamp) {
+        for (int i = 0; i < startTimes.size(); i++) {
+            Log.d("GAP TEST START", String.valueOf(startTimes.get(i).getSeconds()));
+            Log.d("GAP TEST END", String.valueOf(endTimes.get(i).getSeconds()));
+            Log.d("GAP TEST CHOSEN", String.valueOf(timestamp.getSeconds()));
+            if (timestamp.getSeconds() > startTimes.get(i).getSeconds()
+                    && timestamp.getSeconds() < endTimes.get(i).getSeconds()) {
+
+            result.setText("Result: Timeslot is unavailable!");
+            searchBtn.revertAnimation();
+            }
+        }
+    }
+
     private void getListOfEvents() {
         GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
 
             @Override
             public void onPostExecute() {
-                groupEntry = getResult();
+                GroupEntry groupEntry = getResult();
                 GroupEntry.GetGroupRelevantEvents groupRelevantEvents = new GroupEntry.GetGroupRelevantEvents(groupEntry, 5000) {
 
                     @Override
                     public void onPostExecute() {
                         groupEntries = getResult();
                         Log.d("RELEVANT EVENTS", groupEntries.toString());
+                        getStartAndEndTime();
                     }
                 };
                 groupRelevantEvents.start();
             }
         };
         getGroupEntry.start();
+    }
+
+    private void getStartAndEndTime() {
+        for (EventEntry entry: groupEntries) {
+            startTimes.add(entry.getStart_time());
+            endTimes.add(entry.getEnd_time());
+        }
+        Log.d("START TIMES", startTimes.toString());
+        Log.d("END TIMES", endTimes.toString());
     }
 
     @Override
@@ -135,6 +172,16 @@ public class GapFinderFragment extends Fragment implements Populatable{
     public void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getFragmentManager(), "datePicker");
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        chosenDuration = durations[position];
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
     static class GapAdapter extends RecyclerView.Adapter<GapAdapter.ViewHolder> {
