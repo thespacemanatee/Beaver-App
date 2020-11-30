@@ -58,7 +58,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private ArrayList<Timestamp> endTimes = new ArrayList<>();
     private ArrayList<EventEntry> groupEntries = new ArrayList<>();
     private Integer[] durations = new Integer[10];
-    private int chosenDuration;
+    private int CHOSEN_DURATION;
     private GapAdapter adapter;
 
     @Override
@@ -139,7 +139,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
             if (timestamp.getSeconds() > startTimes.get(i).getSeconds()
                     && timestamp.getSeconds() < endTimes.get(i).getSeconds()
                     || timestamp.getSeconds() < startTimes.get(i).getSeconds()
-                    && (timestamp.getSeconds() + chosenDuration*60) > startTimes.get(i).getSeconds()) {
+                    && (timestamp.getSeconds() + CHOSEN_DURATION*60) > startTimes.get(i).getSeconds()) {
 
                 timestamps.clear();
                 result.setText("Result: Timeslot is unavailable!\nHow about: ");
@@ -160,12 +160,13 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         int counter = 0;
         long time = timestamp.getSeconds();
         while (counter < 3) {
-            time -= chosenDuration*60;
+            time -= CHOSEN_DURATION*60;
+            Log.d("TIME LONG", String.valueOf(time));
             for (int i = 0; i < startTimes.size(); i++) {
                 if (time > startTimes.get(i).getSeconds()
                         && time < endTimes.get(i).getSeconds()
                         || time < startTimes.get(i).getSeconds()
-                        && (time + chosenDuration*60) > startTimes.get(i).getSeconds()) {
+                        && (time + CHOSEN_DURATION*60) > startTimes.get(i).getSeconds()) {
 
                 } else {
                     timestamps.add(new Timestamp(new Date(time)));
@@ -218,7 +219,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        chosenDuration = durations[position];
+        CHOSEN_DURATION = durations[position];
     }
 
     @Override
