@@ -12,20 +12,38 @@
     android:padding="20dp"
     tools:context=".feature.GapFinderFragment">
 
-    <com.google.android.material.textfield.TextInputLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        android:gravity="center">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/preferred_text"
-            android:layout_width="match_parent"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/preferred_date"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/enter_your_preferred_timing"
-            android:inputType="text"
-            android:maxLines="1"/>
+            android:layout_margin="5dp"
+            android:text="@string/preferred_date"
+            android:onClick="showDatePickerDialog"/>
 
-    </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/preferred_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_toRightOf="@+id/preferred_date"
+            android:text="@string/preferred_time"
+            android:onClick="showTimePickerDialog"/>
+
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/current_preferred_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_bold"
+        android:textSize="16sp"
+        android:text="@string/current_preferred_time"/>
 
     <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
         android:id="@+id/search_button"

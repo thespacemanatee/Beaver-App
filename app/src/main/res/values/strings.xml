@@ -70,4 +70,7 @@
     <string name="confirm_users">confirm</string>
     <string name="enter_your_preferred_timing">Enter your preferred timing</string>
     <string name="search">Search</string>
+    <string name="preferred_time">Preferred Time</string>
+    <string name="preferred_date">Preferred Date</string>
+    <string name="current_preferred_time">Current preferred time:</string>
 </resources>
