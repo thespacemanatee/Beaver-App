@@ -7,6 +7,7 @@ import com.example.beever.database.GroupEntry;
 import com.google.firebase.Timestamp;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import static java.lang.Math.max;
@@ -24,6 +25,7 @@ public abstract class GapFinderAlgorithm {
     private String groupId = null;
     private Integer timeout = null;
     private ArrayList<ArrayList<Timestamp> > result = null;
+    private Calendar calendar = Calendar.getInstance();
 
     private int targetYear = 0;
     private int targetMonth = 0;
@@ -67,7 +69,9 @@ public abstract class GapFinderAlgorithm {
     }
 
     public void runMainGapFinder(ArrayList<EventEntry> events){
-        Timestamp targetDateBase = new Timestamp(new Date(targetYear,targetMonth,targetDay));
+        calendar.set(targetYear,targetMonth,targetDay);
+        Timestamp targetDateBase = new Timestamp(calendar.getTime());
+        Log.d("ALGORITHM", "runMainGapFinder: " + targetDateBase);
         int availableBlockCount = (MIN_IN_DAY + START_FORBIDDEN_TIMING_MIN) / MIN_BLOCK_MINUTES;
         int requestedBlockCount = (durationInMinutes%MIN_BLOCK_MINUTES==0?
                 durationInMinutes/MIN_BLOCK_MINUTES:(durationInMinutes/MIN_BLOCK_MINUTES)+1);

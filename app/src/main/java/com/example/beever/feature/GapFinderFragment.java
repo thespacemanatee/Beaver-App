@@ -49,7 +49,6 @@ import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
 public class GapFinderFragment extends Fragment implements AdapterView.OnItemSelectedListener, GapAdapter.OnTimestampListener {
 
-    private static final String TAG_ALT = "ALTERNATE TIME";
     private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private RecyclerView mRecyclerView;
     private String groupName;
@@ -193,32 +192,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
             }
         };
         gapFinder.getGaps();
-//        timestamps.clear();
-//        Timestamp chosen = new Timestamp(chosenDay.getTime());
-//        for (int i = 0; i < 48; i++) {
-//            Timestamp block = new Timestamp(new Date((chosen.getSeconds() + i*30*60)*1000));
-//            boolean add = true;
-//            Log.d(TAG_ALT, block.toString());
-//            for (int j = 0; j < startTimes.size(); j++) {
-//                Log.d("GAP TEST START", String.valueOf(startTimes.get(j).getSeconds()));
-//                Log.d("GAP TEST END", String.valueOf(endTimes.get(j).getSeconds()));
-//                Log.d("GAP TEST CHOSEN", String.valueOf(block.getSeconds()));
-//                if (block.getSeconds() > startTimes.get(j).getSeconds()
-//                        && block.getSeconds() < endTimes.get(j).getSeconds()
-//                        || block.getSeconds() < startTimes.get(j).getSeconds()
-//                        && (block.getSeconds() + CHOSEN_DURATION*60) > startTimes.get(j).getSeconds()
-//                        && (block.getSeconds() + CHOSEN_DURATION*60) < endTimes.get(j).getSeconds()) {
-//                    Log.d("GAP TEST RESULT", "BREAK: " + block + ":" + startTimes.get(j) + ":" + endTimes.get(j));
-//                    add = false;
-//                    break;
-//                }
-//            }
-//            if (add) {
-//                Log.d("GAP TEST RESULT", "ADDED");
-//                timestamps.add(block);
-//            }
-//        }
-//        adapter.notifyDataSetChanged();
     }
 
     private void getListOfEvents() {

@@ -87,38 +87,47 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:id="@+id/current_preferred_text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_bold"
-        android:textSize="16sp"
-        android:layout_marginTop="10dp"
-        android:text="@string/current_preferred_time"/>
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:elevation="0.01dp">
 
-    <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
-        android:id="@+id/search_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_gravity="center"
-        android:background="@drawable/circular_border_shape"
-        android:text="@string/search"
-        android:textColor="@color/white"
-        app:spinning_bar_width="4dp"
-        app:spinning_bar_color="#FFF"
-        app:spinning_bar_padding="6dp"
-        app:initialCornerAngle="1000dp"
-        app:finalCornerAngle="1000dp"/>
+        <TextView
+            android:id="@+id/current_preferred_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_bold"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"
+            android:text="@string/current_preferred_time"/>
 
-    <TextView
-        android:id="@+id/gap_result"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_bold"
-        android:textSize="16sp"
-        android:layout_marginTop="10dp"
-        android:text="@string/result"/>
+        <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+            android:id="@+id/search_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/circular_border_shape"
+            android:text="@string/search"
+            android:textColor="@color/white"
+            app:spinning_bar_width="4dp"
+            app:spinning_bar_color="#FFF"
+            app:spinning_bar_padding="6dp"
+            app:initialCornerAngle="1000dp"
+            app:finalCornerAngle="1000dp"/>
+
+        <TextView
+            android:id="@+id/gap_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_bold"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"
+            android:text="@string/result"/>
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/gap_finder_recycler"
