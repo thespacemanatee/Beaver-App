@@ -1,19 +1,26 @@
 
 package com.example.beever.feature;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
@@ -25,6 +32,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GroupsFragment extends Fragment implements Populatable{
 
@@ -200,6 +208,16 @@ public class GroupsFragment extends Fragment implements Populatable{
             } else {
                 //If gridImg is not addGrpBtnImg and gridImgText is not addGrpBtnText,
 
+                viewHolder.gridImg.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        AddToDashboardDialogFragment dialog = new AddToDashboardDialogFragment(selectedGrpId, userID);
+                        assert getFragmentManager() != null;
+                        dialog.show(getFragmentManager(), "");
+                        return true;
+                    }
+                });
+
                 //Set image for ShapeableImageView
                 if (selectedGrpImg.equals("null")) {
                     Glide.with(context).load(R.drawable.pink_circle).centerCrop().into(viewHolder.gridImg);
@@ -240,5 +258,4 @@ public class GroupsFragment extends Fragment implements Populatable{
             TextView gridTxt;
         }
     }
-
 }

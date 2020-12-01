@@ -12,6 +12,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -36,19 +37,13 @@ public class DashboardFragment extends Fragment {
     private SharedPreferences mSharedPref;
     TextView greeting, name;
     DashBoardGroupsAdapter adapter;
+    View bottom_menu;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.dashboard_fragment, container, false);
-
-        //Fade in Nav Bar
-        View bottom_menu = getActivity().findViewById(R.id.bottom_menu);
-        if (bottom_menu.getVisibility() == View.GONE) {
-            Utils utils = new Utils(getContext());
-            utils.fadeIn();
-        }
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Dashboard");
         mSharedPref = this.getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
@@ -65,10 +60,6 @@ public class DashboardFragment extends Fragment {
             greeting.setText(R.string.greetings_evening);
         }
 
-        dbGrpIds.clear();
-        dbGrpImgs.clear();
-        dbGrpNames.clear();
-
         //Populate GridView in dashboard_fragment.xml with Groups
         GridView layout = root.findViewById(R.id.dashboard_groups);
         adapter = new DashBoardGroupsAdapter(getActivity());
@@ -78,10 +69,24 @@ public class DashboardFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onAttachFragment(@NonNull Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+        //Fade in Nav Bar
+        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
+        if (bottom_menu.getVisibility() == View.GONE) {
+            Utils utils = new Utils(getContext());
+            utils.fadeIn();
+        }
+    }
+
     ArrayList<String> dbGrpImgs = new ArrayList<>();
     ArrayList<String> dbGrpNames = new ArrayList<>();
     ArrayList<String> dbGrpIds = new ArrayList<>();
     public void populateRecyclerView() {
+        dbGrpIds.clear();
+        dbGrpImgs.clear();
+        dbGrpNames.clear();
         UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
             public void onPostExecute() {
@@ -197,7 +202,7 @@ public class DashboardFragment extends Fragment {
                     IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
                     indivGroupFragment.setArguments(bundle);
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack(null).commit();
+                    transaction.add(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack(null).commit();
                 }
             });
             return view;
