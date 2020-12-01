@@ -11,6 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -47,13 +49,6 @@ public class GroupsFragment extends Fragment implements Populatable{
         //Inflate the layout for this fragment
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Groups");
 
-        //Fade in Nav Bar
-        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
-        if (bottom_menu.getVisibility() == View.GONE) {
-            Utils utils = new Utils(getContext());
-            utils.fadeIn();
-        }
-
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
         grpNames.clear();
         grpImages.clear();
@@ -73,6 +68,17 @@ public class GroupsFragment extends Fragment implements Populatable{
         populateRecyclerView();
 
         return rootView;
+    }
+
+    @Override
+    public void onAttachFragment(@NonNull Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+        //Fade in Nav Bar
+        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
+        if (bottom_menu.getVisibility() == View.GONE) {
+            Utils utils = new Utils(getContext());
+            utils.fadeIn();
+        }
     }
 
     @Override
@@ -188,7 +194,7 @@ public class GroupsFragment extends Fragment implements Populatable{
                         //Go to CreateGroupFragment
                         CreateGroupFragment fragment = new CreateGroupFragment();
                         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.add(R.id.fragment_container, fragment, "openChat").addToBackStack(null).commit();
+                        transaction.add(R.id.fragment_container, fragment).addToBackStack(null).commit();
                     }
                 });
             } else {

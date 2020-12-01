@@ -11,13 +11,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
 import com.example.beever.admin.UserHelperClass;
+import com.example.beever.database.UserEntry;
 import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
 
-    private ArrayList<UserHelperClass> users;
+    private ArrayList<UserEntry> users;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         private TextView textViewName;
@@ -44,9 +45,9 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
      * @param dataSet String[] containing the data to populate views to be used
      * by RecyclerView.
      */
-    public UsersAdapter(ArrayList<UserHelperClass> array) {
+    public UsersAdapter(ArrayList<UserEntry> array) {
         this.users = array;
-        for (UserHelperClass user: array) {
+        for (UserEntry user: array) {
             Log.i("HELLLLO MY NAMES NINO", user.getName());
             Log.i("HELLLLO MY EMAILS NINO", user.getEmail());
         }

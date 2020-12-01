@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.beever.R;
+import com.example.beever.database.GroupEntry;
+import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -31,6 +33,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -128,21 +131,9 @@ public class CreateGroupFragment extends Fragment {
     }
 
     private void uploadToFirebase(String imageUri, String groupName, String groupID) {
-        DocumentReference documentReference0 = fStore.collection("groups").document(groupID);
-        DocumentReference documentReference1 = fStore.collection("users").document(userID);
-        Map<String, Object> map0 = new HashMap<>();
-//        Map<String, Object> memberMap = new HashMap<>();
-        List<String> members = new ArrayList<>();
-//        List<Map<String, Object>> members = new ArrayList<>();
-//        memberMap.put("name", mSharedPref.getString("registeredName", ""));
-//        memberMap.put("email", mSharedPref.getString("registeredEmail",""));
-//        memberMap.put("user_id", userID);
-        members.add(userID);
-        map0.put("name", groupName);
-        map0.put("display_picture", imageUri);
-        map0.put("member_list", members);
 
-        documentReference0.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        DocumentReference documentReference = fStore.collection("groups").document(groupID);
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -151,59 +142,57 @@ public class CreateGroupFragment extends Fragment {
                     // Check if group exists already, update if exist, if not create new group
                     if (document.exists()) {
 
-                        Toast.makeText(getActivity(), "Group name unavailable", Toast.LENGTH_SHORT).show();
+                      Toast.makeText(getActivity(), "Group name unavailable", Toast.LENGTH_SHORT).show();
 
                     } else {
-                        documentReference0.set(map0).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                        List<Object> members = new ArrayList<>();
+                        members.add(userID);
+                        GroupEntry groupEntry = new GroupEntry();
+                        groupEntry.setName(groupName);
+                        groupEntry.setDisplay_picture(imageUri);
+                        groupEntry.setMember_list(members);
+
+                        GroupEntry.SetGroupEntry createGroup = new GroupEntry.SetGroupEntry(groupEntry, groupID, 5000) {
                             @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(getActivity(), "Group creation successful", Toast.LENGTH_SHORT).show();
-                                List<String> groups = new ArrayList<>();
-                                groups.add(groupID);
-                                documentReference1.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            public void onPostExecute() {
+
+                                Toast.makeText(getContext(), "Group created successfully", Toast.LENGTH_SHORT).show();
+
+                                UserEntry.GetUserEntry getUser = new UserEntry.GetUserEntry(userID, 5000) {
                                     @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            DocumentSnapshot document = task.getResult();
+                                    public void onPostExecute() {
 
-                                            // Check if group exists already, update if exist, if not create new group
-                                            if (document.exists()) {
+                                        UserEntry userEntry = getResult();
+                                        userEntry.addGroupId(groupID);
 
-                                                documentReference1.update("groups",  FieldValue.arrayUnion(groupID)).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Toast.makeText(getActivity(), "ADDED GROUP TO USER LIST", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
+                                        UserEntry.SetUserEntry addUser = new UserEntry.SetUserEntry(userEntry, userID, 5000) {
+                                            @Override
+                                            public void onPostExecute() {
+                                                Toast.makeText(getContext(), "User added successfully", Toast.LENGTH_SHORT).show();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("imageUri", imageUri);
+                                                bundle.putString("groupName", groupName);
+                                                bundle.putString("groupId", groupID);
 
-                                            } else {
-                                                documentReference1.set(groups).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Toast.makeText(getActivity(), "CREATE NEW GROUP LIST FOR USER", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
+                                                AddUsersFragment addUsersFragment = new AddUsersFragment();
+                                                addUsersFragment.setArguments(bundle);
+                                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                                transaction.replace(R.id.fragment_container, addUsersFragment).commit();
                                             }
-                                        }
+                                        };
+                                        addUser.start();
                                     }
-                                });
-
-                                Bundle bundle = new Bundle();
-                                bundle.putString("imageUri", imageUri);
-                                bundle.putString("groupName", groupName);
-                                bundle.putString("groupId", groupID);
-
-                                AddUsersFragment addUsersFragment = new AddUsersFragment();
-                                addUsersFragment.setArguments(bundle);
-                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                transaction.replace(R.id.fragment_container, addUsersFragment).commit();
+                                };
+                                getUser.start();
                             }
-                        });
+                        };
+                        createGroup.start();
                     }
                 }
             }
         });
 
-        createBtn.revertAnimation();
+
     }
 }

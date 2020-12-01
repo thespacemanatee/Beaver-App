@@ -102,8 +102,8 @@ public class IndivGroupFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDetach() {
+        super.onDetach();
         Utils utils = new Utils(getContext());
         utils.fadeIn();
     }

@@ -96,15 +96,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         eventName = rootView.findViewById(R.id.event_name);
         eventDesc = rootView.findViewById(R.id.event_description);
 
-//        String pattern = "HH:mm";
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-//        try {
-//            Date date = simpleDateFormat.parse("00:00");
-//            chosenDay.setTime(date);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-
         spin.setOnItemSelectedListener(this);
 
         mRecyclerView = rootView.findViewById(R.id.gap_finder_recycler);
