@@ -710,7 +710,7 @@ public class GroupEntry {
                     break;
                 }
             }
-            if (result!=null) {
+            if (result==null) {
                 Log.d(LOG_NAME, "Timeout");
                 result = false;
             }
