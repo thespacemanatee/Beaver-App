@@ -359,6 +359,8 @@ public class UserEntry {
         private static final String LOG_NAME = "UserEntry.GetUserEntry";
         private static final int SLEEP_INCREMENT = 10;
         private UserEntry result = null;
+        private boolean timeoutOccurred = false;
+        private boolean exists = true;
 
         private String userId;
         private Integer timeout;
@@ -395,6 +397,7 @@ public class UserEntry {
                         } else {
                             Log.d(LOG_NAME, "User ID not found");
                             finish[0] = true;
+                            exists = false;
                         }
                     } else {
                         Log.d(LOG_NAME, "Retrieval error");
@@ -417,6 +420,7 @@ public class UserEntry {
             }
             if (!finish[0]) {
                 Log.d(LOG_NAME, "Timeout");
+                timeoutOccurred = true;
             }
 
             result = user[0];
@@ -443,6 +447,18 @@ public class UserEntry {
          * Abstract method for what to do after query, in main thread
          */
         public abstract void onPostExecute();
+
+        /**
+         * Check if failure occurred due to timeout (use only for failed queries)
+         * @return true if timeout occurred
+         */
+        public boolean isTimedOut() {return timeoutOccurred;}
+
+        /**
+         * Check if failure occurred due to entry not existing (use only for failed queries)
+         * @return true if entry does not exist
+         */
+        public boolean isEntryMissing() {return !exists;}
     }
 
     /**
@@ -472,6 +488,8 @@ public class UserEntry {
         private UserEntry userEntry = null;
         private UserEntry.UserEntryListener.StateChange stateChange = StateChange.NO_CHANGE;
         private UserEntry.GetUserEntry getUserEntry = null;
+        private boolean timeoutOccurred = false;
+        private boolean exists = true;
 
         /**
          * Standard constructor for the UserEntry Listener
@@ -482,6 +500,12 @@ public class UserEntry {
             this.userId = userId;
             getUserEntry = new UserEntry.GetUserEntry(userId,timeout){
                 public void onPostExecute(){
+                    if (!isSuccessful()){
+                        if (isTimedOut()) UserEntryListener.this.timeoutOccurred = true;
+                        else if (isEntryMissing()) UserEntryListener.this.exists = false;
+                        onSetupFailure();
+                        return;
+                    }
                     UserEntryListener.this.userEntry = getResult();
                     onPreListening();
                     startListening();
@@ -602,6 +626,27 @@ public class UserEntry {
             return userId;
         }
 
+        /**
+         * Handler function for if listener fails to set up
+         */
+        public abstract void onSetupFailure();
+
+        /**
+         * Check if failure occurred due to timeout (use only if setup failed)
+         * @return true if timeout occurred
+         */
+        public boolean isTimedOut(){
+            return timeoutOccurred;
+        }
+
+        /**
+         * Check if failure occurred due to entry not existing (use only if setup failed)
+         * @return true if entry does not exist
+         */
+        public boolean isEntryMissing(){
+            return !exists;
+        }
+
     }
 
     /**
@@ -663,7 +708,7 @@ public class UserEntry {
                     break;
                 }
             }
-            if (result!=null) {
+            if (result==null) {
                 Log.d(LOG_NAME, "Timeout");
                 result = false;
             }
@@ -694,6 +739,8 @@ public class UserEntry {
         private static final String LOG_NAME = "UserEntry.GetUserRelevantEvents";
         private static final int SLEEP_INCREMENT = 10;
         private ArrayList<EventEntry> result = null;
+        private boolean timeoutOccurred = false;
+        private boolean groupExists = true;
 
         private UserEntry userEntry;
         private Integer timeout;
@@ -730,6 +777,10 @@ public class UserEntry {
                         groupEntryGetters.remove(this);
                         groupResults.add(getResult());
                         if (!isSuccessful() || System.currentTimeMillis()>=end || groupEntryGetters.size()==0){
+                            if (!isSuccessful()){
+                                if (isTimedOut()) GetUserRelevantEvents.this.timeoutOccurred = true;
+                                else if (isEntryMissing()) GetUserRelevantEvents.this.groupExists = false;
+                            }
                             Looper.myLooper().quitSafely();
                         }
                     }
@@ -741,6 +792,7 @@ public class UserEntry {
 
             if (groupEntryGetters.size()!=0) {
                 Log.d(LOG_NAME, "Timeout");
+                timeoutOccurred = true;
                 return;
             }
 
@@ -776,6 +828,18 @@ public class UserEntry {
          * Abstract method for post-retrieval operations on main thread
          */
         public abstract void onPostExecute();
+
+        /**
+         * Check if failure occurred due to timeout (use only for failed queries)
+         * @return true if timeout occurred
+         */
+        public boolean isTimedOut() {return timeoutOccurred;}
+
+        /**
+         * Check if failure occurred due to any group entry not existing (use only for failed queries)
+         * @return true if any group entry does not exist
+         */
+        public boolean isGroupEntryMissing() {return !groupExists;}
     }
 
     /**
@@ -788,11 +852,14 @@ public class UserEntry {
         private static final String LOG_NAME = "UserEntry.GetUserRelevantTodos";
         private static final int SLEEP_INCREMENT = 10;
         private ArrayList<TodoEntry> result = null;
+        private boolean timeoutOccurred = false;
+        private boolean groupExists = true;
 
         private UserEntry userEntry;
         private Integer timeout;
         private boolean getCurrent, getPast;
         private String userId;
+
 
         /**
          * Standard constructor for this object.
@@ -827,6 +894,10 @@ public class UserEntry {
                         groupEntryGetters.remove(this);
                         groupResults.add(getResult());
                         if (!isSuccessful() || System.currentTimeMillis()>=end || groupEntryGetters.size()==0){
+                            if (!isSuccessful()){
+                                if (isTimedOut()) GetUserRelevantTodos.this.timeoutOccurred = true;
+                                else if (isEntryMissing()) GetUserRelevantTodos.this.groupExists = false;
+                            }
                             Looper.myLooper().quitSafely();
                         }
                     }
@@ -838,6 +909,7 @@ public class UserEntry {
 
             if (groupEntryGetters.size()!=0) {
                 Log.d(LOG_NAME, "Timeout");
+                timeoutOccurred = true;
                 return;
             }
 
@@ -875,5 +947,17 @@ public class UserEntry {
          * Abstract method for post-query execution
          */
         public abstract void onPostExecute();
+
+        /**
+         * Check if failure occurred due to timeout (use only for failed queries)
+         * @return true if timeout occurred
+         */
+        public boolean isTimedOut() {return timeoutOccurred;}
+
+        /**
+         * Check if failure occurred due to any group entry not existing (use only for failed queries)
+         * @return true if any group entry does not exist
+         */
+        public boolean isGroupEntryMissing() {return !groupExists;}
     }
 }

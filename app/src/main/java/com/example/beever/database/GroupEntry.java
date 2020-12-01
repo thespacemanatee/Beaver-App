@@ -368,6 +368,8 @@ public class GroupEntry {
         private static final String LOG_NAME = "GroupEntry.GetGroupEntry";
         private static final int SLEEP_INCREMENT = 10;
         private GroupEntry result = null;
+        private boolean timeoutOccurred = false;
+        private boolean exists = true;
 
         String groupId;
         Integer timeout;
@@ -407,6 +409,7 @@ public class GroupEntry {
                         } else {
                             Log.d(LOG_NAME, "Group ID not found");
                             finish[0] = true;
+                            exists = false;
                         }
                     } else {
                         Log.d(LOG_NAME, "Retrieval error");
@@ -425,6 +428,7 @@ public class GroupEntry {
             }
             if (!finish[0]) {
                 Log.d(LOG_NAME, "Timeout");
+                timeoutOccurred = true;
                 return;
             }
             result = group[0];
@@ -455,6 +459,18 @@ public class GroupEntry {
          * Abstract method for post-retrieval operations
          */
         public abstract void onPostExecute();
+
+        /**
+         * Check if failure occurred due to timeout (use only for failed queries)
+         * @return true if timeout occurred
+         */
+        public boolean isTimedOut() {return timeoutOccurred;}
+
+        /**
+         * Check if failure occurred due to entry not existing (use only for failed queries)
+         * @return true if entry does not exist
+         */
+        public boolean isEntryMissing() {return !exists;}
     }
 
     /**
@@ -483,6 +499,8 @@ public class GroupEntry {
         private GroupEntry groupEntry = null;
         private StateChange stateChange = StateChange.NO_CHANGE;
         private GetGroupEntry getGroupEntry = null;
+        private boolean timeoutOccurred = false;
+        private boolean exists = true;
 
         /**
          * Standard constructor for the GroupEntry Listener
@@ -493,6 +511,12 @@ public class GroupEntry {
             this.groupId = groupId;
             getGroupEntry = new GroupEntry.GetGroupEntry(groupId,timeout){
                 public void onPostExecute(){
+                    if (!isSuccessful()){
+                        if (isTimedOut()) GroupEntryListener.this.timeoutOccurred = true;
+                        else if (isEntryMissing()) GroupEntryListener.this.exists = false;
+                        onSetupFailure();
+                        return;
+                    }
                     GroupEntryListener.this.groupEntry = getResult();
                     onPreListening();
                     startListening();
@@ -609,6 +633,27 @@ public class GroupEntry {
             return groupId;
         }
 
+        /**
+         * Handler function for if listener fails to set up
+         */
+        public abstract void onSetupFailure();
+
+        /**
+         * Check if failure occurred due to timeout (use only if setup failed)
+         * @return true if timeout occurred
+         */
+        public boolean isTimedOut(){
+            return timeoutOccurred;
+        }
+
+        /**
+         * Check if failure occurred due to entry not existing (use only if setup failed)
+         * @return true if entry does not exist
+         */
+        public boolean isEntryMissing(){
+            return !exists;
+        }
+
     }
 
     /**
@@ -669,7 +714,7 @@ public class GroupEntry {
                     break;
                 }
             }
-            if (result!=null) {
+            if (result==null) {
                 Log.d(LOG_NAME, "Timeout");
                 result = false;
             }
@@ -700,6 +745,9 @@ public class GroupEntry {
         private static final String LOG_NAME = "GroupEntry.GetGroupRelevantEvents";
         private static final int SLEEP_INCREMENT = 10;
         private ArrayList<EventEntry> result = null;
+        private boolean timeoutOccurred = false;
+        private boolean userExists = true;
+        private boolean groupExists = true;
 
         GroupEntry groupEntry;
         Integer timeout;
@@ -732,6 +780,8 @@ public class GroupEntry {
                     public void onPostExecute(){
                         //Log.d("currentUserIdOnPostExecute", (String) user_id);
                         if (!isSuccessful()){
+                            if (isTimedOut()) GetGroupRelevantEvents.this.timeoutOccurred = true;
+                            else if (isEntryMissing()) GetGroupRelevantEvents.this.userExists = false;
                             Looper.myLooper().quitSafely();
                             return;
                         }
@@ -754,6 +804,10 @@ public class GroupEntry {
                                 GroupEntry.GetGroupEntry groupEntryGetter = new GroupEntry.GetGroupEntry(groupId,timeout){
                                     public void onPostExecute(){
                                         if (!isSuccessful() || System.currentTimeMillis()>=end) {
+                                            if (!isSuccessful()){
+                                                if (isTimedOut()) GetGroupRelevantEvents.this.timeoutOccurred = true;
+                                                else if (isEntryMissing()) GetGroupRelevantEvents.this.groupExists = false;
+                                            }
                                             Looper.myLooper().quitSafely();
                                             return;
                                         }
@@ -786,6 +840,7 @@ public class GroupEntry {
 
             if (userEntryGetters.size()!=0) {
                 Log.d(LOG_NAME, "Timeout");
+                timeoutOccurred = true;
                 return;
             }
 
@@ -830,6 +885,24 @@ public class GroupEntry {
          * Abstract method for post-retrieval operations on main thread
          */
         public abstract void onPostExecute();
+
+        /**
+         * Check if failure occurred due to timeout (use only for failed queries)
+         * @return true if timeout occurred
+         */
+        public boolean isTimedOut() {return timeoutOccurred;}
+
+        /**
+         * Check if failure occurred due to any user entry not existing (use only for failed queries)
+         * @return true if any user entry does not exist
+         */
+        public boolean isUserEntryMissing() {return !userExists;}
+
+        /**
+         * Check if failure occurred due to any group entry not existing (use only for failed queries)
+         * @return true if any group entry does not exist
+         */
+        public boolean isGroupEntryMissing() {return !groupExists;}
 
     }
 }
