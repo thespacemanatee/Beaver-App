@@ -1,6 +1,7 @@
 package com.example.beever.feature;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -161,24 +163,27 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // TODO: get the to do list from firebase according to the project
+
         groupID = groupsList.get(position);
         Log.d("GROUP ID", groupID);
 
-        toDoAdapter = new ToDoAdapter(toDoList, groupID, getContext());
+        toDoAdapter = new ToDoAdapter(toDoList, groupID, getContext(), getFragmentManager());
 
         GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000 ) {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onPostExecute() {
                 if (isSuccessful()) {
                     try {
                         toDoList = getResult().getGroupTodo(true, false);
                         Log.d("TODO LIST", String.valueOf(toDoList));
+                        toDoList.sort(new ToDoComparator());
                         archivedList = getResult().getGroupTodo(false, true);
                         Log.d("ARCHIVED LIST", String.valueOf(archivedList));
+                        archivedList.sort(new ToDoComparator());
 
                         // set toDoAdapter for RecyclerView in onPostExecute so that groupID is not null
-                        toDoAdapter = new ToDoAdapter(toDoList, groupID, getContext());
+                        toDoAdapter = new ToDoAdapter(toDoList, groupID, getContext(), getFragmentManager());
                         toDoRecyclerView.setAdapter(toDoAdapter);
                         Log.d(TAG, RECYCLERVIEW);
 
@@ -203,7 +208,6 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         };
 
         getGroupEntry.start();
-        Snackbar.make(view, "Selected: " + parent.getItemAtPosition(position).toString(), Snackbar.LENGTH_LONG).show();
     }
 
     @Override

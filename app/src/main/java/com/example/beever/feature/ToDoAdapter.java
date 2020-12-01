@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,6 +30,7 @@ import com.example.beever.database.TodoEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.firebase.Timestamp;
 
+import java.security.acl.Group;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,15 +44,17 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     private ArrayList<TodoEntry> toDoList = new ArrayList<>();
     private String groupID;
     private Context context;
+    private FragmentManager manager;
 
     /**
      * Initialise the toDoList with strings from Firebase
      * @param toDoList
      */
-    public ToDoAdapter(ArrayList<TodoEntry> toDoList, String groupID, Context context) {
+    public ToDoAdapter(ArrayList<TodoEntry> toDoList, String groupID, Context context, FragmentManager manager) {
         this.toDoList = toDoList;
         this.groupID = groupID;
         this.context = context;
+        this.manager = manager;
     }
 
     /**
@@ -86,19 +91,15 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         public void onClick(View v) {
             int position = getLayoutPosition();
             TodoEntry todoEntry = toDoList.get(position);
-            Timestamp deadline = todoEntry.getDeadline();
-            SimpleDateFormat sf = new SimpleDateFormat("dd-MM");
-            sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
-            String deadlineStr = sf.format(deadline.toDate());
 
-            /*ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_edit);
-            toDoDialogFragment.show(fragmentManager, TAG);*/
-
-            // showAlertDialog(context, "Delete To-Do?", todoEntry);
-
-            // TODO: Make intent and show different fragment that displays the details of the todo
+            manager.beginTransaction()
+                    .replace(R.id.fragment_container, ToDoViewFragment.newInstance(todoEntry, ToDoAdapter.this))
+                    .addToBackStack("ToDoFragment")
+                    .commit();
         }
+
     }
+
 
     private void showAlertDialog(Context context, String message, TodoEntry todoEntry) {
         AlertDialog dialog = new AlertDialog.Builder(context).create();
@@ -121,15 +122,28 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         dialog.show();
     }
 
-    private void removeItem(TodoEntry todoEntry) {
+    public void removeItem(TodoEntry todoEntry) {
         int currPosition = toDoList.indexOf(todoEntry);
         GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onPostExecute() {
                 if (isSuccessful()) {
                     getResult().modifyEventOrTodo(false, true, false, todoEntry);
+
+                    GroupEntry.SetGroupEntry setGroupEntry = new GroupEntry.SetGroupEntry(getResult(), groupID, 5000) {
+                        @Override
+                        public void onPostExecute() {
+                        }
+                    };
+
+                    setGroupEntry.start();
+
+                    toDoList.remove(todoEntry);
                     notifyItemRemoved(currPosition);
-                    notifyDataSetChanged();
+
+                    Toast.makeText(context, "To-Do removed :)", Toast.LENGTH_SHORT).show();
+
                 } else {
                     Toast.makeText(context, "Cannot remove to-do", Toast.LENGTH_SHORT).show();
                 }
@@ -137,21 +151,35 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         };
 
         groupEntry.start();
+
     }
 
     public void addItem(TodoEntry todoEntry) {
         Log.d("GROUP ID", groupID);
         GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onPostExecute() {
                 if (isSuccessful()) {
                     getResult().modifyEventOrTodo(false, true, true, todoEntry);
-                    notifyDataSetChanged();
+
+                    GroupEntry.SetGroupEntry setGroupEntry = new GroupEntry.SetGroupEntry(getResult(), groupID, 5000) {
+                        @Override
+                        public void onPostExecute() {
+
+                        }
+                    };
+
+                    setGroupEntry.start();
+
+                    toDoList.add(0, todoEntry);
+                    notifyItemInserted(0);
+
+                    Toast.makeText(context, "To-Do added :)", Toast.LENGTH_SHORT).show();
+
                 } else {
                     Toast.makeText(context, "Cannot add to-do", Toast.LENGTH_SHORT).show();
                 }
-
-                // TODO
             }
         };
 
@@ -201,15 +229,6 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         toDoAssignedTo.setText(toDo.getAssigned_to());
 
         toDoCheckBox.setOnCheckedChangeListener(null);
-
-        toDoCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    notifyItemRemoved(position);
-                }
-            }
-        });
     }
 
     /**

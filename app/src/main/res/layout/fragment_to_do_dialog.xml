@@ -23,7 +23,6 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/toDoDialogTask"
         android:hint="@string/task_title"
         android:layout_marginStart="36dp"
         android:layout_marginEnd="36dp"
@@ -34,22 +33,28 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"/>
+            android:layout_width="match_parent"
+            android:id="@+id/toDoDialogTask"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <EditText
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/toDoDialogDescription"
         android:hint="@string/task_description"
         android:layout_marginStart="36dp"
         android:layout_marginEnd="36dp"
+        android:paddingTop="10dp"
         android:layout_marginBottom="8dp"
-        android:textColor="@color/beever_blue"
-        android:fontFamily="@font/poppins"
-        android:textSize="16sp"
-        android:inputType="text" />
+        app:hintTextColor="@color/beever_blue"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:id="@+id/toDoDialogDescription" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

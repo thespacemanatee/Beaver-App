@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="36dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/toDoFullTask"
+        android:fontFamily="@font/poppins"
+        android:text="Your Task"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="36sp"
+        android:textColor="@color/beever_pink"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:layout_margin="8dp"
+            android:text="@string/task_name"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/beever_blue"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/toDoFullTaskTitle"
+            android:fontFamily="@font/poppins"
+            android:layout_margin="8dp"
+            android:textSize="20sp"
+            android:textColor="@color/beever_blue"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:layout_margin="8dp"
+            android:text="@string/assigned_to"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/beever_blue"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/toDoFullTaskAssignedTo"
+            android:fontFamily="@font/poppins"
+            android:layout_margin="8dp"
+            android:textSize="20sp"
+            android:textColor="@color/beever_blue"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:layout_margin="8dp"
+            android:text="@string/due_date"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/beever_blue"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/toDoFullTaskDueDate"
+            android:fontFamily="@font/poppins"
+            android:layout_margin="8dp"
+            android:textSize="20sp"
+            android:textColor="@color/beever_blue"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:layout_margin="8dp"
+            android:text="@string/description"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/beever_blue"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="240dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/toDoFullTaskDescr"
+                android:fontFamily="@font/poppins"
+                android:layout_margin="8dp"
+                android:textSize="20sp"
+                android:textColor="@color/beever_blue"/>
+        </ScrollView>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/toDoFullBackBtn"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="36dp"
+            android:text="@string/back" />
+
+        <Button
+            android:id="@+id/toDoFullDeleteBtn"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="36dp"
+            android:text="@string/delete" />
+
+    </LinearLayout>
+
+</LinearLayout>

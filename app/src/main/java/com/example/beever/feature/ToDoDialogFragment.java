@@ -23,6 +23,8 @@ import com.example.beever.R;
 import com.example.beever.database.GroupEntry;
 import com.example.beever.database.TodoEntry;
 import com.example.beever.database.UserEntry;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,8 +46,8 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
     protected View parentView;
     protected Spinner toDoDialogSpinner;
-    protected EditText toDoDialogTask;
-    protected EditText toDoDialogDescription;
+    protected TextInputEditText toDoDialogTask;
+    protected TextInputEditText toDoDialogDescription;
     protected Button toDoDialogDate;
     protected TextView addToDo;
     protected int year, month, day;
@@ -136,7 +138,6 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     }
 
     private void initGroupMembers() {
-        // TODO: get group members from firebase
         Log.d("INIT GROUP MEMBERS", groupID);
         GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
             @Override

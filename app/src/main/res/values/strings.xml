@@ -69,4 +69,10 @@
     <string name="add_user">Add User</string>
     <string name="task_title">Task Title</string>
     <string name="task_description">Task Description</string>
+    <string name="delete">Delete</string>
+    <string name="back">Back</string>
+    <string name="due_date">Due Date:</string>
+    <string name="assigned_to">Assigned To:</string>
+    <string name="description">Description:</string>
+    <string name="task_name">Task Name:</string>
 </resources>
