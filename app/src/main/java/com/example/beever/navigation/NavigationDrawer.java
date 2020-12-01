@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.beever.admin.Login;
 import com.example.beever.R;
+import com.example.beever.database.UserEntry;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -158,6 +159,18 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     @Override
     protected void onStart() {
         super.onStart();
+
+//        String fUserID = fAuth.getCurrentUser().getUid();
+//        UserEntry.GetUserEntry getProfileImage = new UserEntry.GetUserEntry(fUserID, 5000) {
+//            @Override
+//            public void onPostExecute() {
+//                if (getResult().getDisplay_picture() != null) {
+//                    Glide.with(NavigationDrawer.this).load(getResult().getDisplay_picture()).into((CircleImageView) findViewById(R.id.profile_nav));
+//                }
+//            }
+//        };
+//        getProfileImage.start();
+
         FirebaseUser fUser = fAuth.getCurrentUser();
         if (fUser.getPhotoUrl() != null) {
             Glide.with(NavigationDrawer.this).load(fUser.getPhotoUrl()).into((CircleImageView) findViewById(R.id.profile_nav));
