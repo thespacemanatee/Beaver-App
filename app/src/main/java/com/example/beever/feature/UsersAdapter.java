@@ -42,7 +42,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     /**
      * Initialize the dataset of the Adapter.
      *
-     * @param dataSet String[] containing the data to populate views to be used
+     * @param array String[] containing the data to populate views to be used
      * by RecyclerView.
      */
     public UsersAdapter(ArrayList<UserEntry> array) {

@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    android:background="@color/white"
+    android:orientation="vertical">
 
         <TextView
             android:id="@+id/greeting"
@@ -36,7 +32,7 @@
         <LinearLayout
             android:id="@+id/upcoming_events"
             android:layout_width="220dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
@@ -59,24 +55,17 @@
 
         </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Event"
-            android:paddingHorizontal="34dp"
-            android:padding="34dp"/>
-
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/dashboard_to_do"
+            android:id="@+id/dashboard_events"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:paddingHorizontal="34dp"
             android:paddingBottom="34dp"/>
 
         <LinearLayout
             android:id="@+id/jump_to_group"
             android:layout_width="220dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
@@ -97,16 +86,14 @@
                 android:layout_marginTop="-10dp"/>
         </LinearLayout>
 
-        <GridView
-            android:id="@+id/dashboard_groups"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp"
-            android:horizontalSpacing="16dp"
-            android:verticalSpacing="16dp"
-            android:scrollbars="none"
-            android:numColumns="3"/>
+    <GridView
+        android:id="@+id/dashboard_groups"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:horizontalSpacing="16dp"
+        android:numColumns="3"
+        android:padding="16dp"
+        android:scrollbars="none"
+        android:verticalSpacing="16dp" />
 
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

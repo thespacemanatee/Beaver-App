@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.admin.MainActivity;
+import com.example.beever.database.UserEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -58,11 +59,13 @@ public class MyProfileFragment extends Fragment {
 
     //Global variables to hold user data inside this activity
     private static String _USERNAME,_NAME,_EMAIL;
-    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private FirebaseUser fUser;
     private String userID;
     private final String TAG = "Logcat";
+    private UserEntry userEntry;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -86,11 +89,23 @@ public class MyProfileFragment extends Fragment {
         profilePic = root.findViewById(R.id.profile_image);
         FloatingActionButton toOnBoarding = root.findViewById(R.id.to_onboarding);
 
+
+
         fUser = fAuth.getCurrentUser();
         userID = fUser.getUid();
+
+
         if (fUser.getPhotoUrl() != null) {
             Glide.with(getActivity()).load(fUser.getPhotoUrl()).into(profilePic);
         }
+
+        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
+            @Override
+            public void onPostExecute() {
+                userEntry = getResult();
+            }
+        };
+        getUserEntry.start();
 
         showUserData();
 
@@ -142,33 +157,56 @@ public class MyProfileFragment extends Fragment {
                 Uri imageUri = data.getData();
 
                 update.startAnimation();
-                uploadImageFirebase(imageUri);
+                uploadImage(imageUri);
             }
         }
     }
 
-    private void uploadImageFirebase(Uri imageUri) {
+    private void uploadImage(Uri imageUri) {
+        StorageReference fileReference = storageReference.child("users/" + userID + "/group_image.jpg");
+        fileReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        uploadToFirebase(uri);
+                    }
+                });
+            }
+        });
+    }
 
-        FirebaseUser fUser = fAuth.getCurrentUser();
-        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+    private void uploadToFirebase(Uri imageUri) {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(_NAME)
                 .setPhotoUri(imageUri)
                 .build();
-        fUser.updateProfile(request)
+
+        user.updateProfile(profileUpdates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Glide.with(getActivity()).load(imageUri).into(profilePic);
-                            Glide.with(getActivity()).load(imageUri).into((CircleImageView) getActivity().findViewById(R.id.profile_nav));
                             Log.d(TAG, "User profile updated.");
-                            Toast.makeText(getActivity(), "Updated profile image", Toast.LENGTH_SHORT).show();
-                            update.revertAnimation();
-                        } else {
-                            Toast.makeText(getActivity(), "Failed to update profile image", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
 
+        userEntry.setDisplay_picture(imageUri.toString());
+        UserEntry.SetUserEntry setProfileImage = new UserEntry.SetUserEntry(userEntry, userID, 5000) {
+            @Override
+            public void onPostExecute() {
+                Glide.with(getActivity()).load(imageUri).into(profilePic);
+                Glide.with(getActivity()).load(imageUri).into((CircleImageView) getActivity().findViewById(R.id.profile_nav));
+                Toast.makeText(getActivity(), "Updated profile image", Toast.LENGTH_SHORT).show();
+                update.revertAnimation();
+            }
+        };
+        setProfileImage.start();
     }
 
     private void showUserData() {
@@ -178,74 +216,6 @@ public class MyProfileFragment extends Fragment {
         name.getEditText().setText(_NAME);
         email.getEditText().setText(_EMAIL);
     }
-
-//    private boolean isEmailChanged() {
-//
-//        if (!_EMAIL.equals(email.getEditText().getText().toString())) {
-//            String newEmail = email.getEditText().getText().toString();
-//            String validEmail = "[a-zA-z0-9._-]+@[a-z]+\\.+[a-z]+";
-//            if (newEmail.isEmpty()) {
-//                email.setError("Field cannot be empty");
-//                return false;
-//            } else if (!newEmail.matches(validEmail)) {
-//                email.setError("Invalid email address");
-//                return false;
-//
-//            } else {
-//                email.setError(null);
-//                email.setErrorEnabled(false);
-//                reference.child(_USERNAME).child("email").setValue(newEmail);
-//                _EMAIL = newEmail;
-//                SharedPreferences.Editor editor = mSharedPref.edit();
-//                editor.putString("registeredEmail", newEmail);
-//                editor.apply();
-//                return true;
-//            }
-//
-//        } else {
-//            return false;
-//        }
-//    }
-
-//    private boolean isPasswordChanged() {
-//
-//        if (!_PASSWORD.equals(password.getEditText().getText().toString())) {
-//            String newPassword = password.getEditText().getText().toString();
-//            String validPassword = "^" +
-////                "(?=.*[0-9])" +          //at least 1 digit
-////                "(?=.*[a-z])" +          //at least 1 lower case letter
-////                "(?=.*[A-Z])" +          //at least 1 upper case letter
-//                    "(?=.*[a-zA-Z])" +         //any letter
-//                    "(?=.*[@#$%^&+=])" +       //at least 1 special character
-//                    ".{4,}" +                  //at least 4 characters
-//                    "$";
-//            if (newPassword.isEmpty()) {
-//                password.setError("Field cannot be empty");
-//                return false;
-//
-//            } else if (newPassword.contains(" ")) {
-//                password.setError("Spaces not allowed in password");
-//                return false;
-//
-//            } else if (!newPassword.matches(validPassword)) {
-//                password.setError("Password is too weak");
-//                return false;
-//
-//            } else {
-//                password.setError(null);
-//                password.setErrorEnabled(false);
-//                reference.child(_USERNAME).child("password").setValue(newPassword);
-//                _PASSWORD = newPassword;
-//                SharedPreferences.Editor editor = mSharedPref.edit();
-//                editor.putString("registeredPassword", newPassword);
-//                editor.apply();
-//                return true;
-//            }
-//
-//        } else {
-//            return false;
-//        }
-//    }
 
     private boolean isNameChanged() {
 
@@ -257,33 +227,30 @@ public class MyProfileFragment extends Fragment {
             } else {
                 name.setError(null);
                 name.setErrorEnabled(false);
-                Map<String, Object> map = new HashMap<>();
-                map.put("name", newName);
-                DocumentReference documentReference = fStore.collection("users").document(userID);
-                documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
 
-                            if (document.exists()) {
-                                documentReference.update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        SharedPreferences.Editor editor = mSharedPref.edit();
-                                        editor.putString("registeredName", newName);
-                                        update.revertAnimation();
-                                        Toast.makeText(getActivity(), "Name changed successfully!", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
+                    @Override
+                    public void onPostExecute() {
+
+                        UserEntry userEntry = getResult();
+                        userEntry.setName(newName);
+
+                        UserEntry.SetUserEntry setName = new UserEntry.SetUserEntry(userEntry, userID, 5000) {
+                            @Override
+                            public void onPostExecute() {
+                                _NAME = newName;
+                                nameLabel.setText(_NAME);
+                                SharedPreferences.Editor editor = mSharedPref.edit();
+                                editor.putString("registeredName", newName);
+                                editor.apply();
+                                update.revertAnimation();
+                                Toast.makeText(getActivity(), "Name changed successfully!", Toast.LENGTH_SHORT).show();
                             }
-                        }
+                        };
+                        setName.start();
                     }
-                });
-                _NAME = newName;
-                SharedPreferences.Editor editor = mSharedPref.edit();
-                editor.putString("registeredName", newName);
-                editor.apply();
+                };
+                getUserEntry.start();
                 return true;
             }
 
