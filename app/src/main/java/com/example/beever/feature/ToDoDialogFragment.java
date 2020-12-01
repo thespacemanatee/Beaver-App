@@ -147,11 +147,16 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
                         List<Object> member_list = getResult().getMember_list();
                         Log.d("TO DO DIALOG", member_list.toString());
                         for (Object o : member_list) {
-                            String user = (String) ((HashMap) o).get("name");
-                            groupMembers.add(user);
-                        }
 
-                        spinnerAdapter.notifyDataSetChanged();
+                            UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry((String) o, 5000) {
+                                @Override
+                                public void onPostExecute() {
+                                    groupMembers.add(getResult().getName());
+                                    spinnerAdapter.notifyDataSetChanged();
+                                }
+                            };
+                            getUserEntry.start();
+                        }
 
                     } catch (NullPointerException e) {
                         Toast.makeText(getContext(), "No Group Members found :(", Toast.LENGTH_LONG).show();
