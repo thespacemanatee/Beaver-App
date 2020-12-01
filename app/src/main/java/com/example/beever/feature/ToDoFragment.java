@@ -78,6 +78,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected List<String> groupsList = new ArrayList<>();
     protected Map<String, Object> map = new HashMap<>();
     protected int scrollPosition = 0;
+    private View bottom_menu;
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
@@ -89,6 +90,13 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
 
         rootView = layoutInflater.inflate(R.layout.fragment_to_do, viewGroup, false);
         rootView.setTag(TAG);
+
+        //Fade in Nav Bar
+        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
+        if (bottom_menu.getVisibility() == View.GONE) {
+            Utils utils = new Utils(getContext());
+            utils.fadeIn();
+        }
 
         // setting Spinner to select Project
         toDoSpinner = rootView.findViewById(R.id.toDoSpinner);
@@ -139,6 +147,8 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
             public void onPostExecute() {
+                groupsList.clear();
+                projectList.clear();
                 if (isSuccessful()) {
                     List<Object> groups = getResult().getGroups();
                     for (Object group : groups) {
@@ -175,6 +185,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
             public void onPostExecute() {
                 if (isSuccessful()) {
                     try {
+
                         toDoList = getResult().getGroupTodo(true, false);
                         Log.d("TODO LIST", String.valueOf(toDoList));
                         toDoList.sort(new ToDoComparator());

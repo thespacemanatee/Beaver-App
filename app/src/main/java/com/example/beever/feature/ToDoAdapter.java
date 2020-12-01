@@ -92,6 +92,10 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             int position = getLayoutPosition();
             TodoEntry todoEntry = toDoList.get(position);
 
+            //Fade Out Nav Bar
+            Utils utils = new Utils(v.getContext());
+            utils.fadeOut();
+
             manager.beginTransaction()
                     .replace(R.id.fragment_container, ToDoViewFragment.newInstance(todoEntry, ToDoAdapter.this))
                     .addToBackStack("ToDoFragment")
