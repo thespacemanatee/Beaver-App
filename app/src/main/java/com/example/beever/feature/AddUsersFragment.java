@@ -172,7 +172,7 @@ public class AddUsersFragment extends Fragment {
                                            public void onPostExecute() {
                                                Toast.makeText(getContext(), "User added successfully", Toast.LENGTH_SHORT).show();
                                                addUsersBtn.revertAnimation();
-//                                                          adaptedUsers.add(user);
+                                               adaptedUsers.add(userEntry);
                                                adapter.notifyDataSetChanged();
                                            }
                                        };
@@ -189,8 +189,6 @@ public class AddUsersFragment extends Fragment {
            }
         });
         addUsersBtn.revertAnimation();
-
-
 
 //        CollectionReference collectionReferenceUsers = fStore.collection("users");
 //        CollectionReference collectionReferenceGroups = fStore.collection("groups");
@@ -325,14 +323,6 @@ public class AddUsersFragment extends Fragment {
 //            }
 //        });
     }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-
-    }
-
 //    private void setUpItemTouchHelper() {
 //        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 //

@@ -55,7 +55,6 @@ public class DashboardFragment extends Fragment {
         greeting = root.findViewById(R.id.greeting);
         name = root.findViewById(R.id.name);
 
-        FirebaseUser fUser = fAuth.getCurrentUser();
         name.setText(mSharedPref.getString("registeredName", "Beever") + ".");
 
         if (currentTime < 12) {

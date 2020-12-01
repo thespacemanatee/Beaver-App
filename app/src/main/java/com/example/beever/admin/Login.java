@@ -72,7 +72,7 @@ public class Login extends AppCompatActivity {
         logoText = findViewById(R.id.logo_name);
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
-        loginButton = (CircularProgressButton) findViewById(R.id.log_in);
+        loginButton = findViewById(R.id.log_in);
         signUpText = findViewById(R.id.sign_up_text);
 
         fAuth = FirebaseAuth.getInstance();

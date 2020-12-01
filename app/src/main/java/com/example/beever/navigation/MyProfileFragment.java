@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.admin.MainActivity;
+import com.example.beever.database.UserEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -257,34 +258,55 @@ public class MyProfileFragment extends Fragment {
             } else {
                 name.setError(null);
                 name.setErrorEnabled(false);
-                Map<String, Object> map = new HashMap<>();
-                map.put("name", newName);
-                DocumentReference documentReference = fStore.collection("users").document(userID);
-                documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
 
-                            if (document.exists()) {
-                                documentReference.update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        SharedPreferences.Editor editor = mSharedPref.edit();
-                                        editor.putString("registeredName", newName);
-                                        update.revertAnimation();
-                                        Toast.makeText(getActivity(), "Name changed successfully!", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
+                    @Override
+                    public void onPostExecute() {
+
+                        UserEntry userEntry = getResult();
+                        userEntry.setName(newName);
+
+                        UserEntry.SetUserEntry setName = new UserEntry.SetUserEntry(userEntry, userID, 5000) {
+                            @Override
+                            public void onPostExecute() {
+                                _NAME = newName;
+                                nameLabel.setText(_NAME);
+                                SharedPreferences.Editor editor = mSharedPref.edit();
+                                editor.putString("registeredName", newName);
+                                editor.apply();
+                                update.revertAnimation();
+                                Toast.makeText(getActivity(), "Name changed successfully!", Toast.LENGTH_SHORT).show();
                             }
-                        }
+                        };
+                        setName.start();
                     }
-                });
-                _NAME = newName;
-                SharedPreferences.Editor editor = mSharedPref.edit();
-                editor.putString("registeredName", newName);
-                editor.apply();
+                };
+                getUserEntry.start();
                 return true;
+
+//                Map<String, Object> map = new HashMap<>();
+//                map.put("name", newName);
+//                DocumentReference documentReference = fStore.collection("users").document(userID);
+//                documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            DocumentSnapshot document = task.getResult();
+//
+//                            if (document.exists()) {
+//                                documentReference.update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                    @Override
+//                                    public void onSuccess(Void aVoid) {
+//                                        SharedPreferences.Editor editor = mSharedPref.edit();
+//                                        editor.putString("registeredName", newName);
+//                                        update.revertAnimation();
+//                                        Toast.makeText(getActivity(), "Name changed successfully!", Toast.LENGTH_SHORT).show();
+//                                    }
+//                                });
+//                            }
+//                        }
+//                    }
+//                });
             }
 
         } else {
