@@ -13,8 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.beever.R;
+import com.example.beever.database.EventEntry;
 import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
+import com.google.firebase.Timestamp;
 
 public class GapFinderFragment extends Fragment {
 
@@ -55,13 +57,22 @@ public class GapFinderFragment extends Fragment {
                             infoDisplay.setText("Failed0");
                             return;
                         }
-                        UserEntry.GetUserRelevantTodos getUserRelevantTodos = new UserEntry.GetUserRelevantTodos(getResult(),5000,true,true,queryUserId) {
-                            @Override
-                            public void onPostExecute() {
-                                infoDisplay.setText(isSuccessful()? getResult().toString():"Failed1");
-                            }
-                        };
-                        getUserRelevantTodos.start();
+                        String ret = "";
+                        for (EventEntry e:getResult().getUserEvents(true,true)){
+                            ret += "Name=" + e.getName() + '\n';
+                            ret += "\tDescription=" + e.getDescription() + '\n';
+                            ret += "\tStart time=\n";
+                            Timestamp start_time = e.getStart_time();
+                            ret += "\t\tYear=" + start_time.toDate().getYear() + '\n';
+                            ret += "\t\tMonth=" + start_time.toDate().getMonth() + '\n';
+                            ret += "\t\tDay=" + start_time.toDate().getDay() + '\n';
+                            ret += "\tEnd time=\n";
+                            start_time = e.getEnd_time();
+                            ret += "\t\tYear=" + start_time.toDate().getYear() + '\n';
+                            ret += "\t\tMonth=" + start_time.toDate().getMonth() + '\n';
+                            ret += "\t\tDay=" + start_time.toDate().getDay() + '\n';
+                        }
+                        infoDisplay.setText(ret);
                     }
                 };
                 getUserEntry.start();
@@ -78,17 +89,42 @@ public class GapFinderFragment extends Fragment {
                     Toast.makeText(getActivity(), "Please enter a group id.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                GroupEntry.GroupEntryListener groupEntryListener = new GroupEntry.GroupEntryListener(queryGroupId,5000) {
-                    public void onPreListening(){
-                        infoDisplay.setText(exists()? "Initial retrieval success" : "InitFail");
-                    }
-
-                    @Override
-                    public void onListenerUpdate() {
-                        infoDisplay.setText(exists()? getStateChange().toString() : "Failed");
+                GroupEntry.GetGroupEntry a = new GroupEntry.GetGroupEntry(queryGroupId,5000){
+                    public void onPostExecute(){
+                        if (!isSuccessful()){
+                            infoDisplay.setText("Failed0");
+                            return;
+                        }
+                        GroupEntry.GetGroupRelevantEvents b = new GroupEntry.GetGroupRelevantEvents(getResult(),5000){
+                            public void onPostExecute(){
+                                if (!isSuccessful()){
+                                    infoDisplay.setText("Failed1");
+                                    return;
+                                }
+                                String ret = "";
+                                for (EventEntry e:getResult()){
+                                    ret += "Name=" + e.getName() + '\n';
+                                    ret += "\tDescription=" + e.getDescription() + '\n';
+                                    ret += "\tStart time=\n";
+                                    Timestamp start_time = e.getStart_time();
+                                    ret += "\t\tYear=" + start_time.toDate().getYear() + '\n';
+                                    ret += "\t\tMonth=" + start_time.toDate().getMonth() + '\n';
+                                    ret += "\t\tDay=" + start_time.toDate().getDay() + '\n';
+                                    ret += "\t\tRawTime=" + start_time.toString() + '\n';
+                                    ret += "\tEnd time=\n";
+                                    start_time = e.getEnd_time();
+                                    ret += "\t\tYear=" + start_time.toDate().getYear() + '\n';
+                                    ret += "\t\tMonth=" + start_time.toDate().getMonth() + '\n';
+                                    ret += "\t\tDay=" + start_time.toDate().getDay() + '\n';
+                                    ret += "\t\tRawTime=" + start_time.toString() + '\n';
+                                }
+                                infoDisplay.setText(ret);
+                            }
+                        };
+                        b.start();
                     }
                 };
-                groupEntryListener.start();
+                a.start();
 
             }
         });
