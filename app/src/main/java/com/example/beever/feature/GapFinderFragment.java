@@ -18,6 +18,8 @@ import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.google.firebase.Timestamp;
 
+import java.util.ArrayList;
+
 public class GapFinderFragment extends Fragment {
 
     EditText userId;
@@ -102,7 +104,12 @@ public class GapFinderFragment extends Fragment {
                             infoDisplay.setText("Failed0");
                             return;
                         }
-                        infoDisplay.setText(getResult().toString());
+                        String ret = "";
+                        for (ArrayList<Timestamp> t: getResult()){
+                            ret += t.get(0).toDate().toString() + '\n';
+                            ret += '\t' + t.get(1).toDate().toString() + '\n';
+                        }
+                        infoDisplay.setText(ret);
                     }
                 };
                 gapFinder.getGaps();

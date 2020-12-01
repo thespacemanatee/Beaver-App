@@ -67,7 +67,7 @@ public abstract class GapFinderAlgorithm {
     }
 
     public void runMainGapFinder(ArrayList<EventEntry> events){
-        Timestamp targetDateBase = new Timestamp(new Date(targetYear,targetMonth,targetDay));
+        Timestamp targetDateBase = new Timestamp(new Date(targetYear-1900,targetMonth-1,targetDay));
         int availableBlockCount = (MIN_IN_DAY + START_FORBIDDEN_TIMING_MIN) / MIN_BLOCK_MINUTES;
         int requestedBlockCount = (durationInMinutes%MIN_BLOCK_MINUTES==0?
                 durationInMinutes/MIN_BLOCK_MINUTES:(durationInMinutes/MIN_BLOCK_MINUTES)+1);
