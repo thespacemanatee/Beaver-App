@@ -26,6 +26,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.database.ChatEntry;
 import com.example.beever.database.UserEntry;
@@ -49,7 +50,7 @@ public class ChatInfoFragment extends Fragment implements Populatable{
 
     private CircularProgressButton addUsersBtn;
     private ArrayList<String> grpMembers = new ArrayList<>();
-    private ArrayList<Integer> grpMemberImg = new ArrayList<>();
+    private ArrayList<String> grpMemberImg = new ArrayList<>();
     private GroupMemberAdapter adapter;
     private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     String groupId;
@@ -122,7 +123,11 @@ public class ChatInfoFragment extends Fragment implements Populatable{
                                     @Override
                                     public void onPostExecute() {
                                         grpMembers.add(getResult().getName());
-                                        grpMemberImg.add(R.drawable.pink_circle);
+                                        if (getResult().getDisplay_picture() == null) {
+                                            grpMemberImg.add("null");
+                                        } else {
+                                            grpMemberImg.add(getResult().getDisplay_picture());
+                                        }
                                         adapter.notifyDataSetChanged();
                                     }
                                 };
@@ -137,8 +142,10 @@ public class ChatInfoFragment extends Fragment implements Populatable{
 
     class GroupMemberAdapter extends BaseAdapter {
 
+        Context context;
         LayoutInflater inflater;
         GroupMemberAdapter(Context c) {
+            context = c;
             inflater = LayoutInflater.from(c);
         }
 
@@ -182,11 +189,15 @@ public class ChatInfoFragment extends Fragment implements Populatable{
             }
 
             //Set variables to allow multiple access of same image and text
-            int selectedMemberImg = grpMemberImg.get(i);
+            String selectedMemberImg = grpMemberImg.get(i);
             String selectedMember = grpMembers.get(i);
 
             //setImageResource for ImageButton and setText for TextView
-            viewHolder.memberImg.setImageResource(selectedMemberImg);
+            if (selectedMemberImg.equals("null")) {
+                Glide.with(context).load(R.drawable.pink_circle).centerCrop().into(viewHolder.memberImg);
+            } else {
+                Glide.with(context).load(selectedMemberImg).centerCrop().into(viewHolder.memberImg);
+            }
             viewHolder.member.setText(selectedMember);
 
             return view;

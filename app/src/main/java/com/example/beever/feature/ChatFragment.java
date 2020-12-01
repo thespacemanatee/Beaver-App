@@ -19,16 +19,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.database.ChatEntry;
+import com.example.beever.database.UserEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 import java.sql.Time;
 import java.util.ArrayList;
@@ -40,12 +44,15 @@ import java.util.Map;
 public class ChatFragment extends Fragment implements Populatable{
 
     private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
+    private String userID = fAuth.getUid();
+
     private String groupName;
     private String groupId;
     private String groupImage;
     private BubblesAdapter adapter;
 
-    private ArrayList<Integer> senderImg = new ArrayList<>();
+    private ArrayList<String> senderImg = new ArrayList<>();
     private ArrayList<String> texts = new ArrayList<>();
     private ArrayList<String> sender = new ArrayList<>();
     private ArrayList<Timestamp> times = new ArrayList<>();
@@ -54,6 +61,7 @@ public class ChatFragment extends Fragment implements Populatable{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_chat, container, false);
 
@@ -62,11 +70,6 @@ public class ChatFragment extends Fragment implements Populatable{
         groupId = bundle.getString("groupId");
         groupImage = bundle.getString("groupImage");
         mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
-
-        texts.clear();
-        senderImg.clear();
-        times.clear();
-        sender.clear();
 
         //Show Chat Bubbles
         ListView layout = rootView.findViewById(R.id.bubbles_area);
@@ -82,14 +85,9 @@ public class ChatFragment extends Fragment implements Populatable{
             public void onClick(View v) {
                 String newText = editText.getText().toString();
                 if (!newText.equals("")) {
-//                    grpMemberImg.add(R.drawable.beever_logo);
-//                    texts.add(newText);
                     Log.d("CHECK NEW TEXT", newText);
-//                    times.add(new Timestamp(new Date()));
                     addMessage(newText, new Timestamp(new Date()));
                     editText.setText("");
-//                    adapter = new BubblesAdapter(getContext());
-//                    layout.setAdapter(adapter);
                 }
             }
         });
@@ -98,15 +96,13 @@ public class ChatFragment extends Fragment implements Populatable{
     }
 
     private void addMessage(String text, Timestamp timestamp) {
-        String name = mSharedPref.getString("registeredName", "");
-        ChatEntry chatEntry = new ChatEntry(name, text, null, timestamp);
+        ChatEntry chatEntry = new ChatEntry(userID, text, null, timestamp);
         DocumentReference documentReference = fStore.collection("groups").document(groupId);
         documentReference.update("chat", FieldValue.arrayUnion(chatEntry)).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Toast.makeText(getContext(), "Chat sent successfully", Toast.LENGTH_SHORT).show();
                 populateRecyclerView();
-
             }
         });
     }
@@ -117,21 +113,40 @@ public class ChatFragment extends Fragment implements Populatable{
         senderImg.clear();
         times.clear();
         sender.clear();
+
         DocumentReference documentReference = fStore.collection("groups").document(groupId);
+        Log.d("testId",groupId);
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
+                        Log.d("test2",document.toString());
                         List<Map<String, Object>> chatList = (ArrayList<Map<String, Object>>) document.get("chat");
                         if (chatList != null) {
+                            Log.d("test",chatList.toString());
                             for (Object o: chatList) {
                                 ChatEntry chatEntry = new ChatEntry(o);
                                 texts.add(chatEntry.getMessage());
-                                senderImg.add(R.drawable.pink_circle); /*TO DO: Get the Profile Picture via UserEntry*/
                                 times.add(chatEntry.getTime());
-                                sender.add(chatEntry.getSender());
+                                senderImg.add("https://firebasestorage.googleapis.com/v0/b/beaver-app-7998c.appspot.com/o/groups%2FH8DKr5zp34Sf5xHVhwD6TJljIWh2CreateWorks%2Fgroup_image.jpg?alt=media&token=ae707bd1-ccb1-4154-a254-01f3b1d99b0f");
+                                sender.add(mSharedPref.getString("registeredName", ""));
+
+//                                UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(chatEntry.getSender(), 5000) {
+//                                    @Override
+//                                    public void onPostExecute() {
+//                                        Log.d("ENTERS USER ENTRY", "please");
+//                                        Log.d("USER ENTRY", getResult().toString());
+//                                        if (getResult().getDisplay_picture() == null) {
+//                                            senderImg.add("null");
+//                                        } else {
+//                                            senderImg.add(getResult().getDisplay_picture());
+//                                        }
+//                                        sender.add(getResult().getName());
+//                                    }
+//                                };
+//                                userGetter.start();
                             }
                             adapter.notifyDataSetChanged();
                         }
@@ -144,8 +159,10 @@ public class ChatFragment extends Fragment implements Populatable{
 
     class BubblesAdapter extends BaseAdapter {
 
+        Context context;
         LayoutInflater inflater;
         BubblesAdapter(Context c) {
+            context = c;
             inflater = LayoutInflater.from(c);
         }
 
@@ -166,17 +183,16 @@ public class ChatFragment extends Fragment implements Populatable{
            BubblesViewHolder viewHolder;
 
             //Set variables to allow multiple access of same image and text
-            int img = senderImg.get(i);
+            String img = senderImg.get(i);
             String txt = texts.get(i);
-            String timestamp = times.get(i).toDate().toString().substring(0, 19);
+            // String timestamp = times.get(i).toDate().toString().substring(0, 19);
+            String timestamp = new Timestamp(new Date()).toString();
             String senderName = sender.get(i);
             if (senderName == null) {
                 senderName = "NULL";
             }
 
             String name = mSharedPref.getString("registeredName", "");
-            Log.d("NAME", name);
-            Log.d("SENDER NAME", senderName);
             if (prevSender != senderName) {
                 //If view (View to populate GridView cells) not loaded before,
                 //create new ViewHolder to hold view
@@ -202,16 +218,17 @@ public class ChatFragment extends Fragment implements Populatable{
                     viewHolder.member = view.findViewById(R.id.bubble_name);
                 }
 
-                //Tag to reference
-                view.setTag(viewHolder);
-
             } else {
                 //If view loaded before, get view's tag and cast to ViewHolder
                 viewHolder = (BubblesViewHolder)view.getTag();
             }
 
             //setImageResource for ImageButton and setText for TextView
-            viewHolder.memberImg.setImageResource(img);
+            if (img.equals("null")) {
+                Glide.with(context).load(R.drawable.pink_circle).centerCrop().into(viewHolder.memberImg);
+            } else {
+                Glide.with(context).load(img).centerCrop().into(viewHolder.memberImg);
+            }
             viewHolder.text.setText(txt);
             viewHolder.time.setText(timestamp);
             viewHolder.member.setText(senderName);

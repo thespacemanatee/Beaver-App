@@ -93,7 +93,6 @@ public class GroupsFragment extends Fragment implements Populatable{
                                     Log.d("GROUP ID", getGroupId());
                                     grpIds.add(getGroupId());
                                     grpNames.add(getResult().getName());
-                                    adapter.notifyDataSetChanged();
                                     if (getResult().getDisplay_picture() == null) {
                                         grpImages.add("null");
                                     } else {
@@ -163,7 +162,6 @@ public class GroupsFragment extends Fragment implements Populatable{
             }
 
             //Set variables to allow multiple access of same image and text
-            //Bitmap selectedGrpImg = grpImages.get(i);
             String selectedGrpImg = grpImages.get(i);
             String selectedGrpName = grpNames.get(i);
             String selectedGrpId = grpIds.get(i);
