@@ -22,7 +22,9 @@ public class GapFinderFragment extends Fragment {
 
     EditText userId;
     Button userQueryButton;
-    EditText groupId;
+    EditText groupId0;
+    EditText groupId1;
+    EditText groupId2;
     Button groupQueryButton;
     TextView infoDisplay;
 
@@ -37,7 +39,9 @@ public class GapFinderFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_experimental_gap_finder, container, false);
         userId = v.findViewById(R.id.edittext_experimental_user_id);
         userQueryButton = v.findViewById(R.id.button_experimental_user_id);
-        groupId = v.findViewById(R.id.edittext_experimental_group_id);
+        groupId0 = v.findViewById(R.id.edittext_experimental_group_id0);
+        groupId1 = v.findViewById(R.id.edittext_experimental_group_id1);
+        groupId2 = v.findViewById(R.id.edittext_experimental_group_id2);
         groupQueryButton = v.findViewById(R.id.button_experimental_group_id);
         infoDisplay = v.findViewById(R.id.textview_experimental_info);
 
@@ -48,7 +52,7 @@ public class GapFinderFragment extends Fragment {
                 String queryUserId = userId.getText().toString();
                 //Log.i("Test",queryUserId);
                 if (queryUserId.equals("")) {
-                    Toast.makeText(getActivity(),"Please enter a user id.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"Please enter a valid id.",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(queryUserId,5000){
@@ -83,48 +87,25 @@ public class GapFinderFragment extends Fragment {
 
             @Override
             public void onClick(View v){
-                String queryGroupId = groupId.getText().toString();
-                //Log.i("Test",queryUserId);
-                if (queryGroupId.equals("")) {
-                    Toast.makeText(getActivity(), "Please enter a group id.", Toast.LENGTH_SHORT).show();
+                String queryGroupId = "0";
+                String queryYear = groupId0.getText().toString();
+                String queryMonth = groupId1.getText().toString();
+                String queryDay = groupId2.getText().toString();
+                if (queryYear.equals("") | queryMonth.equals("") | queryDay.equals("")) {
+                    Toast.makeText(getActivity(), "Please enter a valid timing.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                GroupEntry.GetGroupEntry a = new GroupEntry.GetGroupEntry(queryGroupId,5000){
+                GapFinderAlgorithm gapFinder = new GapFinderAlgorithm(queryGroupId,10000,
+                        Integer.parseInt(queryYear),Integer.parseInt(queryMonth),Integer.parseInt(queryDay),60){
                     public void onPostExecute(){
                         if (!isSuccessful()){
                             infoDisplay.setText("Failed0");
                             return;
                         }
-                        GroupEntry.GetGroupRelevantEvents b = new GroupEntry.GetGroupRelevantEvents(getResult(),5000){
-                            public void onPostExecute(){
-                                if (!isSuccessful()){
-                                    infoDisplay.setText("Failed1");
-                                    return;
-                                }
-                                String ret = "";
-                                for (EventEntry e:getResult()){
-                                    ret += "Name=" + e.getName() + '\n';
-                                    ret += "\tDescription=" + e.getDescription() + '\n';
-                                    ret += "\tStart time=\n";
-                                    Timestamp start_time = e.getStart_time();
-                                    ret += "\t\tYear=" + start_time.toDate().getYear() + '\n';
-                                    ret += "\t\tMonth=" + start_time.toDate().getMonth() + '\n';
-                                    ret += "\t\tDay=" + start_time.toDate().getDay() + '\n';
-                                    ret += "\t\tRawTime=" + start_time.toString() + '\n';
-                                    ret += "\tEnd time=\n";
-                                    start_time = e.getEnd_time();
-                                    ret += "\t\tYear=" + start_time.toDate().getYear() + '\n';
-                                    ret += "\t\tMonth=" + start_time.toDate().getMonth() + '\n';
-                                    ret += "\t\tDay=" + start_time.toDate().getDay() + '\n';
-                                    ret += "\t\tRawTime=" + start_time.toString() + '\n';
-                                }
-                                infoDisplay.setText(ret);
-                            }
-                        };
-                        b.start();
+                        infoDisplay.setText(getResult().toString());
                     }
                 };
-                a.start();
+                gapFinder.getGaps();
 
             }
         });

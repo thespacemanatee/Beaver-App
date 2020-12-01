@@ -46,6 +46,7 @@ public abstract class GapFinderAlgorithm {
             public void onPostExecute() {
                 if (!isSuccessful()){
                     Log.d(LOG_TAG,"GroupEntry retrieval failed");
+                    onPostExecute();
                     return;
                 }
                 GroupEntry.GetGroupRelevantEvents secondGetter = new GroupEntry.GetGroupRelevantEvents(getResult(),
@@ -53,6 +54,7 @@ public abstract class GapFinderAlgorithm {
                     public void onPostExecute(){
                         if (!isSuccessful()){
                             Log.d(LOG_TAG,"Events retrieval failed");
+                            onPostExecute();
                             return;
                         }
                         runMainGapFinder(getResult());
@@ -87,10 +89,11 @@ public abstract class GapFinderAlgorithm {
             }
         }
         ArrayList<Integer> occupancyCumulative = new ArrayList<Integer>(availableBlockCount);
+        for (int i=0;i<availableBlockCount;i++) occupancyCumulative.add(0);
         occupancyCumulative.set(availableBlockCount-1,occupancy.get(availableBlockCount-1)? 1 : 0);
         result = new ArrayList<ArrayList<Timestamp> >();
-        for (int i = availableBlockCount-1;i>-1;i--) {
-            occupancyCumulative.set(i, occupancy.get(i) ? occupancyCumulative.get(i - 1) + 1 : 0);
+        for (int i = availableBlockCount-2;i>-1;i--) {
+            occupancyCumulative.set(i, occupancy.get(i) ? occupancyCumulative.get(i + 1) + 1 : 0);
             if (occupancyCumulative.get(i) >= requestedBlockCount) {
                 ArrayList<Timestamp> resultAppend = new ArrayList<Timestamp>();
                 resultAppend.add(getOffsetTimestamp(targetDateBase, i));
@@ -112,5 +115,13 @@ public abstract class GapFinderAlgorithm {
         int targetSecond = (int)base.getSeconds();
         targetSecond += block * MIN_BLOCK_MINUTES * 60;
         return new Timestamp(targetSecond,0);
+    }
+
+    public boolean isSuccessful(){
+        return result!=null;
+    }
+
+    public ArrayList<ArrayList<Timestamp> > getResult(){
+        return result;
     }
 }
