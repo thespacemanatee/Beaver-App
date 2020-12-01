@@ -170,6 +170,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
                 timestamps.clear();
                 result.setText("Result: " + combinedCal.getTime().toString().substring(0, 16) + " is available!");
                 timestamps.add(timestamp);
+                timestampsEnd.add(new Timestamp(new Date((timestamp.getSeconds() + CHOSEN_DURATION*60)*1000)));
                 adapter.notifyDataSetChanged();
             }
         }
