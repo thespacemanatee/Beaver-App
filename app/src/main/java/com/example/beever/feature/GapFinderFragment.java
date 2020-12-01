@@ -35,14 +35,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
 public class GapFinderFragment extends Fragment implements AdapterView.OnItemSelectedListener, GapAdapter.OnTimestampListener {
 
+    private static final String TAG_ALT = "ALTERNATE TIME";
     private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private RecyclerView mRecyclerView;
     private String groupName;
@@ -53,13 +58,66 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private TextInputLayout eventName, eventDesc;
     private Spinner spin;
     private static Calendar combinedCal = Calendar.getInstance();
+    private static Calendar chosenDay = Calendar.getInstance();
     private ArrayList<Timestamp> timestamps = new ArrayList<>();
     private ArrayList<Timestamp> startTimes = new ArrayList<>();
     private ArrayList<Timestamp> endTimes = new ArrayList<>();
     private ArrayList<EventEntry> groupEntries = new ArrayList<>();
+    private HashMap<String, Boolean> availableBlocks = new HashMap<>();
     private Integer[] durations = new Integer[10];
     private int CHOSEN_DURATION;
     private GapAdapter adapter;
+
+//    {
+//        availableBlocks.put("0:00", true);
+//        availableBlocks.put("0:30", true);
+//        availableBlocks.put("1:00", true);
+//        availableBlocks.put("1:30", true);
+//        availableBlocks.put("2:00", true);
+//        availableBlocks.put("2:30", true);
+//        availableBlocks.put("3:00", true);
+//        availableBlocks.put("3:30", true);
+//        availableBlocks.put("4:00", true);
+//        availableBlocks.put("4:30", true);
+//        availableBlocks.put("5:00", true);
+//        availableBlocks.put("5:30", true);
+//        availableBlocks.put("6:00", true);
+//        availableBlocks.put("6:30", true);
+//        availableBlocks.put("7:00", true);
+//        availableBlocks.put("7:30", true);
+//        availableBlocks.put("8:00", true);
+//        availableBlocks.put("8:30", true);
+//        availableBlocks.put("9:00", true);
+//        availableBlocks.put("9:30", true);
+//        availableBlocks.put("10:00", true);
+//        availableBlocks.put("10:30", true);
+//        availableBlocks.put("11:00", true);
+//        availableBlocks.put("11:30", true);
+//        availableBlocks.put("12:00", true);
+//        availableBlocks.put("12:30", true);
+//        availableBlocks.put("13:00", true);
+//        availableBlocks.put("13:30", true);
+//        availableBlocks.put("14:00", true);
+//        availableBlocks.put("14:30", true);
+//        availableBlocks.put("15:00", true);
+//        availableBlocks.put("15:30", true);
+//        availableBlocks.put("16:00", true);
+//        availableBlocks.put("16:30", true);
+//        availableBlocks.put("17:00", true);
+//        availableBlocks.put("17:30", true);
+//        availableBlocks.put("18:00", true);
+//        availableBlocks.put("18:30", true);
+//        availableBlocks.put("19:00", true);
+//        availableBlocks.put("19:30", true);
+//        availableBlocks.put("20:00", true);
+//        availableBlocks.put("20:30", true);
+//        availableBlocks.put("21:00", true);
+//        availableBlocks.put("21:30", true);
+//        availableBlocks.put("22:00", true);
+//        availableBlocks.put("22:30", true);
+//        availableBlocks.put("23:00", true);
+//        availableBlocks.put("23:30", true);
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -143,7 +201,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
 
                 timestamps.clear();
                 result.setText("Result: Timeslot is unavailable!\nHow about: ");
-                findAlternativeTimings(timestamp);
+//                findAlternativeTimings(timestamp);
                 searchBtn.revertAnimation();
                 break;
             } else {
@@ -156,25 +214,22 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         searchBtn.revertAnimation();
     }
 
-    private void findAlternativeTimings(Timestamp timestamp) {
-        int counter = 0;
-        long time = timestamp.getSeconds();
-        while (counter < 3) {
-            time -= CHOSEN_DURATION*60;
-            Log.d("TIME LONG", String.valueOf(time));
-            for (int i = 0; i < startTimes.size(); i++) {
-                if (time > startTimes.get(i).getSeconds()
-                        && time < endTimes.get(i).getSeconds()
-                        || time < startTimes.get(i).getSeconds()
-                        && (time + CHOSEN_DURATION*60) > startTimes.get(i).getSeconds()) {
-
-                } else {
-                    timestamps.add(new Timestamp(new Date(time)));
-                    counter++;
-                }
-            }
-        }adapter.notifyDataSetChanged();
-    }
+//    private void findAlternativeTimings(Timestamp timestamp) {
+//        for (Map.Entry<String, Boolean> entry: availableBlocks.entrySet()) {
+//            String timing = entry.getKey();
+//            Boolean available = entry.getValue();
+//            try {
+//                SimpleDateFormat time = new SimpleDateFormat("hh:mm");
+//                Date dateTime = time.parse(timing);
+//                dateTime.getTime();
+//                Log.d(TAG_ALT, dateTime.toString());
+//            } catch (ParseException e) {
+//                Log.d(TAG_ALT, e.toString());
+//            }
+//
+//
+//        }
+//    }
 
     private void getListOfEvents() {
         GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
@@ -290,6 +345,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date chosen by the user
             combinedCal.set(year, month, day);
+            chosenDay.set(year, month, day);
         }
     }
 }
