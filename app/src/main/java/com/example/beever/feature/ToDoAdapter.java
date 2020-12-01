@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -22,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
 import com.example.beever.admin.MainActivity;
+import com.example.beever.database.GroupEntry;
 import com.example.beever.database.TodoEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.firebase.Timestamp;
@@ -37,7 +39,6 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     public static final String TAG = "ToDoAdapter";
 
     private ArrayList<TodoEntry> toDoList = new ArrayList<>();
-    private FragmentManager fragmentManager;
     private String groupID;
     private Context context;
 
@@ -45,9 +46,8 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
      * Initialise the toDoList with strings from Firebase
      * @param toDoList
      */
-    public ToDoAdapter(ArrayList<TodoEntry> toDoList, FragmentManager fragmentManager, String groupID, Context context) {
+    public ToDoAdapter(ArrayList<TodoEntry> toDoList, String groupID, Context context) {
         this.toDoList = toDoList;
-        this.fragmentManager = fragmentManager;
         this.groupID = groupID;
         this.context = context;
     }
@@ -70,6 +70,16 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             this.toDoAssignedTo = view.findViewById(R.id.toDoAssignedTo);
 
             view.setOnClickListener(this);
+
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int position = getLayoutPosition();
+                    TodoEntry todoEntry = toDoList.get(position);
+                    showAlertDialog(context, "Delete To-Do?", todoEntry);
+                    return true;
+                }
+            });
         }
 
         @Override
@@ -84,7 +94,9 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             /*ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_edit);
             toDoDialogFragment.show(fragmentManager, TAG);*/
 
-            showAlertDialog(context, "Delete To-Do?", todoEntry);
+            // showAlertDialog(context, "Delete To-Do?", todoEntry);
+
+            // TODO: Make intent and show different fragment that displays the details of the todo
         }
     }
 
@@ -111,13 +123,39 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
     private void removeItem(TodoEntry todoEntry) {
         int currPosition = toDoList.indexOf(todoEntry);
-        toDoList.remove(currPosition);
-        notifyItemRemoved(currPosition);
+        GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    getResult().modifyEventOrTodo(false, true, false, todoEntry);
+                    notifyItemRemoved(currPosition);
+                    notifyDataSetChanged();
+                } else {
+                    Toast.makeText(context, "Cannot remove to-do", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        groupEntry.start();
     }
 
     public void addItem(TodoEntry todoEntry) {
-        toDoList.add(0, todoEntry);
-        notifyItemInserted(0);
+        Log.d("GROUP ID", groupID);
+        GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    getResult().modifyEventOrTodo(false, true, true, todoEntry);
+                    notifyDataSetChanged();
+                } else {
+                    Toast.makeText(context, "Cannot add to-do", Toast.LENGTH_SHORT).show();
+                }
+
+                // TODO
+            }
+        };
+
+        groupEntry.start();
     }
 
     /**

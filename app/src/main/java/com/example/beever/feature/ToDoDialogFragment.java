@@ -49,9 +49,10 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected Button toDoDialogDate;
     protected TextView addToDo;
     protected int year, month, day;
-    protected List<String> groupMembers;
+    protected List<String> groupMembers = new ArrayList<>();
+    protected ArrayAdapter<String> spinnerAdapter;
 
-    private ToDoAdapter adapter;
+    private ToDoAdapter toDoAdapter;
 
     private String groupID;
     private int layoutResource;
@@ -64,7 +65,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     public ToDoDialogFragment(String groupID, int layoutResource, ToDoAdapter adapter) {
         this.groupID = groupID;
         this.layoutResource = layoutResource;
-        this.adapter = adapter;
+        this.toDoAdapter = adapter;
     }
 
     @Override
@@ -88,12 +89,13 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setIcon(R.drawable.list);
 
-        // setting the spinner for assigning to group members
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(parentView.getContext(), R.layout.spinner_item_dialog, groupMembers);
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown);
-        toDoDialogSpinner.setAdapter(adapter);
         toDoDialogSpinner.setOnItemSelectedListener(this);
         Log.d(TAG, SPINNER);
+
+        // setting spinner to group members list
+        spinnerAdapter = new ArrayAdapter<>(parentView.getContext(), R.layout.spinner_item_dialog, groupMembers);
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown);
+        toDoDialogSpinner.setAdapter(spinnerAdapter);
 
         // setting calendar when the due date button is pressed
         toDoDialogDate.setOnClickListener(v -> {
@@ -120,8 +122,8 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
                     taskTitle = toDoDialogTask.getText().toString();
                     taskDescr = toDoDialogDescription.getText().toString();
                     assignedTo = toDoDialogSpinner.getSelectedItem().toString();
-                    if (dueDate.toString().isEmpty() || taskTitle.isEmpty() || assignedTo.isEmpty()) {
-                        Toast.makeText(getContext(), "All fields except description must be filled in!", Toast.LENGTH_SHORT).show();
+                    if (dueDate == null || taskTitle.isEmpty() || assignedTo.isEmpty()) {
+                        Toast.makeText(getContext(), "All fields must be filled in!", Toast.LENGTH_SHORT).show();
                     } else {
                         addNewToDo(taskTitle, taskDescr, assignedTo, dueDate);
                     }
@@ -135,28 +137,31 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
     private void initGroupMembers() {
         // TODO: get group members from firebase
-        /*Log.d("INIT GROUP MEMBERS", groupID);
-        groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
+        Log.d("INIT GROUP MEMBERS", groupID);
+        GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
             @Override
             public void onPostExecute() {
-                groupMembers = new ArrayList<>();
-
                 if (isSuccessful()) {
-                    List<Object> member_list = getResult().getMember_list();
-                    for (Object o : member_list) {
-                        groupMembers.add((String) o);
+                    try {
+                        List<Object> member_list = getResult().getMember_list();
+                        Log.d("TO DO DIALOG", member_list.toString());
+                        for (Object o : member_list) {
+                            String user = (String) ((HashMap) o).get("name");
+                            groupMembers.add(user);
+                        }
+
+                        spinnerAdapter.notifyDataSetChanged();
+
+                    } catch (NullPointerException e) {
+                        Toast.makeText(getContext(), "No Group Members found :(", Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    Toast.makeText(getContext(), "Not Successful", Toast.LENGTH_SHORT).show();
                 }
             }
         };
 
-        groupEntry.start();*/
-        groupMembers = new ArrayList<>();
-        groupMembers.add("Claudia");
-        groupMembers.add("Chee Kit");
-        groupMembers.add("Jun Hao");
-        groupMembers.add("Sean");
-        groupMembers.add("Xing Yi");
+        groupEntry.start();
     }
 
     @Override
@@ -171,17 +176,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
     private void addNewToDo(String taskTitle, String taskDescr, String assignedTo, Date dueDate) {
         TodoEntry newToDo = new TodoEntry(taskTitle, taskDescr, assignedTo, new Timestamp(dueDate), groupID);
-        // TODO
-        /*GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
-            @Override
-            public void onPostExecute() {
-                if (isSuccessful()) {
-                    getResult().modifyEventOrTodo(false, true, true, newToDo);
-                }
-            }
-        };
 
-        groupEntry.start();*/
-        adapter.addItem(newToDo);
+        toDoAdapter.addItem(newToDo);
     }
 }

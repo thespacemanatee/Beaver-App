@@ -58,9 +58,11 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected RecyclerView.LayoutManager layoutManager;
     protected ToDoAdapter toDoAdapter;
     protected Spinner toDoSpinner;
+    protected ArrayAdapter<String> arrayAdapter;
     protected FloatingActionButton toDoAddButton;
     protected ExpandableListView toDoArchivedListView;
     protected ExpandableListAdapter toDoArchivedAdapter;
+    private View rootView;
 
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userID;
@@ -69,35 +71,28 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected List<String> ARCHIVED = new ArrayList<>();
     protected List<TodoEntry> archivedList = new ArrayList<>();
     protected HashMap<String, List<TodoEntry>> expandableListDetail = new HashMap<>();
-    protected static ArrayList<TodoEntry> toDoList = new ArrayList<>();
+    protected ArrayList<TodoEntry> toDoList = new ArrayList<>();
     protected List<String> projectList = new ArrayList<>();
+    protected List<String> groupsList = new ArrayList<>();
     protected Map<String, Object> map = new HashMap<>();
     protected int scrollPosition = 0;
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
 
+        Objects.requireNonNull(((NavigationDrawer) Objects.requireNonNull(getActivity())).getSupportActionBar()).setTitle("To-Do");
+
         FirebaseUser fUser = fAuth.getCurrentUser();
         userID = fUser.getUid();
 
-        populateProjectList();
-        if (!projectList.isEmpty()) {
-            groupID = projectList.get(0);
-        }
-        initToDoList();
-        initArchivedList();
-
-        View rootView = layoutInflater.inflate(R.layout.fragment_to_do, viewGroup, false);
+        rootView = layoutInflater.inflate(R.layout.fragment_to_do, viewGroup, false);
         rootView.setTag(TAG);
-
-        Objects.requireNonNull(((NavigationDrawer) Objects.requireNonNull(getActivity())).getSupportActionBar()).setTitle("To-Do");
 
         // setting Spinner to select Project
         toDoSpinner = rootView.findViewById(R.id.toDoSpinner);
         toDoSpinner.setOnItemSelectedListener(this);
-
         // ArrayAdapter for Spinner
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(), R.layout.spinner_item, projectList);
+        arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, projectList);
         arrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown);
         toDoSpinner.setAdapter(arrayAdapter);
         Log.d(TAG, SPINNER);
@@ -112,19 +107,10 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoRecyclerView.setItemAnimator(new DefaultItemAnimator());
         toDoRecyclerView.scrollToPosition(scrollPosition);
 
-        // set toDoAdapter for RecyclerView
-        toDoAdapter = new ToDoAdapter(toDoList, getFragmentManager(), groupID, getContext());
-        toDoRecyclerView.setAdapter(toDoAdapter);
-        Log.d(TAG, RECYCLERVIEW);
-
         // set Archived to dos for Expandable View
         toDoArchivedListView = rootView.findViewById(R.id.toDoArchivedListView);
         ARCHIVED = new ArrayList<>();
         ARCHIVED.add("Archived");
-        expandableListDetail.put("Archived", archivedList);
-        toDoArchivedAdapter = new ExpandableListAdapter(this.getContext(), ARCHIVED, expandableListDetail);
-        toDoArchivedListView.setAdapter(toDoArchivedAdapter);
-        toDoArchivedListView.setOnGroupExpandListener(groupPosition -> Toast.makeText(getContext(), "Archive Expanded.", Toast.LENGTH_SHORT).show());
 
         // set To Do Form for FloatingActionButton
         toDoAddButton = rootView.findViewById(R.id.toDoAddButton);
@@ -139,34 +125,93 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         });
         Log.d(TAG, FAB);
 
+        populateProjectList();
+        if (!projectList.isEmpty()) {
+            groupID = projectList.get(0);
+        }
+
         return rootView;
     }
 
     private void populateProjectList() {
-        /*UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
+        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
             public void onPostExecute() {
                 if (isSuccessful()) {
                     List<Object> groups = getResult().getGroups();
                     for (Object group : groups) {
                         Log.d("PROJECT LIST", (String) group);
-                        projectList.add((String) group);
+                        projectList.add(((String) group).substring(28));
+                        groupsList.add((String) group);
                     }
+                    arrayAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(getContext(), "Groups Not Found", Toast.LENGTH_LONG).show();
                 }
             }
         };
 
-        getUserEntry.start();*/
+        getUserEntry.start();
 
-        projectList = new ArrayList<>();
+        /*projectList = new ArrayList<>();
         projectList.add("50.001 1D");
         projectList.add("50.002 1D");
-        projectList.add("50.004 2D");
+        projectList.add("50.004 2D");*/
     }
 
-    private void initToDoList() {
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // TODO: get the to do list from firebase according to the project
+        groupID = groupsList.get(position);
+        Log.d("GROUP ID", groupID);
+
+        toDoAdapter = new ToDoAdapter(toDoList, groupID, getContext());
+
+        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000 ) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    try {
+                        toDoList = getResult().getGroupTodo(true, false);
+                        Log.d("TODO LIST", String.valueOf(toDoList));
+                        archivedList = getResult().getGroupTodo(false, true);
+                        Log.d("ARCHIVED LIST", String.valueOf(archivedList));
+
+                        // set toDoAdapter for RecyclerView in onPostExecute so that groupID is not null
+                        toDoAdapter = new ToDoAdapter(toDoList, groupID, getContext());
+                        toDoRecyclerView.setAdapter(toDoAdapter);
+                        Log.d(TAG, RECYCLERVIEW);
+
+                        // set expandable list for archived todos
+                        expandableListDetail.put("Archived", archivedList);
+                        toDoArchivedAdapter = new ExpandableListAdapter(getContext(), ARCHIVED, expandableListDetail);
+                        toDoArchivedListView.setAdapter(toDoArchivedAdapter);
+                        toDoArchivedListView.setOnGroupExpandListener(groupPosition -> Toast.makeText(getContext(), "Archive Expanded.", Toast.LENGTH_SHORT).show());
+
+                        toDoAdapter.notifyDataSetChanged();
+                        toDoArchivedAdapter.notifyDataSetChanged();
+                    } catch (NullPointerException e) {
+                        Toast.makeText(parent.getContext(), "To Do List Not Found", Toast.LENGTH_LONG).show();
+                        int size = toDoList.size();
+                        toDoList.clear();
+                        toDoAdapter.notifyItemRangeRemoved(0, size);
+                    }
+                } else {
+                    Toast.makeText(parent.getContext(), "Unsuccessful :(", Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+
+        getGroupEntry.start();
+        Snackbar.make(view, "Selected: " + parent.getItemAtPosition(position).toString(), Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    /* private void initToDoList() {
         toDoList = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
             toDoList.add(new TodoEntry("Item Number " + i, "Details", "Xing Yi", new Timestamp(new Date()), "50.001 1D"));
@@ -178,7 +223,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         for (int i = 0; i < 20; i++) {
             archivedList.add(new TodoEntry("Archived Number " + i, "Details", "Xing Yi", new Timestamp(new Date()), "50.001 1D"));
         }
-    }
+    }*/
 
     @Override
     public void onStart() {
@@ -220,34 +265,5 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     public void onResume() {
         super.onResume();
         Log.d(TAG, "ON RESUME");
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        /*// TODO: get the to do list from firebase according to the project
-        groupID = parent.getItemAtPosition(position).toString();
-        Log.d("GROUP ID", groupID);
-        Toast.makeText(parent.getContext(), "Selected: " + groupID, Toast.LENGTH_SHORT).show();
-        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000 ) {
-            @Override
-            public void onPostExecute() {
-                if (isSuccessful()) {
-                    toDoList = getResult().getGroupTodo(true, false);
-                    Log.d("TODO LIST", String.valueOf(toDoList));
-                    archivedList = getResult().getGroupTodo(false, true);
-                    Log.d("ARCHIVED LIST", String.valueOf(archivedList));
-                } else {
-                    Toast.makeText(parent.getContext(), "To Do List Not Found", Toast.LENGTH_LONG).show();
-                }
-            }
-        };
-
-        getGroupEntry.start();*/
-        Snackbar.make(view, "Selected: " + parent.getItemAtPosition(position).toString(), Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
     }
 }
