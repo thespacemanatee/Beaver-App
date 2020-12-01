@@ -27,7 +27,8 @@
         android:background="@drawable/circular_border_shape"
         android:gravity="center"
         android:textColor="@color/white"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:foreground="@drawable/my_selector_oval"/>
 
 
 </LinearLayout>

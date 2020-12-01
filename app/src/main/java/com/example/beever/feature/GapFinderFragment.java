@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.beever.R;
 import com.example.beever.database.EventEntry;
 import com.example.beever.database.GroupEntry;
+import com.example.beever.database.UserEntry;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -49,7 +50,7 @@ import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
 public class GapFinderFragment extends Fragment implements AdapterView.OnItemSelectedListener, GapAdapter.OnTimestampListener {
 
-    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private RecyclerView mRecyclerView;
     private String groupName;
     private String groupID;
@@ -58,8 +59,9 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private TextView currentTime, result;
     private TextInputLayout eventName, eventDesc;
     private Spinner spin;
-    private static Calendar combinedCal = Calendar.getInstance();
-    private static Calendar chosenDay = Calendar.getInstance();
+    private GroupEntry groupEntry;
+    private static final Calendar combinedCal = Calendar.getInstance();
+    private static final Calendar chosenDay = Calendar.getInstance();
     private ArrayList<Timestamp> timestamps = new ArrayList<>();
     private ArrayList<Timestamp> timestampsEnd = new ArrayList<>();
     private ArrayList<Timestamp> startTimes = new ArrayList<>();
@@ -94,14 +96,14 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         eventName = rootView.findViewById(R.id.event_name);
         eventDesc = rootView.findViewById(R.id.event_description);
 
-        String pattern = "HH:mm";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        try {
-            Date date = simpleDateFormat.parse("00:00");
-            chosenDay.setTime(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+//        String pattern = "HH:mm";
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+//        try {
+//            Date date = simpleDateFormat.parse("00:00");
+//            chosenDay.setTime(date);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
 
         spin.setOnItemSelectedListener(this);
 
@@ -199,7 +201,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
 
             @Override
             public void onPostExecute() {
-                GroupEntry groupEntry = getResult();
+                groupEntry = getResult();
                 GroupEntry.GetGroupRelevantEvents groupRelevantEvents = new GroupEntry.GetGroupRelevantEvents(groupEntry, 5000) {
 
                     @Override
@@ -262,6 +264,22 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
             eventDesc.setErrorEnabled(false);
         } else {
             eventDesc.setError("Please enter an event name!");
+        }
+        if (!name.isEmpty() && !description.isEmpty()) {
+            EventEntry eventEntry = new EventEntry();
+            eventEntry.setName(name);
+            eventEntry.setDescription(description);
+            eventEntry.setGroup_id_source(groupID);
+            eventEntry.setStart_time(timestamps.get(position));
+            eventEntry.setEnd_time(timestampsEnd.get(position));
+            GroupEntry.SetGroupEntry setEvent = new GroupEntry.SetGroupEntry(groupEntry, groupID, 5000) {
+                @Override
+                public void onPostExecute() {
+                    groupEntry.modifyEventOrTodo(true, true, true, eventEntry);
+                    Log.d("GAP RESULT", "onPostExecute: " + timestamps.get(position).toString() + timestampsEnd.get(position).toString());
+                }
+            };
+            setEvent.start();
         }
 
 
