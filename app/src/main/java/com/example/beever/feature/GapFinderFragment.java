@@ -35,6 +35,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private ArrayList<Timestamp> startTimes = new ArrayList<>();
     private ArrayList<Timestamp> endTimes = new ArrayList<>();
     private ArrayList<EventEntry> groupEntries = new ArrayList<>();
-    private HashMap<String, Boolean> availableBlocks = new HashMap<>();
+//    private HashMap<String, Boolean> availableBlocks = new HashMap<>();
     private Integer[] durations = new Integer[10];
     private int CHOSEN_DURATION;
     private GapAdapter adapter;
@@ -141,6 +142,15 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         eventName = rootView.findViewById(R.id.event_name);
         eventDesc = rootView.findViewById(R.id.event_description);
 
+        String pattern = "HH:mm";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        try {
+            Date date = simpleDateFormat.parse("00:00");
+            chosenDay.setTime(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         spin.setOnItemSelectedListener(this);
 
         mRecyclerView = rootView.findViewById(R.id.gap_finder_recycler);
@@ -191,17 +201,15 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
 
     private void gapFinder(Timestamp timestamp) {
         for (int i = 0; i < startTimes.size(); i++) {
-            Log.d("GAP TEST START", String.valueOf(startTimes.get(i).getSeconds()));
-            Log.d("GAP TEST END", String.valueOf(endTimes.get(i).getSeconds()));
-            Log.d("GAP TEST CHOSEN", String.valueOf(timestamp.getSeconds()));
             if (timestamp.getSeconds() > startTimes.get(i).getSeconds()
                     && timestamp.getSeconds() < endTimes.get(i).getSeconds()
                     || timestamp.getSeconds() < startTimes.get(i).getSeconds()
-                    && (timestamp.getSeconds() + CHOSEN_DURATION*60) > startTimes.get(i).getSeconds()) {
+                    && (timestamp.getSeconds() + CHOSEN_DURATION*60) > startTimes.get(i).getSeconds()
+                    && (timestamp.getSeconds() + CHOSEN_DURATION*60) < endTimes.get(i).getSeconds()) {
 
                 timestamps.clear();
                 result.setText("Result: Timeslot is unavailable!\nHow about: ");
-//                findAlternativeTimings(timestamp);
+                findAlternativeTimings();
                 searchBtn.revertAnimation();
                 break;
             } else {
@@ -214,7 +222,34 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         searchBtn.revertAnimation();
     }
 
-//    private void findAlternativeTimings(Timestamp timestamp) {
+    private void findAlternativeTimings() {
+        timestamps.clear();
+        Timestamp chosen = new Timestamp(chosenDay.getTime());
+        for (int i = 0; i < 48; i++) {
+            Timestamp block = new Timestamp(new Date((chosen.getSeconds() + i*30*60)*1000));
+            boolean add = true;
+            Log.d(TAG_ALT, block.toString());
+            for (int j = 0; j < startTimes.size(); j++) {
+                Log.d("GAP TEST START", String.valueOf(startTimes.get(j).getSeconds()));
+                Log.d("GAP TEST END", String.valueOf(endTimes.get(j).getSeconds()));
+                Log.d("GAP TEST CHOSEN", String.valueOf(block.getSeconds()));
+                if (block.getSeconds() > startTimes.get(j).getSeconds()
+                        && block.getSeconds() < endTimes.get(j).getSeconds()
+                        || block.getSeconds() < startTimes.get(j).getSeconds()
+                        && (block.getSeconds() + CHOSEN_DURATION*60) > startTimes.get(j).getSeconds()
+                        && (block.getSeconds() + CHOSEN_DURATION*60) < endTimes.get(j).getSeconds()) {
+                    Log.d("GAP TEST RESULT", "BREAK: " + block + ":" + startTimes.get(j) + ":" + endTimes.get(j));
+                    add = false;
+                    break;
+                }
+            }
+            if (add) {
+                Log.d("GAP TEST RESULT", "ADDED");
+                timestamps.add(block);
+            }
+        }
+        adapter.notifyDataSetChanged();
+
 //        for (Map.Entry<String, Boolean> entry: availableBlocks.entrySet()) {
 //            String timing = entry.getKey();
 //            Boolean available = entry.getValue();
@@ -229,7 +264,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
 //
 //
 //        }
-//    }
+    }
 
     private void getListOfEvents() {
         GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
