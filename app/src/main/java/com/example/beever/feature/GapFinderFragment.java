@@ -39,6 +39,7 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,64 +62,16 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private static Calendar combinedCal = Calendar.getInstance();
     private static Calendar chosenDay = Calendar.getInstance();
     private ArrayList<Timestamp> timestamps = new ArrayList<>();
+    private ArrayList<Timestamp> timestampsEnd = new ArrayList<>();
     private ArrayList<Timestamp> startTimes = new ArrayList<>();
     private ArrayList<Timestamp> endTimes = new ArrayList<>();
     private ArrayList<EventEntry> groupEntries = new ArrayList<>();
-//    private HashMap<String, Boolean> availableBlocks = new HashMap<>();
     private Integer[] durations = new Integer[10];
     private int CHOSEN_DURATION;
     private GapAdapter adapter;
-
-//    {
-//        availableBlocks.put("0:00", true);
-//        availableBlocks.put("0:30", true);
-//        availableBlocks.put("1:00", true);
-//        availableBlocks.put("1:30", true);
-//        availableBlocks.put("2:00", true);
-//        availableBlocks.put("2:30", true);
-//        availableBlocks.put("3:00", true);
-//        availableBlocks.put("3:30", true);
-//        availableBlocks.put("4:00", true);
-//        availableBlocks.put("4:30", true);
-//        availableBlocks.put("5:00", true);
-//        availableBlocks.put("5:30", true);
-//        availableBlocks.put("6:00", true);
-//        availableBlocks.put("6:30", true);
-//        availableBlocks.put("7:00", true);
-//        availableBlocks.put("7:30", true);
-//        availableBlocks.put("8:00", true);
-//        availableBlocks.put("8:30", true);
-//        availableBlocks.put("9:00", true);
-//        availableBlocks.put("9:30", true);
-//        availableBlocks.put("10:00", true);
-//        availableBlocks.put("10:30", true);
-//        availableBlocks.put("11:00", true);
-//        availableBlocks.put("11:30", true);
-//        availableBlocks.put("12:00", true);
-//        availableBlocks.put("12:30", true);
-//        availableBlocks.put("13:00", true);
-//        availableBlocks.put("13:30", true);
-//        availableBlocks.put("14:00", true);
-//        availableBlocks.put("14:30", true);
-//        availableBlocks.put("15:00", true);
-//        availableBlocks.put("15:30", true);
-//        availableBlocks.put("16:00", true);
-//        availableBlocks.put("16:30", true);
-//        availableBlocks.put("17:00", true);
-//        availableBlocks.put("17:30", true);
-//        availableBlocks.put("18:00", true);
-//        availableBlocks.put("18:30", true);
-//        availableBlocks.put("19:00", true);
-//        availableBlocks.put("19:30", true);
-//        availableBlocks.put("20:00", true);
-//        availableBlocks.put("20:30", true);
-//        availableBlocks.put("21:00", true);
-//        availableBlocks.put("21:30", true);
-//        availableBlocks.put("22:00", true);
-//        availableBlocks.put("22:30", true);
-//        availableBlocks.put("23:00", true);
-//        availableBlocks.put("23:30", true);
-//    }
+    private static int queryDay;
+    private static int queryMonth;
+    private static int queryYear;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -224,46 +177,48 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
 
     private void findAlternativeTimings() {
         timestamps.clear();
-        Timestamp chosen = new Timestamp(chosenDay.getTime());
-        for (int i = 0; i < 48; i++) {
-            Timestamp block = new Timestamp(new Date((chosen.getSeconds() + i*30*60)*1000));
-            boolean add = true;
-            Log.d(TAG_ALT, block.toString());
-            for (int j = 0; j < startTimes.size(); j++) {
-                Log.d("GAP TEST START", String.valueOf(startTimes.get(j).getSeconds()));
-                Log.d("GAP TEST END", String.valueOf(endTimes.get(j).getSeconds()));
-                Log.d("GAP TEST CHOSEN", String.valueOf(block.getSeconds()));
-                if (block.getSeconds() > startTimes.get(j).getSeconds()
-                        && block.getSeconds() < endTimes.get(j).getSeconds()
-                        || block.getSeconds() < startTimes.get(j).getSeconds()
-                        && (block.getSeconds() + CHOSEN_DURATION*60) > startTimes.get(j).getSeconds()
-                        && (block.getSeconds() + CHOSEN_DURATION*60) < endTimes.get(j).getSeconds()) {
-                    Log.d("GAP TEST RESULT", "BREAK: " + block + ":" + startTimes.get(j) + ":" + endTimes.get(j));
-                    add = false;
-                    break;
+        timestampsEnd.clear();
+        GapFinderAlgorithm gapFinder = new GapFinderAlgorithm(groupID,10000,
+                queryYear, queryMonth, queryDay, CHOSEN_DURATION){
+            public void onPostExecute(){
+                if (isSuccessful()){
+                    ArrayList<ArrayList<Timestamp>> timingBlocks = getResult();
+                    for (ArrayList<Timestamp> timeList: timingBlocks) {
+                        timestamps.add(timeList.get(0));
+                        timestampsEnd.add(timeList.get(1));
+                    }
+                    adapter.notifyDataSetChanged();
+                    Log.d("FINAL RESULT", timestamps.toString());
                 }
             }
-            if (add) {
-                Log.d("GAP TEST RESULT", "ADDED");
-                timestamps.add(block);
-            }
-        }
-        adapter.notifyDataSetChanged();
-
-//        for (Map.Entry<String, Boolean> entry: availableBlocks.entrySet()) {
-//            String timing = entry.getKey();
-//            Boolean available = entry.getValue();
-//            try {
-//                SimpleDateFormat time = new SimpleDateFormat("hh:mm");
-//                Date dateTime = time.parse(timing);
-//                dateTime.getTime();
-//                Log.d(TAG_ALT, dateTime.toString());
-//            } catch (ParseException e) {
-//                Log.d(TAG_ALT, e.toString());
+        };
+        gapFinder.getGaps();
+//        timestamps.clear();
+//        Timestamp chosen = new Timestamp(chosenDay.getTime());
+//        for (int i = 0; i < 48; i++) {
+//            Timestamp block = new Timestamp(new Date((chosen.getSeconds() + i*30*60)*1000));
+//            boolean add = true;
+//            Log.d(TAG_ALT, block.toString());
+//            for (int j = 0; j < startTimes.size(); j++) {
+//                Log.d("GAP TEST START", String.valueOf(startTimes.get(j).getSeconds()));
+//                Log.d("GAP TEST END", String.valueOf(endTimes.get(j).getSeconds()));
+//                Log.d("GAP TEST CHOSEN", String.valueOf(block.getSeconds()));
+//                if (block.getSeconds() > startTimes.get(j).getSeconds()
+//                        && block.getSeconds() < endTimes.get(j).getSeconds()
+//                        || block.getSeconds() < startTimes.get(j).getSeconds()
+//                        && (block.getSeconds() + CHOSEN_DURATION*60) > startTimes.get(j).getSeconds()
+//                        && (block.getSeconds() + CHOSEN_DURATION*60) < endTimes.get(j).getSeconds()) {
+//                    Log.d("GAP TEST RESULT", "BREAK: " + block + ":" + startTimes.get(j) + ":" + endTimes.get(j));
+//                    add = false;
+//                    break;
+//                }
 //            }
-//
-//
+//            if (add) {
+//                Log.d("GAP TEST RESULT", "ADDED");
+//                timestamps.add(block);
+//            }
 //        }
+//        adapter.notifyDataSetChanged();
     }
 
     private void getListOfEvents() {
@@ -381,6 +336,9 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
             // Do something with the date chosen by the user
             combinedCal.set(year, month, day);
             chosenDay.set(year, month, day);
+            queryDay = day;
+            queryMonth = month;
+            queryYear = year;
         }
     }
 }
