@@ -45,8 +45,9 @@ public class ChatFragment extends Fragment implements Populatable{
     private String groupImage;
     private BubblesAdapter adapter;
 
-    private ArrayList<Integer> grpMemberImg = new ArrayList<>();
+    private ArrayList<Integer> senderImg = new ArrayList<>();
     private ArrayList<String> texts = new ArrayList<>();
+    private ArrayList<String> sender = new ArrayList<>();
     private ArrayList<Timestamp> times = new ArrayList<>();
     private SharedPreferences mSharedPref;
 
@@ -63,8 +64,9 @@ public class ChatFragment extends Fragment implements Populatable{
         mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
         texts.clear();
-        grpMemberImg.clear();
+        senderImg.clear();
         times.clear();
+        sender.clear();
 
         //Show Chat Bubbles
         ListView layout = rootView.findViewById(R.id.bubbles_area);
@@ -112,8 +114,9 @@ public class ChatFragment extends Fragment implements Populatable{
     @Override
     public void populateRecyclerView() {
         texts.clear();
-        grpMemberImg.clear();
+        senderImg.clear();
         times.clear();
+        sender.clear();
         DocumentReference documentReference = fStore.collection("groups").document(groupId);
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -126,8 +129,9 @@ public class ChatFragment extends Fragment implements Populatable{
                             for (Object o: chatList) {
                                 ChatEntry chatEntry = new ChatEntry(o);
                                 texts.add(chatEntry.getMessage());
-                                grpMemberImg.add(R.drawable.pink_circle);
+                                senderImg.add(R.drawable.pink_circle); /*TO DO: Get the Profile Picture via UserEntry*/
                                 times.add(chatEntry.getTime());
+                                sender.add(chatEntry.getSender());
                             }
                             adapter.notifyDataSetChanged();
                         }
@@ -154,24 +158,49 @@ public class ChatFragment extends Fragment implements Populatable{
         @Override
         public long getItemId(int i) { return i; }
 
+        String prevSender = "";
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
 
             //ViewHolder for smoother scrolling
            BubblesViewHolder viewHolder;
 
-            if (view == null) {
+            //Set variables to allow multiple access of same image and text
+            int img = senderImg.get(i);
+            String txt = texts.get(i);
+            String timestamp = times.get(i).toDate().toString().substring(0, 19);
+            String senderName = sender.get(i);
+            if (senderName == null) {
+                senderName = "NULL";
+            }
+
+            String name = mSharedPref.getString("registeredName", "");
+            Log.d("NAME", name);
+            Log.d("SENDER NAME", senderName);
+            if (prevSender != senderName) {
                 //If view (View to populate GridView cells) not loaded before,
                 //create new ViewHolder to hold view
                 viewHolder = new BubblesViewHolder();
 
                 //Inflate the layout for GridView cells (created as a Fragment)
-                view = inflater.inflate(R.layout.chat_bubbles, null);
+                if (senderName.equals(name)) {
+                    view = inflater.inflate(R.layout.chat_bubbles_left, null);
 
-                //Get ImageButton and TextView to populate
-                viewHolder.memberImg = view.findViewById(R.id.chat_member_img);
-                viewHolder.text = view.findViewById(R.id.bubble);
-                viewHolder.time = view.findViewById(R.id.bubble_time);
+                    //Get ImageButton and TextView to populate
+                    viewHolder.memberImg = view.findViewById(R.id.chat_member_img_left);
+                    viewHolder.text = view.findViewById(R.id.bubble_left);
+                    viewHolder.time = view.findViewById(R.id.bubble_time_left);
+                    viewHolder.member = view.findViewById(R.id.bubble_name_left);
+
+                } else {
+                    view = inflater.inflate(R.layout.chat_bubbles, null);
+
+                    //Get ImageButton and TextView to populate
+                    viewHolder.memberImg = view.findViewById(R.id.chat_member_img);
+                    viewHolder.text = view.findViewById(R.id.bubble);
+                    viewHolder.time = view.findViewById(R.id.bubble_time);
+                    viewHolder.member = view.findViewById(R.id.bubble_name);
+                }
 
                 //Tag to reference
                 view.setTag(viewHolder);
@@ -181,15 +210,11 @@ public class ChatFragment extends Fragment implements Populatable{
                 viewHolder = (BubblesViewHolder)view.getTag();
             }
 
-            //Set variables to allow multiple access of same image and text
-            int img = grpMemberImg.get(i);
-            String txt = texts.get(i);
-            String timestamp = times.get(i).toDate().toString().substring(0, 19);
-
             //setImageResource for ImageButton and setText for TextView
             viewHolder.memberImg.setImageResource(img);
             viewHolder.text.setText(txt);
             viewHolder.time.setText(timestamp);
+            viewHolder.member.setText(senderName);
 
             return view;
         }
@@ -199,6 +224,7 @@ public class ChatFragment extends Fragment implements Populatable{
             ShapeableImageView memberImg;
             TextView text;
             TextView time;
+            TextView member;
         }
     }
 

@@ -5,46 +5,47 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        app:shapeAppearance="@style/roundedImageViewRounded"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:id="@+id/chat_member_img"
-        android:scaleType="fitCenter"
-        android:layout_alignParentBottom="true"
-        android:foreground="@drawable/my_selector"/>
-
     <LinearLayout
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@id/chat_member_img"
+        android:layout_toStartOf="@id/chat_member_img_left"
         android:background="@drawable/rounded_corners_nav"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/bubble_name"
+            android:id="@+id/bubble_name_left"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="@color/beever_blue"/>
 
         <TextView
-            android:id="@+id/bubble"
+            android:id="@+id/bubble_left"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="@color/black"/>
 
         <TextView
-            android:id="@+id/bubble_time"
+            android:id="@+id/bubble_time_left"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:textAlignment="textEnd"/>
 
     </LinearLayout>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        app:shapeAppearance="@style/roundedImageViewRounded"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/chat_member_img_left"
+        android:scaleType="fitCenter"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:foreground="@drawable/my_selector"/>
 
 </RelativeLayout>
