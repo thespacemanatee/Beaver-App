@@ -2,7 +2,7 @@
 <ScrollView
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_marginBottom="100dp"
+    android:layout_marginBottom="0dp"
     android:background="@color/white"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -50,22 +50,38 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/start"
                 android:textSize="20sp"
                 android:fontFamily="@font/poppins"/>
 
-            <TextView
-                android:id="@+id/start_datetime"
+            <Button
+                android:id="@+id/start_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="end"
-                android:text="@string/dateTime"
-                android:textSize="20sp"
-                android:fontFamily="@font/poppins"/>
+                android:gravity="center"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/beever_dark_blue"
+                android:text="@string/date"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginEnd="5dp"/>
+
+            <Button
+                android:id="@+id/start_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/beever_dark_blue"
+                android:text="@string/time"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginStart="5dp"/>
 
         </LinearLayout>
 
@@ -81,22 +97,38 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/End"
                 android:textSize="20sp"
                 android:fontFamily="@font/poppins"/>
 
-            <TextView
-                android:id="@+id/end_datetime"
+            <Button
+                android:id="@+id/end_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="end"
-                android:text="@string/dateTime"
-                android:textSize="20sp"
-                android:fontFamily="@font/poppins"/>
+                android:gravity="center"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/beever_dark_blue"
+                android:text="@string/date"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginEnd="5dp"/>
+
+            <Button
+                android:id="@+id/end_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/beever_dark_blue"
+                android:text="@string/time"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginStart="5dp"/>
 
         </LinearLayout>
 

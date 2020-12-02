@@ -3,6 +3,7 @@ package com.example.beever.feature;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
@@ -19,6 +20,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -50,7 +52,7 @@ public class AddEventFragment extends Fragment {
 
     private EditText mInput,mDescription;
     private LinearLayout eventStart, eventEnd, addEventButtons;
-    private TextView startDateTime, endDateTime;
+    private Button startDate, endDate, startTime, endTime;
     private Button cancel, save;
     private Date start, end;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -66,9 +68,11 @@ public class AddEventFragment extends Fragment {
         mInput = root.findViewById(R.id.eventTitle);
         mDescription = root.findViewById(R.id.description);
         eventStart = root.findViewById(R.id.startEvent);
-        startDateTime = eventStart.findViewById(R.id.start_datetime);
+        startDate = eventStart.findViewById(R.id.start_date);
+        startTime = eventStart.findViewById(R.id.start_time);
         eventEnd = root.findViewById(R.id.endEvent);
-        endDateTime = eventEnd.findViewById(R.id.end_datetime);
+        endDate = eventEnd.findViewById(R.id.end_date);
+        endTime = eventEnd.findViewById(R.id.end_time);
         addEventButtons = root.findViewById(R.id.add_event_buttons);
         cancel = addEventButtons.findViewById(R.id.cancel_button);
         save = addEventButtons.findViewById(R.id.save_button);
@@ -89,8 +93,10 @@ public class AddEventFragment extends Fragment {
         start = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
         end = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
 
-        startDateTime.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear);
-        endDateTime.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear);
+        startDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear);
+        startTime.setText(calendar.getTime().toString().substring(11,19));
+        endDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear);
+        endTime.setText(calendar.getTime().toString().substring(11,19));
 
 
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -157,7 +163,7 @@ public class AddEventFragment extends Fragment {
             }
         });
 
-        eventStart.setOnClickListener(new View.OnClickListener() {
+        startDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // date picker dialog
@@ -165,7 +171,7 @@ public class AddEventFragment extends Fragment {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                startDateTime.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                                startDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
                                 calendar.set(year,monthOfYear,dayOfMonth);
                                 start = calendar.getTime();
 
@@ -177,7 +183,7 @@ public class AddEventFragment extends Fragment {
             }
         });
 
-        eventEnd.setOnClickListener(new View.OnClickListener() {
+        endDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // date picker dialog
@@ -185,7 +191,7 @@ public class AddEventFragment extends Fragment {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                endDateTime.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                                endDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
                                 calendar.set(year, monthOfYear, dayOfMonth);
                                 end = calendar.getTime();
                             }
@@ -194,6 +200,23 @@ public class AddEventFragment extends Fragment {
                 picker.show();
             }
         });
+
+        startTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                TimePickerDialog picker = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+//                    @Override
+//                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+//
+//                    }
+//                }, 0, 0, false);
+//                picker.show();
+                DialogFragment timeSelectFragment = new AddEventFragment.TimeSelectFragment(AddEventFragment.this);
+                timeSelectFragment.show(getFragmentManager(),"TimeSelectFragment");
+            }
+
+        });
+
         return root;
     }
 
@@ -221,15 +244,15 @@ public class AddEventFragment extends Fragment {
             View dialog = inflater.inflate(R.layout.fragment_gap_finder_time_select,null);
 
             add_event_select_hour = dialog.findViewById(R.id.gap_finder_select_hour);
-            gap_finder_select_minute = dialog.findViewById(R.id.gap_finder_select_minute);
+            add_event_select_minute = dialog.findViewById(R.id.gap_finder_select_minute);
 
-            gap_finder_select_hour.setMaxValue(hourPicks.length-1);
-            gap_finder_select_hour.setMinValue(0);
-            gap_finder_select_hour.setDisplayedValues(hourPicks);
+            add_event_select_hour.setMaxValue(hourPicks.length-1);
+            add_event_select_hour.setMinValue(0);
+            add_event_select_hour.setDisplayedValues(hourPicks);
 
-            gap_finder_select_minute.setMaxValue(minutePicks.length-1);
-            gap_finder_select_minute.setMinValue(0);
-            gap_finder_select_minute.setDisplayedValues(minutePicks);
+            add_event_select_minute.setMaxValue(minutePicks.length-1);
+            add_event_select_minute.setMinValue(0);
+            add_event_select_minute.setDisplayedValues(minutePicks);
 
             builder.setView(dialog).setTitle("Select time")
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -240,8 +263,8 @@ public class AddEventFragment extends Fragment {
                     }).setPositiveButton("Set", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    gapFinderFragment.setHourMinute(hourPicks[gap_finder_select_hour.getValue()],
-                            minutePicks[gap_finder_select_minute.getValue()]);
+//                    gapFinderFragment.setHourMinute(hourPicks[gap_finder_select_hour.getValue()],
+//                            minutePicks[gap_finder_select_minute.getValue()]);
                 }
             });
             return builder.create();

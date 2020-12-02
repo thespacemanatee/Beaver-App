@@ -84,6 +84,7 @@ public class CalendarFragment extends Fragment {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(textEventAdapter);
 
+        calendar.set(selectedYear,selectedMonth,selectedDay,0,0,0);
         populateEventsList();
 
         addEvent = root.findViewById(R.id.addEvent);
@@ -182,7 +183,7 @@ public class CalendarFragment extends Fragment {
                                 ArrayList<EventEntry> eventEntries = new ArrayList<>();
                                 for (EventEntry e : getResult()){
                                     Log.d(TAG, "onPostExecute: " + e.getStart_time());
-                                    if (e.getStart_time().getSeconds() >= startDate.getSeconds() && e.getStart_time().getSeconds() < endDate.getSeconds()){
+                                    if (!(e.getStart_time().getSeconds() >= endDate.getSeconds() || e.getEnd_time().getSeconds() < startDate.getSeconds())){
                                         eventEntries.add(e);
                                     }
                                 }
