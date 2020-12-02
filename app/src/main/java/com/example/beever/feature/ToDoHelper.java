@@ -99,6 +99,12 @@ public class ToDoHelper {
             }
         });
 
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                utils.fadeIn();
+            }
+        });
         dialog.show();
     }
 
