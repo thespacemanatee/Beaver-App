@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
 import com.example.beever.database.GroupEntry;
@@ -185,7 +186,7 @@ public class ToDoHelper {
      * triggered upon pressing the add button in ToDoDialogFragment
      * @param todoEntry
      */
-    public void addItem(TodoEntry todoEntry) {
+    public void addItem(TodoEntry todoEntry, RecyclerView recyclerView) {
         Log.d("GROUP ID", groupID);
         GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -205,6 +206,7 @@ public class ToDoHelper {
 
                     toDoList.add(0, todoEntry);
                     adapter.notifyItemInserted(0);
+                    recyclerView.smoothScrollToPosition(0);
 
                 } else {
                     Toast.makeText(context, "Cannot add to-do", Toast.LENGTH_SHORT).show();
