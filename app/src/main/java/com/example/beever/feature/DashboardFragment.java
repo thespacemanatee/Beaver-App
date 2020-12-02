@@ -14,8 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -203,7 +205,9 @@ public class DashboardFragment extends Fragment {
                                         IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
                                         indivGroupFragment.setArguments(bundle);
                                         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                        transaction.add(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack(null).commit();
+                                        transaction.add(R.id.fragment_container, indivGroupFragment, "openChat")
+                                                .addToBackStack("dashboard")
+                                                .commit();
                                     }
                                 }
                             }
@@ -216,6 +220,7 @@ public class DashboardFragment extends Fragment {
         grpGetter.start();
 
     }
+
 
     class DashboardGroupsAdapter extends BaseAdapter {
 

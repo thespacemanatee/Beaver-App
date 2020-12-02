@@ -61,7 +61,7 @@ public class ToDoViewFragment extends Fragment {
         toDoFullTaskAssignedTo.setText(todoEntry.getAssigned_to());
         // formatting the timestamp to human readable format
         Timestamp deadline = todoEntry.getDeadline();
-        SimpleDateFormat sf = new SimpleDateFormat("dd-MM-YYYY");
+        SimpleDateFormat sf = new SimpleDateFormat("dd MMM YYYY");
         sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
         String deadlineStr = sf.format(deadline.toDate());
         toDoFullTaskDueDate.setText(deadlineStr);

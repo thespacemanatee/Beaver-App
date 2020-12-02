@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
 import com.example.beever.database.GroupEntry;
@@ -46,6 +47,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected TextInputEditText toDoDialogDescription;
     protected Button toDoDialogDate;
     protected TextView addToDo;
+    protected RecyclerView recyclerView;
     protected int year, month, day;
     protected List<String> groupMembers = new ArrayList<>();
     protected ArrayAdapter<String> spinnerAdapter;
@@ -64,9 +66,10 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
      * @param groupID   to see what group the user is looking at
      * @param helper    helps with data retrieval from firestore
      */
-    public ToDoDialogFragment(String groupID, ToDoHelper helper) {
+    public ToDoDialogFragment(String groupID, ToDoHelper helper, RecyclerView recyclerView) {
         this.groupID = groupID;
         this.helper = helper;
+        this.recyclerView = recyclerView;
     }
 
     @Override
@@ -206,7 +209,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
         // creates a new ToDoEntry
         TodoEntry newToDo = new TodoEntry(taskTitle, taskDescr, assignedTo, new Timestamp(dueDate), groupID);
         // uses helper to add this to-do
-        helper.addItem(newToDo);
+        helper.addItem(newToDo, recyclerView);
 
     }
 }
