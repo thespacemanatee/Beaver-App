@@ -86,7 +86,13 @@ public class DashboardFragment extends Fragment {
         eventsAdapter = new DashboardEventsAdapter(getContext());
         eventLayout.setAdapter(eventsAdapter);
 
-        populateRecyclerView();
+        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
+            @Override
+            public void onPostExecute() {
+                populateRecyclerView(getResult());
+            }
+        };
+        getUserEntry.start();
 
         return root;
     }
@@ -102,13 +108,13 @@ public class DashboardFragment extends Fragment {
         }
     }
     
-    public void populateRecyclerView() {
+    public void populateRecyclerView(UserEntry userEntry) {
         dbGrpIds.clear();
         dbGrpImgs.clear();
         dbGrpNames.clear();
         dbEvents.clear();
 
-        UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
+        UserEntry.GetUserRelevantEvents userGetter = new UserEntry.GetUserRelevantEvents(userEntry, 5000, true, false) {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onPostExecute() {
@@ -117,7 +123,7 @@ public class DashboardFragment extends Fragment {
 
 
                     try {
-                        ArrayList<EventEntry> events = getResult().getUserEvents(true, false);
+                        ArrayList<EventEntry> events = getResult();
                         events.sort(new DashboardEventComparator());
                         dbEvents.add(events.get(0));
                         dbEvents.add(events.get(1));
@@ -128,7 +134,7 @@ public class DashboardFragment extends Fragment {
                         e.printStackTrace();
                     }
 
-                    for (Object o: getResult().getDashboard_grps()) {
+                    for (Object o: userEntry.getDashboard_grps()) {
                         if (o != null) {
                             Log.d("GROUP", (String) o);
                             GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String) o, 5000) {
