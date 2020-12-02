@@ -1,41 +1,51 @@
 package com.example.beever.feature;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.OrientationHelper;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
+import com.example.beever.database.EventEntry;
+import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import android.util.Log;
-import android.widget.CalendarView;
-import android.widget.LinearLayout;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class CalendarFragment extends Fragment {
     private static final String TAG = "CalendarFragment";
     FloatingActionButton addEvent;
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    ArrayList<Events> list = new ArrayList<>();
+    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    protected ArrayList<EventEntry> list = new ArrayList<>();
+    protected Map<String,Object> map = new HashMap<>();
     private final String[] months = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+    private String USER_ID;
+    private UserEntry userEntry;
+    private TextEventAdapter textEventAdapter;
+    private RecyclerView mRecyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,29 +53,23 @@ public class CalendarFragment extends Fragment {
         // Inflate the layout for this fragment
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_calendar, container, false);
 
+        /**
+         * Get user ID from firebase authentication
+         */
+        FirebaseUser fUser = fAuth.getCurrentUser();
+        USER_ID = fUser.getUid();
+
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Calendar");
         list.clear();
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
 
-        TextEventAdapter adapter = new TextEventAdapter(list, getContext());
+        textEventAdapter = new TextEventAdapter(list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
-        RecyclerView mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
+        mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setAdapter(textEventAdapter);
+
+        populateEventsList();
 
         addEvent = root.findViewById(R.id.addEvent);
         addEvent.setOnClickListener(new View.OnClickListener() {
@@ -86,13 +90,27 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 list.clear();
-                list.add(new Events(Events.TEXT_TYPE,0,"Event for " + dayOfMonth + " " + months[month] + " " + year));
-                TextEventAdapter adapter = new TextEventAdapter(list, getContext());
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
-                RecyclerView mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
-                mRecyclerView.setLayoutManager(linearLayoutManager);
-                mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-                mRecyclerView.setAdapter(adapter);
+                EventEntry eventEntry = new EventEntry();
+                eventEntry.setName("Event for " + dayOfMonth + " " + months[month] + " " + year);
+                eventEntry.setStart_time(new Timestamp(new Date()));
+                eventEntry.setEnd_time(new Timestamp(new Date()));
+                eventEntry.setUser_id_source(USER_ID);
+                userEntry.modifyEventOrTodo(true, true, true, eventEntry);
+                UserEntry.SetUserEntry setEvent = new UserEntry.SetUserEntry(userEntry, USER_ID, 5000) {
+                    @Override
+                    public void onPostExecute() {
+                        populateEventsList();
+                        textEventAdapter.notifyDataSetChanged();
+//                        TextEventAdapter adapter = new TextEventAdapter(list, getContext());
+//                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
+//                        RecyclerView mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
+//                        mRecyclerView.setLayoutManager(linearLayoutManager);
+//                        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+//                        mRecyclerView.setAdapter(adapter);
+                    }
+                };
+//                setEvent.start();
+
             }
         });
 
@@ -130,5 +148,29 @@ public class CalendarFragment extends Fragment {
 
     }
 
+    public void populateEventsList(){
+        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(USER_ID, 5000) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    userEntry = getResult();
+                    UserEntry.GetUserRelevantEvents getUserRelevantEvents = new UserEntry.GetUserRelevantEvents(userEntry, 5000, true, false) {
+                        @Override
+                        public void onPostExecute() {
+                            if (isSuccessful()) {
+                                list = getResult();
+                                textEventAdapter = new TextEventAdapter(list);
+                                mRecyclerView.setAdapter(textEventAdapter);
+                                textEventAdapter.notifyDataSetChanged();
+                                Log.d(TAG, "onPostExecute: " + list.toString());
+                            }
+                        }
+                    };
 
+                    getUserRelevantEvents.start();
+                }
+            }
+        };
+        getUserEntry.start();
+    }
 }
