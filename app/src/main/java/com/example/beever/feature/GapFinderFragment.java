@@ -5,7 +5,6 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
@@ -51,8 +49,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private TextInputLayout eventName, eventDesc;
     private Spinner spin;
     private GroupEntry groupEntry;
-    private static final Calendar combinedCal = Calendar.getInstance();
-    private static final Calendar chosenDay = Calendar.getInstance();
     private ArrayList<Timestamp> timestamps = new ArrayList<>();
     private ArrayList<Timestamp> timestampsEnd = new ArrayList<>();
     private ArrayList<Timestamp> startTimes = new ArrayList<>();
@@ -61,9 +57,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private Integer[] durations = new Integer[DURATION_BLOCK_UPPER_LIMIT];
     private int chosenDuration;
     private GapAdapter adapter;
-    //private static int queryDay;
-    //private static int queryMonth;
-    //private static int queryYear;
     private int queryYear;
     private int queryMonth;
     private int queryDay;
@@ -139,7 +132,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
                     //Log.d("TIME SELECTED", combinedCal.getTime().toString());
                     //Log.d("TIME SELECTED", timestamp.toString());
                 gapFinder();
-                return;
             }
         });
 
@@ -208,31 +200,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
             }
         };
         gapFinder.getGaps();
-
-
-
-        /*
-        for (int i = 0; i < startTimes.size(); i++) {
-            if (timestamp.getSeconds() > startTimes.get(i).getSeconds()
-                    && timestamp.getSeconds() < endTimes.get(i).getSeconds()
-                    || timestamp.getSeconds() < startTimes.get(i).getSeconds()
-                    && (timestamp.getSeconds() + chosenDuration *60) > startTimes.get(i).getSeconds()
-                    && (timestamp.getSeconds() + chosenDuration *60) < endTimes.get(i).getSeconds()) {
-
-                timestamps.clear();
-                result.setText("Result: Timeslot is unavailable!\nHow about: ");
-                findAlternativeTimings();
-                searchBtn.revertAnimation();
-                break;
-            } else {
-                timestamps.clear();
-                result.setText("Result: " + combinedCal.getTime().toString().substring(0, 16) + " is available!");
-                timestamps.add(timestamp);
-                timestampsEnd.add(new Timestamp(new Date((timestamp.getSeconds() + chosenDuration *60)*1000)));
-                adapter.notifyDataSetChanged();
-            }
-        }
-        searchBtn.revertAnimation();*/
     }
 
     public void setHourMinute(String hour,String minute){
@@ -251,43 +218,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         c.set(queryYear,queryMonth,queryDay,queryHour,queryMinute,0);
         setPreferredTimeIndicator(c);
     }
-
-    /*private void findAlternativeTimings() {
-        timestamps.clear();
-        timestampsEnd.clear();
-        GapFinderAlgorithm gapFinder = new GapFinderAlgorithm(groupID,10000,
-                queryYear, queryMonth, queryDay, chosenDuration){
-            public void onPostExecute(){
-                if (isSuccessful()){
-                    ArrayList<ArrayList<Timestamp>> timingBlocks = getResult();
-                    for (ArrayList<Timestamp> timeList: timingBlocks) {
-                        timestamps.add(timeList.get(0));
-                        timestampsEnd.add(timeList.get(1));
-                    }
-                    adapter.notifyDataSetChanged();
-                    Log.d("FINAL RESULT", timestamps.toString());
-                }
-            }
-        };
-        gapFinder.getGaps();
-    }*/
-
-
-
-    /*private void getStartAndEndTime() {
-        for (EventEntry entry: groupEntries) {
-            startTimes.add(entry.getStart_time());
-            endTimes.add(entry.getEnd_time());
-        }
-        Log.d("START TIMES", startTimes.toString());
-        Log.d("END TIMES", endTimes.toString());
-    }*/
-
-
-    /*public void showTimePickerDialog(View v) {
-        DialogFragment newFragment = new TimePickerFragment();
-        newFragment.show(getFragmentManager(), "timePicker");
-    }*/
 
     public void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment(GapFinderFragment.this);
@@ -342,6 +272,8 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
                         toast.show();
                         timestamps.clear();
                         timestampsEnd.clear();
+                        eventName.getEditText().setText("");
+                        eventDesc.getEditText().setText("");
                         adapter.notifyDataSetChanged();
                         result.setText("");
                     }
@@ -349,8 +281,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
             };
             setEvent.start();
         }
-
-
     }
 
     private String getCalendarString(Calendar c){
@@ -360,28 +290,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private void setPreferredTimeIndicator(Calendar c){
         currentTime.setText("Current preferred time: " + getCalendarString(c));
     }
-
-    /*public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
-
-        @NotNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker
-            final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-
-            // Create a new instance of TimePickerDialog and return it
-            return new TimePickerDialog(getActivity(), this, hour, minute,
-                    DateFormat.is24HourFormat(getActivity()));
-        }
-
-        @Override
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            combinedCal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            combinedCal.set(Calendar.MINUTE, minute);
-        }
-    }*/
 
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
@@ -462,25 +370,4 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
             return builder.create();
         }
     }
-
-    /*private void getListOfEvents() {
-        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
-
-            @Override
-            public void onPostExecute() {
-                groupEntry = getResult();
-                GroupEntry.GetGroupRelevantEvents groupRelevantEvents = new GroupEntry.GetGroupRelevantEvents(groupEntry, 5000) {
-
-                    @Override
-                    public void onPostExecute() {
-                        groupEntries = getResult();
-                        Log.d("RELEVANT EVENTS", groupEntries.toString());
-                        getStartAndEndTime();
-                    }
-                };
-                groupRelevantEvents.start();
-            }
-        };
-        getGroupEntry.start();
-    }*/
 }

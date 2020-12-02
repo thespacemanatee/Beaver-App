@@ -11,9 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -24,8 +22,6 @@ import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,8 +30,11 @@ public class DashboardFragment extends Fragment {
 
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userID = fAuth.getUid();
-    int currentTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+    private int currentTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
     private SharedPreferences mSharedPref;
+    private ArrayList<String> dbGrpImgs = new ArrayList<>();
+    private ArrayList<String> dbGrpNames = new ArrayList<>();
+    private ArrayList<String> dbGrpIds = new ArrayList<>();
     TextView greeting, name;
     DashBoardGroupsAdapter adapter;
     View bottom_menu;
@@ -80,14 +79,12 @@ public class DashboardFragment extends Fragment {
             utils.fadeIn();
         }
     }
-
-    ArrayList<String> dbGrpImgs = new ArrayList<>();
-    ArrayList<String> dbGrpNames = new ArrayList<>();
-    ArrayList<String> dbGrpIds = new ArrayList<>();
+    
     public void populateRecyclerView() {
         dbGrpIds.clear();
         dbGrpImgs.clear();
         dbGrpNames.clear();
+
         UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
             public void onPostExecute() {
@@ -104,7 +101,6 @@ public class DashboardFragment extends Fragment {
                                         Log.d("GROUP RESULT", getResult().toString());
                                         dbGrpIds.add(getGroupId());
                                         dbGrpNames.add(getResult().getName());
-                                        adapter.notifyDataSetChanged();
                                         if (getResult().getDisplay_picture() == null) {
                                             dbGrpImgs.add("null");
                                         } else {
