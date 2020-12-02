@@ -158,7 +158,8 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoAddButton = rootView.findViewById(R.id.toDoAddButton);
         toDoAddButton.setOnClickListener(v -> {
             if (groupID != null) {
-                ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_dialog, toDoAdapter, helper);
+                helper = new ToDoHelper(getContext(), getFragmentManager(), toDoList, toDoAdapter, archivedList, toDoArchivedAdapter, groupID);
+                ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_dialog, helper);
                 assert getFragmentManager() != null;
                 toDoDialogFragment.show(getFragmentManager(), ADD_TO_DO);
             } else {

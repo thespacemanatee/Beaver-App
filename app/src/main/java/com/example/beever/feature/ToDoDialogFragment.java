@@ -54,7 +54,6 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected List<String> groupMembers = new ArrayList<>();
     protected ArrayAdapter<String> spinnerAdapter;
 
-    private ToDoAdapter toDoAdapter;
     private ToDoHelper helper;
 
     private String groupID;
@@ -65,10 +64,9 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected String taskDescr;
     protected Date dueDate;
 
-    public ToDoDialogFragment(String groupID, int layoutResource, ToDoAdapter adapter, ToDoHelper helper) {
+    public ToDoDialogFragment(String groupID, int layoutResource, ToDoHelper helper) {
         this.groupID = groupID;
         this.layoutResource = layoutResource;
-        this.toDoAdapter = adapter;
         this.helper = helper;
     }
 
@@ -184,11 +182,6 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
     private void addNewToDo(String taskTitle, String taskDescr, String assignedTo, Date dueDate) {
         TodoEntry newToDo = new TodoEntry(taskTitle, taskDescr, assignedTo, new Timestamp(dueDate), groupID);
-        try {
-            Toast.makeText(getContext(), newToDo.toString() + " ok", Toast.LENGTH_LONG).show();
-            helper.addItem(newToDo);
-        } catch (NullPointerException e) {
-            Toast.makeText(getContext(), newToDo.toString(), Toast.LENGTH_LONG).show();
-        }
+        helper.addItem(newToDo);
     }
 }
