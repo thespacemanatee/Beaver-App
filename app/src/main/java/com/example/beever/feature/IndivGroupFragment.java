@@ -27,13 +27,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class IndivGroupFragment extends Fragment {
 
     private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
-    ArrayList<String> grpMembers = new ArrayList<>();
-    ArrayList<String> grpMemberImg = new ArrayList<>();
+//    HashMap<String, String> grpMembers = new HashMap<>();
+//    HashMap<String, String> grpMemberImg = new HashMap<>();
 
 
     @Override

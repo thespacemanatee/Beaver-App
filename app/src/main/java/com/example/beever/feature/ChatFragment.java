@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -72,7 +73,7 @@ public class ChatFragment extends Fragment implements Populatable{
         mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
         //Show Chat Bubbles
-        ListView layout = rootView.findViewById(R.id.bubbles_area);
+        RecyclerView layout = rootView.findViewById(R.id.bubbles_area);
         adapter = new BubblesAdapter(getContext());
         layout.setAdapter(adapter);
         populateRecyclerView();
@@ -109,6 +110,7 @@ public class ChatFragment extends Fragment implements Populatable{
 
     @Override
     public void populateRecyclerView() {
+
         texts.clear();
         senderImg.clear();
         times.clear();
@@ -122,28 +124,29 @@ public class ChatFragment extends Fragment implements Populatable{
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Log.d("test2",document.toString());
                         List<Map<String, Object>> chatList = (ArrayList<Map<String, Object>>) document.get("chat");
                         if (chatList != null) {
-                            Log.d("test",chatList.toString());
                             for (Object o: chatList) {
                                 ChatEntry chatEntry = new ChatEntry(o);
                                 texts.add(chatEntry.getMessage());
                                 times.add(chatEntry.getTime());
-                                senderImg.add("https://firebasestorage.googleapis.com/v0/b/beaver-app-7998c.appspot.com/o/groups%2FH8DKr5zp34Sf5xHVhwD6TJljIWh2CreateWorks%2Fgroup_image.jpg?alt=media&token=ae707bd1-ccb1-4154-a254-01f3b1d99b0f");
-                                sender.add(mSharedPref.getString("registeredName", ""));
+                                sender.add(chatEntry.getSender());
+                                senderImg.add("null");
+
+                                //getSenderInfo(chatEntry.getSender());
 
 //                                UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(chatEntry.getSender(), 5000) {
 //                                    @Override
 //                                    public void onPostExecute() {
-//                                        Log.d("ENTERS USER ENTRY", "please");
-//                                        Log.d("USER ENTRY", getResult().toString());
+//                                        Log.d("HEEERRREE", "i hvae arrived in the User Entry");
+//                                        sender.add(getResult().getName());
 //                                        if (getResult().getDisplay_picture() == null) {
 //                                            senderImg.add("null");
 //                                        } else {
 //                                            senderImg.add(getResult().getDisplay_picture());
 //                                        }
-//                                        sender.add(getResult().getName());
+//                                        Log.d("SENDER", getResult().getName());
+//                                        Log.d("SENDER IMG", getResult().getDisplay_picture());
 //                                    }
 //                                };
 //                                userGetter.start();
@@ -156,8 +159,10 @@ public class ChatFragment extends Fragment implements Populatable{
         });
     }
 
+    class BubblesAdapter extends RecyclerView.Adapter<BubblesAdapter.ViewHolder> {
 
-    class BubblesAdapter extends BaseAdapter {
+        String name = mSharedPref.getString("registeredName", "");
+        int fromUser = 0;
 
         Context context;
         LayoutInflater inflater;
@@ -166,82 +171,102 @@ public class ChatFragment extends Fragment implements Populatable{
             inflater = LayoutInflater.from(c);
         }
 
-        @Override
-        public int getCount() { return texts.size(); }
-
-        @Override
-        public Object getItem(int i) { return i; }
-
-        @Override
-        public long getItemId(int i) { return i; }
-
-        String prevSender = "";
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-
-            //ViewHolder for smoother scrolling
-           BubblesViewHolder viewHolder;
-
-            //Set variables to allow multiple access of same image and text
-            String img = senderImg.get(i);
-            String txt = texts.get(i);
-            // String timestamp = times.get(i).toDate().toString().substring(0, 19);
-            String timestamp = new Timestamp(new Date()).toString();
-            String senderName = sender.get(i);
-            if (senderName == null) {
-                senderName = "NULL";
-            }
-
-            String name = mSharedPref.getString("registeredName", "");
-            if (prevSender != senderName) {
-                //If view (View to populate GridView cells) not loaded before,
-                //create new ViewHolder to hold view
-                viewHolder = new BubblesViewHolder();
-
-                //Inflate the layout for GridView cells (created as a Fragment)
-                if (senderName.equals(name)) {
-                    view = inflater.inflate(R.layout.chat_bubbles_left, null);
-
-                    //Get ImageButton and TextView to populate
-                    viewHolder.memberImg = view.findViewById(R.id.chat_member_img_left);
-                    viewHolder.text = view.findViewById(R.id.bubble_left);
-                    viewHolder.time = view.findViewById(R.id.bubble_time_left);
-                    viewHolder.member = view.findViewById(R.id.bubble_name_left);
-
-                } else {
-                    view = inflater.inflate(R.layout.chat_bubbles, null);
-
-                    //Get ImageButton and TextView to populate
-                    viewHolder.memberImg = view.findViewById(R.id.chat_member_img);
-                    viewHolder.text = view.findViewById(R.id.bubble);
-                    viewHolder.time = view.findViewById(R.id.bubble_time);
-                    viewHolder.member = view.findViewById(R.id.bubble_name);
-                }
-
-            } else {
-                //If view loaded before, get view's tag and cast to ViewHolder
-                viewHolder = (BubblesViewHolder)view.getTag();
-            }
-
-            //setImageResource for ImageButton and setText for TextView
-            if (img.equals("null")) {
-                Glide.with(context).load(R.drawable.pink_circle).centerCrop().into(viewHolder.memberImg);
-            } else {
-                Glide.with(context).load(img).centerCrop().into(viewHolder.memberImg);
-            }
-            viewHolder.text.setText(txt);
-            viewHolder.time.setText(timestamp);
-            viewHolder.member.setText(senderName);
-
-            return view;
-        }
-
-        //To reduce reloading of same layout
-        class BubblesViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder {
             ShapeableImageView memberImg;
             TextView text;
             TextView time;
             TextView member;
+
+            public ViewHolder(View view) {
+                super(view);
+                if (fromUser == 1) {
+                    memberImg = view.findViewById(R.id.chat_member_img_left);
+                    text = view.findViewById(R.id.bubble_left);
+                    time = view.findViewById(R.id.bubble_time_left);
+                    member = view.findViewById(R.id.bubble_name_left);
+                } else {
+                    memberImg = view.findViewById(R.id.chat_member_img);
+                    text = view.findViewById(R.id.bubble);
+                    time = view.findViewById(R.id.bubble_time);
+                    member = view.findViewById(R.id.bubble_name);
+                }
+            }
+
+            public TextView getMember() {
+                return member;
+            }
+
+            public ShapeableImageView getMemberImg() {
+                return memberImg;
+            }
+
+            public TextView getText() {
+                return text;
+            }
+
+            public TextView getTime() {
+                return time;
+            }
+        }
+
+        @Override
+        public int getItemViewType(int i) {
+            if (getMemberData(i).equals(name)) {
+                fromUser = 1;
+            } else {
+                fromUser = 0;
+            }
+            return fromUser;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+            View view;
+            if (fromUser == 1) {
+                view = inflater.inflate(R.layout.chat_bubbles_left, viewGroup, false);
+            } else {
+                view = inflater.inflate(R.layout.chat_bubbles, viewGroup, false);
+            }
+            return new ViewHolder(view);
+        }
+
+        public String getImgData(int i) {
+            return senderImg.get(i);
+        }
+
+        public String getTextData(int i) {
+            return texts.get(i);
+        }
+
+        public String getTimeData(int i) {
+            return times.get(i).toDate().toString().substring(0, 19);
+        }
+
+        public String getMemberData(int i) {
+            return sender.get(i);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+            String img = getImgData(i);
+            String text = getTextData(i);
+            String time = getTimeData(i);
+            String member = getMemberData(i);
+
+            if (img.equals("null")) {
+                Glide.with(context).load(R.drawable.pink_circle).centerCrop().into(viewHolder.getMemberImg());
+            } else {
+                Glide.with(context).load(img).centerCrop().into(viewHolder.getMemberImg());
+            }
+            viewHolder.getText().setText(text);
+            viewHolder.getTime().setText(time);
+            viewHolder.getMember().setText(member);
+        }
+
+        @Override
+        public int getItemCount() {
+            return texts.size();
         }
     }
 
