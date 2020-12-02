@@ -64,8 +64,6 @@ public class ChatFragment extends Fragment implements Populatable{
     private ArrayList<Timestamp> times = new ArrayList<>();
     private SharedPreferences mSharedPref;
     private GroupEntry groupEntry;
-    private LinearLayoutManager mLinearLayoutManager;
-    private int CHAT_SIZE;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,9 +83,6 @@ public class ChatFragment extends Fragment implements Populatable{
 
         //Show Chat Bubbles
         RecyclerView layout = rootView.findViewById(R.id.bubbles_area);
-        mLinearLayoutManager = new LinearLayoutManager(getContext());
-        mLinearLayoutManager.setStackFromEnd(true);
-        layout.setLayoutManager(mLinearLayoutManager);
         adapter = new BubblesAdapter(getContext());
         layout.setAdapter(adapter);
         populateRecyclerView();
@@ -126,7 +121,6 @@ public class ChatFragment extends Fragment implements Populatable{
             public void onListenerUpdate(){
                 if (getStateChange()==StateChange.CHAT) {
                     populateRecyclerView();
-                    mLinearLayoutManager.scrollToPosition(CHAT_SIZE-1);
                 }
             }
 
@@ -163,7 +157,6 @@ public class ChatFragment extends Fragment implements Populatable{
             public void onPostExecute() {
                 ArrayList<ChatEntry> chats = getResult().getGroupChat();
                 if (chats != null) {
-                    CHAT_SIZE = chats.size();
                     for (ChatEntry entry: chats) {
                         texts.add(entry.getMessage());
                         times.add(entry.getTime());

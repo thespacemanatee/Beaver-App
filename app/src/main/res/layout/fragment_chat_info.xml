@@ -41,7 +41,7 @@
     <ListView
         android:id="@+id/chat_info_group_members"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="300dp"
         android:divider="@null"
         android:dividerHeight="8dp"
         android:orientation="vertical"
@@ -61,6 +61,22 @@
         app:spinning_bar_color="#FFF"
         app:spinning_bar_padding="6dp"
         android:layout_margin="20dp"
+        app:initialCornerAngle="1000dp"
+        app:finalCornerAngle="1000dp"/>
+
+    <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+        android:id="@+id/delete_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/circular_border_shape"
+        android:text="@string/delete_group"
+        android:textColor="@color/white"
+        app:spinning_bar_width="4dp"
+        app:spinning_bar_color="#FFF"
+        app:spinning_bar_padding="6dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         app:initialCornerAngle="1000dp"
         app:finalCornerAngle="1000dp"/>
 
