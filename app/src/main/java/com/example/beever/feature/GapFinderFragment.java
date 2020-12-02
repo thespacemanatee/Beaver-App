@@ -180,7 +180,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
                     return;
                 }
                 if (getResult().size()==0){
-                    result.setText("Result: Timeslot is unavailable,and no other timings available. Try another day?");
+                    result.setText("Result: Timeslot is unavailable, and no other timings available. Try another day?");
                     timestamps.clear();
                     timestampsEnd.clear();
                     adapter.notifyDataSetChanged();
