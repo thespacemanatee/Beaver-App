@@ -13,6 +13,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
 
@@ -53,7 +55,6 @@ public class DashboardFragment extends Fragment {
     private ArrayList<String> dbGrpIds = new ArrayList<>();
     private ArrayList<EventEntry> dbEvents = new ArrayList<>();
     private ArrayList<Long> dbColours = new ArrayList<>();
-    private Timestamp upcomingEvent;
     TextView greeting, name, noUpcomingText, noFavouriteText;
     DashboardGroupsAdapter grpAdapter;
     DashboardEventsAdapter eventsAdapter;
@@ -138,22 +139,29 @@ public class DashboardFragment extends Fragment {
                     Log.d("USER ENTRY", "success");
 
 
-                    try {
-                        ArrayList<EventEntry> events = getResult();
-                        events.sort(new DashboardEventComparator());
-                        upcomingEvent = events.get(0).getStart_time();
-                        dbEvents.add(events.get(0));
-                        dbEvents.add(events.get(1));
-                        dbEvents.add(events.get(2));
-                        if (dbEvents.size() > 0) {
-                            noUpcomingImage.setVisibility(View.GONE);
-                            noUpcomingText.setVisibility(View.GONE);
+
+                    ArrayList<EventEntry> events = getResult();
+                    events.sort(new DashboardEventComparator());
+                    ArrayList<EventEntry> upcomingEvents = new ArrayList<>();
+
+                    for (int i = 0; i < events.size(); i++) {
+                        if (!(events.get(i).getStart_time().toDate().getTime() < new Date().getTime())) {
+                            upcomingEvents.add(events.get(i));
                         }
-                        eventsAdapter.notifyDataSetChanged();
-                        Log.d("EVENTS", dbEvents.toString());
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+
+                    for (int i = 0; i < 3; i++) {
+                        if (events.get(i) != null) {
+                            dbEvents.add(upcomingEvents.get(i));
+                        }
+                    }
+
+                    if (dbEvents.size() > 0) {
+                        noUpcomingImage.setVisibility(View.GONE);
+                        noUpcomingText.setVisibility(View.GONE);
+                    }
+                    eventsAdapter.notifyDataSetChanged();
+                    Log.d("EVENTS", dbEvents.toString());
 
                     for (Object o: userEntry.getDashboard_grps()) {
                         if (o != null) {
