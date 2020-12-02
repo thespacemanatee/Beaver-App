@@ -78,4 +78,13 @@
     <string name="duration_of_meeting">Duration of meeting (min)</string>
     <string name="event_name">Event Name</string>
     <string name="description">Description</string>
+    <string name="task_title">Task Title</string>
+    <string name="task_description">Task Description</string>
+    <string name="delete">Delete</string>
+    <string name="back">Back</string>
+    <string name="due_date">Due Date</string>
+    <string name="assigned_to">Assigned To</string>
+    <string name="task_name">Task Name</string>
+    <string name="deadline">deadline</string>
+    <string name="assigned_to1">assigned to</string>
 </resources>

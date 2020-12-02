@@ -1,64 +1,86 @@
 package com.example.beever.feature;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
-import com.example.beever.admin.MainActivity;
-import com.example.beever.navigation.NavigationDrawer;
+import com.example.beever.database.TodoEntry;
+import com.google.firebase.Timestamp;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.TimeZone;
 
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
     public static final String TAG = "ToDoAdapter";
 
-    private Activity context;
-    protected Button toDoButton;
-    protected CheckBox toDoCheckBox;
+    private ArrayList<TodoEntry> toDoList;
+    private Context context;
+
+    private Utils utils;
+    private ToDoHelper helper;
+
+    /**
+     * Initialise the toDoList with strings from Firebase
+     * @param toDoList
+     */
+    public ToDoAdapter(ArrayList<TodoEntry> toDoList, String groupID, Context context, FragmentManager manager,
+                       List<TodoEntry> archivedList, ExpandableListAdapter toDoArchivedAdapter) {
+        this.toDoList = toDoList;
+        this.context = context;
+        this.helper = new ToDoHelper(context, manager, toDoList, this, archivedList, toDoArchivedAdapter, groupID);
+    }
 
     /**
      * Provides a reference to the type of views that you are using
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final LinearLayout toDoTaskView;
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        protected TextView toDoTaskContent;
+        protected TextView toDoDeadline;
+        protected TextView toDoAssignedTo;
 
         public ViewHolder(View view) {
             super(view);
+            this.toDoTaskContent = view.findViewById(R.id.toDoTaskContent);
+            this.toDoDeadline = view.findViewById(R.id.toDoDeadline);
+            this.toDoAssignedTo = view.findViewById(R.id.toDoAssignedTo);
 
-            // define Click Listener for view
-            view.setOnClickListener(new View.OnClickListener() {
+            view.setOnClickListener(this);
+
+            view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public void onClick(View v) {
-                    Log.d(TAG, getAdapterPosition() + " was clicked.");
+                public boolean onLongClick(View v) {
+                    int position = getLayoutPosition();
+                    TodoEntry todoEntry = toDoList.get(position);
+                    helper.showDeleteAlertDialog(context, todoEntry, true, null);
+                    return true;
                 }
             });
-            toDoTaskView = view.findViewById(R.id.toDoTaskView);
         }
 
-        public LinearLayout getToDoTaskView() {
-            return toDoTaskView;
-        }
-    }
+        @Override
+        public void onClick(View v) {
+            int position = getLayoutPosition();
+            TodoEntry todoEntry = toDoList.get(position);
 
-    /**
-     * Initialise the toDoList with strings from Firebase
-     * @param context
-     */
-    public ToDoAdapter(Activity context) {
-        this.context = context;
+            //Fade Out Nav Bar
+            utils = new Utils(v.getContext());
+            utils.fadeOut();
+
+            helper.showOptionsAlertDialog(context, todoEntry, utils);
+        }
+
     }
 
     /**
@@ -74,35 +96,6 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_to_do_task_, parent, false);
 
-        toDoButton = view.findViewById(R.id.toDoButton);
-        toDoCheckBox = view.findViewById(R.id.toDoCheckBox);
-
-        toDoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment();
-                // TODO: toDoDialogFragment.addToDo.setText("Edit To-Do");
-                toDoDialogFragment.show(((NavigationDrawer) context).getSupportFragmentManager(), "EDIT_TO_DO");
-            }
-        });
-
-        // TODO: Check for change for CheckBox. THIS CURRENTLY DOES NOT WORK
-        toDoCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String toDo = toDoButton.getText().toString();
-                if (toDoCheckBox.isChecked()) {
-                    ToDoFragment.toDoList.remove(toDo);
-                    ToDoFragment.archivedList.add(toDo);
-                } else {
-                    if (!ToDoFragment.toDoList.contains(toDo)) {
-                        ToDoFragment.toDoList.add(toDo);
-                        ToDoFragment.archivedList.remove(toDo);
-                    }
-                }
-            }
-        });
-
         return new ViewHolder(view);
     }
 
@@ -116,8 +109,21 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         // get element from dataset at the specified position and replace
         // the contents of the view with that element
         Log.d(TAG, "To Do List " + position + " set.");
-        Button toDoButton = holder.getToDoTaskView().findViewById(R.id.toDoButton);
-        toDoButton.setText(ToDoFragment.toDoList.get(position));
+
+        TextView toDoTaskContent = holder.toDoTaskContent;
+        TextView toDoDeadline = holder.toDoDeadline;
+        TextView toDoAssignedTo = holder.toDoAssignedTo;
+
+        TodoEntry toDo = toDoList.get(position);
+
+        toDoTaskContent.setText(toDo.getName());
+        Timestamp deadline = toDo.getDeadline();
+        SimpleDateFormat sf = new SimpleDateFormat("dd-MM");
+        sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+        String deadlineStr = sf.format(deadline.toDate());
+        toDoDeadline.setText(deadlineStr);
+        toDoAssignedTo.setText(toDo.getAssigned_to());
+
     }
 
     /**
@@ -126,6 +132,6 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
      */
     @Override
     public int getItemCount() {
-        return ToDoFragment.toDoList.size();
+        return toDoList.size();
     }
 }
