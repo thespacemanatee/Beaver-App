@@ -48,6 +48,7 @@ public class DashboardFragment extends Fragment {
     private ArrayList<String> dbGrpNames = new ArrayList<>();
     private ArrayList<String> dbGrpIds = new ArrayList<>();
     private ArrayList<EventEntry> dbEvents = new ArrayList<>();
+    private ArrayList<Long> dbColours = new ArrayList<>();
     TextView greeting, name;
     DashboardGroupsAdapter grpAdapter;
     DashboardEventsAdapter eventsAdapter;
