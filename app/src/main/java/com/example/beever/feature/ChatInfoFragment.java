@@ -30,9 +30,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.database.ChatEntry;
+import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.tabs.TabLayout;
@@ -40,6 +43,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,13 +54,16 @@ import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
 public class ChatInfoFragment extends Fragment implements Populatable{
 
-    private CircularProgressButton addUsersBtn;
+    private CircularProgressButton addUsersBtn, deleteGroup;
     private ArrayList<String> grpMembers = new ArrayList<>();
     private ArrayList<String> grpMemberImg = new ArrayList<>();
     private GroupMemberAdapter adapter;
     private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private String groupId;
     private String groupName;
+    private GroupEntry groupEntry;
+    List<Object> members;
+    View bottom_menu;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,6 +80,7 @@ public class ChatInfoFragment extends Fragment implements Populatable{
         groupId = bundle.getString("groupId");
 
         addUsersBtn = rootView.findViewById(R.id.addUsersBtn2);
+        deleteGroup = rootView.findViewById(R.id.delete_group);
 
         //Get chat_info_img in fragment_chat_info.xml and setImageResource
         ShapeableImageView chatImg = rootView.findViewById(R.id.chat_info_img);
@@ -84,6 +92,15 @@ public class ChatInfoFragment extends Fragment implements Populatable{
         adapter = new GroupMemberAdapter(getActivity());
         layout.setAdapter(adapter);
         populateRecyclerView();
+
+        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupId, 5000) {
+            @Override
+            public void onPostExecute() {
+                groupEntry = getResult();
+                members = groupEntry.getMember_list();
+            }
+        };
+        getGroupEntry.start();
 
 
         addUsersBtn.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +115,15 @@ public class ChatInfoFragment extends Fragment implements Populatable{
                 addUsersFragment.setArguments(bundle);
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
                 transaction.replace(R.id.fragment_container, addUsersFragment).commit();
+            }
+        });
+
+        deleteGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                DeleteGroupDialogFragment deleteGroupDialogFragment = new DeleteGroupDialogFragment(groupId, members);
+                deleteGroupDialogFragment.show(getFragmentManager(), "chatInfo");
             }
         });
 

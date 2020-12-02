@@ -60,6 +60,14 @@ public class GroupsFragment extends Fragment implements Populatable{
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Groups");
 
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
+
+        //Fade in Nav Bar
+        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
+        if (bottom_menu.getVisibility() == View.GONE) {
+            Utils utils = new Utils(getContext());
+            utils.fadeIn();
+        }
+
         grpNames.clear();
         grpImages.clear();
         grpIds.clear();
