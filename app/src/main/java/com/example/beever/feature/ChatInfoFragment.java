@@ -221,7 +221,8 @@ public class ChatInfoFragment extends Fragment implements Populatable{
                 public boolean onLongClick(View v) {
                     Toast.makeText(getContext(), selectedMemberId, Toast.LENGTH_SHORT).show();
                     DeleteUserDialogFragment deleteUserDialogFragment = new DeleteUserDialogFragment(selectedMemberId, groupId, adapter,
-                            grpMemberIds, grpMemberImg, grpMemberNames, selectedMemberImg, selectedMemberName);
+                            grpMemberIds, grpMemberImg, grpMemberNames,
+                            selectedMemberImg, selectedMemberName);
                     deleteUserDialogFragment.show(getFragmentManager(), "chatInfo");
                     return true;
                 }
