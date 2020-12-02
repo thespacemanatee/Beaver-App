@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -29,6 +30,7 @@ import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.w3c.dom.Text;
@@ -51,10 +53,12 @@ public class DashboardFragment extends Fragment {
     private ArrayList<String> dbGrpIds = new ArrayList<>();
     private ArrayList<EventEntry> dbEvents = new ArrayList<>();
     private ArrayList<Long> dbColours = new ArrayList<>();
-    TextView greeting, name;
+    private Timestamp upcomingEvent;
+    TextView greeting, name, noUpcomingText, noFavouriteText;
     DashboardGroupsAdapter grpAdapter;
     DashboardEventsAdapter eventsAdapter;
     View bottom_menu;
+    ImageView noUpcomingImage, noFavouriteImage;
 
 
     @Override
@@ -66,6 +70,10 @@ public class DashboardFragment extends Fragment {
         mSharedPref = this.getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
         greeting = root.findViewById(R.id.greeting);
         name = root.findViewById(R.id.name);
+        noUpcomingImage = root.findViewById(R.id.no_event_image);
+        noUpcomingText = root.findViewById(R.id.no_event_text);
+        noFavouriteImage = root.findViewById(R.id.no_fav_groups_image);
+        noFavouriteText = root.findViewById(R.id.no_fav_groups_text);
 
         name.setText(mSharedPref.getString("registeredName", "Beever") + ".");
 
@@ -92,6 +100,12 @@ public class DashboardFragment extends Fragment {
             @Override
             public void onPostExecute() {
                 populateRecyclerView(getResult());
+                for (Object group: getResult().getDashboard_grps()) {
+                    if (group != null) {
+                        noFavouriteImage.setVisibility(View.GONE);
+                        noFavouriteText.setVisibility(View.GONE);
+                    }
+                }
             }
         };
         getUserEntry.start();
@@ -127,9 +141,14 @@ public class DashboardFragment extends Fragment {
                     try {
                         ArrayList<EventEntry> events = getResult();
                         events.sort(new DashboardEventComparator());
+                        upcomingEvent = events.get(0).getStart_time();
                         dbEvents.add(events.get(0));
                         dbEvents.add(events.get(1));
                         dbEvents.add(events.get(2));
+                        if (dbEvents.size() > 0) {
+                            noUpcomingImage.setVisibility(View.GONE);
+                            noUpcomingText.setVisibility(View.GONE);
+                        }
                         eventsAdapter.notifyDataSetChanged();
                         Log.d("EVENTS", dbEvents.toString());
                     } catch (Exception e) {
