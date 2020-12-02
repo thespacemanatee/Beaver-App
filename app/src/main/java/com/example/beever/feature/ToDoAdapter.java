@@ -1,40 +1,22 @@
 package com.example.beever.feature;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
-import com.example.beever.admin.MainActivity;
-import com.example.beever.database.GroupEntry;
 import com.example.beever.database.TodoEntry;
-import com.example.beever.navigation.NavigationDrawer;
 import com.google.firebase.Timestamp;
 
-import java.security.acl.Group;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -43,12 +25,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     public static final String TAG = "ToDoAdapter";
 
     private ArrayList<TodoEntry> toDoList;
-    private String groupID;
     private Context context;
-    private FragmentManager manager;
-
-    private List<TodoEntry> archivedList;
-    private ExpandableListAdapter toDoArchivedAdapter;
 
     private Utils utils;
     private ToDoHelper helper;
@@ -60,11 +37,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     public ToDoAdapter(ArrayList<TodoEntry> toDoList, String groupID, Context context, FragmentManager manager,
                        List<TodoEntry> archivedList, ExpandableListAdapter toDoArchivedAdapter) {
         this.toDoList = toDoList;
-        this.groupID = groupID;
         this.context = context;
-        this.manager = manager;
-        this.archivedList = archivedList;
-        this.toDoArchivedAdapter = toDoArchivedAdapter;
         this.helper = new ToDoHelper(context, manager, toDoList, this, archivedList, toDoArchivedAdapter, groupID);
     }
 
