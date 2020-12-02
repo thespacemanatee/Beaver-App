@@ -2,6 +2,7 @@ package com.example.beever.feature;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,23 +10,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.beever.R;
+import com.example.beever.database.EventEntry;
 import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 
+import org.w3c.dom.Text;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 public class DashboardFragment extends Fragment {
 
@@ -36,8 +47,10 @@ public class DashboardFragment extends Fragment {
     private ArrayList<String> dbGrpImgs = new ArrayList<>();
     private ArrayList<String> dbGrpNames = new ArrayList<>();
     private ArrayList<String> dbGrpIds = new ArrayList<>();
+    private ArrayList<EventEntry> dbEvents = new ArrayList<>();
     TextView greeting, name;
-    DashBoardGroupsAdapter adapter;
+    DashboardGroupsAdapter grpAdapter;
+    DashboardEventsAdapter eventsAdapter;
     View bottom_menu;
 
 
@@ -62,9 +75,16 @@ public class DashboardFragment extends Fragment {
         }
 
         //Populate GridView in dashboard_fragment.xml with Groups
-        GridView layout = root.findViewById(R.id.dashboard_groups);
-        adapter = new DashBoardGroupsAdapter(getActivity());
-        layout.setAdapter(adapter);
+        GridView grpLayout = root.findViewById(R.id.dashboard_groups);
+        grpAdapter = new DashboardGroupsAdapter(getActivity());
+        grpLayout.setAdapter(grpAdapter);
+
+        RecyclerView eventLayout = root.findViewById(R.id.dashboard_events);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        eventLayout.setLayoutManager(layoutManager);
+        eventsAdapter = new DashboardEventsAdapter(getContext());
+        eventLayout.setAdapter(eventsAdapter);
+
         populateRecyclerView();
 
         return root;
@@ -85,12 +105,23 @@ public class DashboardFragment extends Fragment {
         dbGrpIds.clear();
         dbGrpImgs.clear();
         dbGrpNames.clear();
+        dbEvents.clear();
 
         UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onPostExecute() {
                 if (isSuccessful()) {
                     Log.d("USER ENTRY", "success");
+
+                    ArrayList<EventEntry> events = getResult().getUserEvents(true, false);
+                    events.sort(new DashboardEventComparator());
+                    dbEvents.add(events.get(0));
+                    dbEvents.add(events.get(1));
+                    dbEvents.add(events.get(2));
+                    eventsAdapter.notifyDataSetChanged();
+                    Log.d("EVENTS", dbEvents.toString());
+
                     for (Object o: getResult().getDashboard_grps()) {
                         if (o != null) {
                             Log.d("GROUP", (String) o);
@@ -107,7 +138,7 @@ public class DashboardFragment extends Fragment {
                                         } else {
                                             dbGrpImgs.add(getResult().getDisplay_picture());
                                         }
-                                        adapter.notifyDataSetChanged();
+                                        grpAdapter.notifyDataSetChanged();
                                     }
                                 }
                             };
@@ -174,11 +205,11 @@ public class DashboardFragment extends Fragment {
 
     }
 
-    class DashBoardGroupsAdapter extends BaseAdapter {
+    class DashboardGroupsAdapter extends BaseAdapter {
 
         Context context;
         LayoutInflater inflater;
-        DashBoardGroupsAdapter(Context c) {
+        DashboardGroupsAdapter(Context c) {
             context = c;
             inflater = LayoutInflater.from(c);
         }
@@ -201,12 +232,12 @@ public class DashboardFragment extends Fragment {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             //ViewHolder for smoother scrolling
-            DashBoardViewHolder viewHolder;
+            DashboardGroupViewHolder viewHolder;
 
             if (view == null) {
                 //If view (View to populate GridView cells) not loaded before,
                 //create new ViewHolder to hold view
-                viewHolder = new DashBoardViewHolder();
+                viewHolder = new DashboardGroupViewHolder();
 
                 //Inflate the layout for GridView cells (created as a Fragment)
                 view = inflater.inflate(R.layout.group_grid_item, null);
@@ -220,7 +251,7 @@ public class DashboardFragment extends Fragment {
 
             } else {
                 //If view loaded before, get view's tag and cast to ViewHolder
-                viewHolder = (DashBoardViewHolder)view.getTag();
+                viewHolder = (DashboardGroupViewHolder)view.getTag();
             }
 
             //Set variables to allow multiple access of same image and text
@@ -249,9 +280,130 @@ public class DashboardFragment extends Fragment {
         }
 
         //To reduce reloading of same layout
-        class DashBoardViewHolder {
+        class DashboardGroupViewHolder {
             ShapeableImageView gridImg;
             TextView gridTxt;
         }
+    }
+
+    class DashboardEventsAdapter extends RecyclerView.Adapter<DashboardEventsAdapter.ViewHolder> {
+
+        int moreThanDay;
+        SimpleDateFormat sfDate = new SimpleDateFormat("dd MM");
+        SimpleDateFormat sfTime = new SimpleDateFormat("HH:mm");
+
+        Context context;
+        LayoutInflater inflater;
+        DashboardEventsAdapter(Context c) {
+            context = c;
+            inflater = LayoutInflater.from(c);
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+
+            TextView eventName;
+            LinearLayout eventTiming;
+            LinearLayout eventTiming_More;
+            TextView startDate;
+            TextView startTime;
+            TextView endDate;
+            TextView endTime;
+
+            public ViewHolder(View view) {
+                super(view);
+
+                eventName = view.findViewById(R.id.event_title);
+                eventTiming = view.findViewById(R.id.event);
+                eventTiming_More = view.findViewById(R.id.event_more);
+                if (moreThanDay == 1)  {
+                    startDate = view.findViewById(R.id.start_date_more);
+                    startTime = view.findViewById(R.id.start_time_more);
+                    endDate = view.findViewById(R.id.end_date_more);
+                    endTime = view.findViewById(R.id.end_time_more);
+                } else {
+                    startDate = view.findViewById(R.id.start_date);
+                    startTime = view.findViewById(R.id.start_time);
+                    endTime = view.findViewById(R.id.end_time);
+                }
+            }
+
+            public TextView getEventName() {
+                return eventName;
+            }
+
+            public LinearLayout getEventTiming() {
+                return eventTiming;
+            }
+
+            public LinearLayout getEventTiming_More() {
+                return eventTiming_More;
+            }
+
+            public TextView getStartDate() {
+                return startDate;
+            }
+
+            public TextView getEndDate() {
+                return endDate;
+            }
+
+            public TextView getStartTime() {
+                return startTime;
+            }
+
+            public TextView getEndTime() {
+                return endTime;
+            }
+        }
+
+        @Override
+        public int getItemViewType(int i) {
+            String start = sfDate.format(dbEvents.get(i).getStart_time().toDate());
+            String end = sfDate.format(dbEvents.get(i).getEnd_time().toDate());
+            if (start == end) {
+                moreThanDay = 0;
+            } else {
+                moreThanDay = 1;
+            }
+            return moreThanDay;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+            View view = inflater.inflate(R.layout.calendar_card, viewGroup, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+            String eventName = dbEvents.get(i).getName();
+            String startTime = sfTime.format(dbEvents.get(i).getStart_time().toDate());
+            String startDate = sfDate.format(dbEvents.get(i).getStart_time().toDate());
+            String endTime = sfTime.format(dbEvents.get(i).getEnd_time().toDate());
+            String endDate = sfDate.format(dbEvents.get(i).getEnd_time().toDate());
+
+            Log.d("CHECK ADAPTER", "info includes - " +eventName+", " +startTime+", " +startDate+", " +endTime+", " +endDate);
+
+            if (moreThanDay == 1) {
+                viewHolder.getEndDate().setText(endDate);
+                viewHolder.getEventTiming().setVisibility(View.GONE);
+                viewHolder.getEventTiming_More().setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.getEventTiming().setVisibility(View.VISIBLE);
+                viewHolder.getEventTiming_More().setVisibility(View.GONE);
+            }
+            viewHolder.getEventName().setText(eventName);
+            viewHolder.getStartDate().setText(startDate);
+            viewHolder.getStartTime().setText(startTime);
+            viewHolder.getEndTime().setText(endTime);
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return dbEvents.size();
+        }
+
     }
 }

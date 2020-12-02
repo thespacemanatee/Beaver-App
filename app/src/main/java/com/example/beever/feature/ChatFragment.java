@@ -57,6 +57,7 @@ public class ChatFragment extends Fragment implements Populatable{
     private HashMap<String, String> groupMemberNames;
     private HashMap<String, String> groupMemberImgs;
     private BubblesAdapter adapter;
+    private RecyclerView layout;
 
     private ArrayList<String> senderImg = new ArrayList<>();
     private ArrayList<String> texts = new ArrayList<>();
@@ -82,7 +83,7 @@ public class ChatFragment extends Fragment implements Populatable{
         mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
         //Show Chat Bubbles
-        RecyclerView layout = rootView.findViewById(R.id.bubbles_area);
+        layout = rootView.findViewById(R.id.bubbles_area);
         adapter = new BubblesAdapter(getContext());
         layout.setAdapter(adapter);
         populateRecyclerView();
@@ -120,7 +121,23 @@ public class ChatFragment extends Fragment implements Populatable{
 
             public void onListenerUpdate(){
                 if (getStateChange()==StateChange.CHAT) {
-                    populateRecyclerView();
+                    GroupEntry.GetGroupEntry getGroupEntry1 = new GroupEntry.GetGroupEntry(groupId, 5000) {
+                        @Override
+                        public void onPostExecute() {
+                            ArrayList<ChatEntry> chats = getResult().getGroupChat();
+                            ChatEntry chatEntry = chats.get(chats.size() - 1);
+
+                            texts.add(chatEntry.getMessage());
+                            times.add(chatEntry.getTime());
+                            sender.add(groupMemberNames.get(chatEntry.getSender()));
+                            senderImg.add(groupMemberImgs.get(chatEntry.getSender()));
+
+                            adapter.notifyItemInserted(chats.size() - 1);
+                            layout.smoothScrollToPosition(chats.size() - 1);
+                        }
+                    };
+
+                    getGroupEntry1.start();
                 }
             }
 
@@ -168,48 +185,6 @@ public class ChatFragment extends Fragment implements Populatable{
             }
         };
         getMessages.start();
-
-//        DocumentReference documentReference = fStore.collection("groups").document(groupId);
-//        Log.d("testId",groupId);
-//        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    DocumentSnapshot document = task.getResult();
-//                    if (document.exists()) {
-//                        List<Map<String, Object>> chatList = (ArrayList<Map<String, Object>>) document.get("chat");
-//                        if (chatList != null) {
-//                            for (Object o: chatList) {
-//                                ChatEntry chatEntry = new ChatEntry(o);
-//                                texts.add(chatEntry.getMessage());
-//                                times.add(chatEntry.getTime());
-//                                sender.add(chatEntry.getSender());
-//                                senderImg.add("null");
-//
-//                                //getSenderInfo(chatEntry.getSender());
-//
-////                                UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(chatEntry.getSender(), 5000) {
-////                                    @Override
-////                                    public void onPostExecute() {
-////                                        Log.d("HEEERRREE", "i hvae arrived in the User Entry");
-////                                        sender.add(getResult().getName());
-////                                        if (getResult().getDisplay_picture() == null) {
-////                                            senderImg.add("null");
-////                                        } else {
-////                                            senderImg.add(getResult().getDisplay_picture());
-////                                        }
-////                                        Log.d("SENDER", getResult().getName());
-////                                        Log.d("SENDER IMG", getResult().getDisplay_picture());
-////                                    }
-////                                };
-////                                userGetter.start();
-//                            }
-//                            adapter.notifyDataSetChanged();
-//                        }
-//                    }
-//                }
-//            }
-//        });
     }
 
     class BubblesAdapter extends RecyclerView.Adapter<BubblesAdapter.ViewHolder> {
