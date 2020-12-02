@@ -165,7 +165,7 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
     public int getItemViewType(int position) {
         String start = sfDate.format(dbEvents.get(position).getStart_time().toDate());
         String end = sfDate.format(dbEvents.get(position).getEnd_time().toDate());
-        if (start == end) {
+        if (start.equals(end)) {
             moreThanDay = 0;
         } else {
             moreThanDay = 1;
@@ -202,6 +202,7 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
         holder.getEventName().setText(eventName);
         holder.getStartDate().setText(startDate);
         holder.getStartTime().setText(startTime);
+        holder.getEndTime().setText(endTime);
     }
 
     @Override

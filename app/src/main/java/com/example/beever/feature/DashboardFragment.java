@@ -398,7 +398,7 @@ public class DashboardFragment extends Fragment {
         public int getItemViewType(int i) {
             String start = sfDate.format(dbEvents.get(i).getStart_time().toDate());
             String end = sfDate.format(dbEvents.get(i).getEnd_time().toDate());
-            if (start == end) {
+            if (start.equals(end)) {
                 moreThanDay = 0;
             } else {
                 moreThanDay = 1;
