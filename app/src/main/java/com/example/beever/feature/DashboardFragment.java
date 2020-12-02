@@ -115,13 +115,18 @@ public class DashboardFragment extends Fragment {
                 if (isSuccessful()) {
                     Log.d("USER ENTRY", "success");
 
-                    ArrayList<EventEntry> events = getResult().getUserEvents(true, false);
-                    events.sort(new DashboardEventComparator());
-                    dbEvents.add(events.get(0));
-                    dbEvents.add(events.get(1));
-                    dbEvents.add(events.get(2));
-                    eventsAdapter.notifyDataSetChanged();
-                    Log.d("EVENTS", dbEvents.toString());
+
+                    try {
+                        ArrayList<EventEntry> events = getResult().getUserEvents(true, false);
+                        events.sort(new DashboardEventComparator());
+                        dbEvents.add(events.get(0));
+                        dbEvents.add(events.get(1));
+                        dbEvents.add(events.get(2));
+                        eventsAdapter.notifyDataSetChanged();
+                        Log.d("EVENTS", dbEvents.toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                     for (Object o: getResult().getDashboard_grps()) {
                         if (o != null) {
