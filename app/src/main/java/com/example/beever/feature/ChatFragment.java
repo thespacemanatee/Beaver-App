@@ -143,24 +143,6 @@ public class ChatFragment extends Fragment implements Populatable{
 
                                 sender.add(groupMemberNames.get(chatEntry.getSender()));
                                 senderImg.add(groupMemberImgs.get(chatEntry.getSender()));
-
-                                //getSenderInfo(chatEntry.getSender());
-
-//                                UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(chatEntry.getSender(), 5000) {
-//                                    @Override
-//                                    public void onPostExecute() {
-//                                        Log.d("HEEERRREE", "i hvae arrived in the User Entry");
-//                                        sender.add(getResult().getName());
-//                                        if (getResult().getDisplay_picture() == null) {
-//                                            senderImg.add("null");
-//                                        } else {
-//                                            senderImg.add(getResult().getDisplay_picture());
-//                                        }
-//                                        Log.d("SENDER", getResult().getName());
-//                                        Log.d("SENDER IMG", getResult().getDisplay_picture());
-//                                    }
-//                                };
-//                                userGetter.start();
                             }
                             adapter.notifyDataSetChanged();
                         }
