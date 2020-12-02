@@ -33,8 +33,6 @@ import java.util.List;
 public class IndivGroupFragment extends Fragment {
 
     private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
-//    HashMap<String, String> grpMembers = new HashMap<>();
-//    HashMap<String, String> grpMemberImg = new HashMap<>();
 
 
     @Override
@@ -47,8 +45,6 @@ public class IndivGroupFragment extends Fragment {
         //Receive arguments from GroupFragment
         Bundle bundle = this.getArguments();
         String groupName = bundle.getString("groupName");
-        String groupId = bundle.getString("groupId");
-        String groupImage = bundle.getString("groupImage");
 
         ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle(groupName);
 

@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,9 +71,6 @@ public class ChatInfoFragment extends Fragment implements Populatable{
         Bitmap selectedGrpImg = bundle.getParcelable("groupImage");
         groupName = bundle.getString("groupName");
         groupId = bundle.getString("groupId");
-
-        grpMembers.clear();
-        grpMemberImg.clear();
 
         addUsersBtn = rootView.findViewById(R.id.addUsersBtn2);
 

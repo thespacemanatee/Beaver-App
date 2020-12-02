@@ -52,6 +52,9 @@ public class ChatFragment extends Fragment implements Populatable{
     private String groupName;
     private String groupId;
     private String groupImage;
+    private ArrayList<String> groupMemberIDs;
+    private HashMap<String, String> groupMemberNames;
+    private HashMap<String, String> groupMemberImgs;
     private BubblesAdapter adapter;
 
     private ArrayList<String> senderImg = new ArrayList<>();
@@ -72,6 +75,11 @@ public class ChatFragment extends Fragment implements Populatable{
         groupName = bundle.getString("groupName");
         groupId = bundle.getString("groupId");
         groupImage = bundle.getString("groupImage");
+        groupMemberIDs = bundle.getStringArrayList("grpMemberIDs");
+        groupMemberNames = (HashMap<String, String>) bundle.getSerializable("grpMemberNames");
+        Log.d("MEMBER NAMES", groupMemberNames.toString());
+        groupMemberImgs = (HashMap<String, String>) bundle.getSerializable("grpMemberImgs");
+        Log.d("MEMBER IMGS", groupMemberImgs.toString());
         mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
         //Show Chat Bubbles
@@ -151,8 +159,8 @@ public class ChatFragment extends Fragment implements Populatable{
                     for (ChatEntry entry: chats) {
                         texts.add(entry.getMessage());
                         times.add(entry.getTime());
-                        sender.add(entry.getSender());
-                        senderImg.add("null");
+                        sender.add(groupMemberNames.get(entry.getSender()));
+                        senderImg.add(groupMemberImgs.get(entry.getSender()));
                         adapter.notifyDataSetChanged();
                     }
                 }
