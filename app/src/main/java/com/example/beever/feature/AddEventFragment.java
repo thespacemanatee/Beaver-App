@@ -1,7 +1,10 @@
 package com.example.beever.feature;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +17,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +35,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.auth.User;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -189,5 +195,56 @@ public class AddEventFragment extends Fragment {
             }
         });
         return root;
+    }
+
+    public static class TimeSelectFragment extends DialogFragment{
+
+        private AddEventFragment addEventFragment = null;
+        private NumberPicker add_event_select_hour = null;
+        private NumberPicker add_event_select_minute = null;
+
+        private final String[] hourPicks = new String[] {"0","8","9","10","11","12","13","14",
+                "15","16","17","18","19","20","21","22","23"};
+        private final String[] minutePicks = new String[] {"00","15","30","45"};
+
+        public TimeSelectFragment(AddEventFragment addEventFragment){
+            super();
+            this.addEventFragment = addEventFragment;
+        }
+
+        @NotNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View dialog = inflater.inflate(R.layout.fragment_gap_finder_time_select,null);
+
+            add_event_select_hour = dialog.findViewById(R.id.gap_finder_select_hour);
+            gap_finder_select_minute = dialog.findViewById(R.id.gap_finder_select_minute);
+
+            gap_finder_select_hour.setMaxValue(hourPicks.length-1);
+            gap_finder_select_hour.setMinValue(0);
+            gap_finder_select_hour.setDisplayedValues(hourPicks);
+
+            gap_finder_select_minute.setMaxValue(minutePicks.length-1);
+            gap_finder_select_minute.setMinValue(0);
+            gap_finder_select_minute.setDisplayedValues(minutePicks);
+
+            builder.setView(dialog).setTitle("Select time")
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            return;
+                        }
+                    }).setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    gapFinderFragment.setHourMinute(hourPicks[gap_finder_select_hour.getValue()],
+                            minutePicks[gap_finder_select_minute.getValue()]);
+                }
+            });
+            return builder.create();
+        }
     }
 }
