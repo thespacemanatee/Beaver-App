@@ -89,7 +89,7 @@
     <GridView
         android:id="@+id/dashboard_groups"
         android:layout_width="match_parent"
-        android:layout_height="220dp"
+        android:layout_height="match_parent"
         android:horizontalSpacing="16dp"
         android:numColumns="3"
         android:padding="16dp"
