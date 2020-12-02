@@ -70,6 +70,7 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
                     AlertDialog alertDialog = new AlertDialog.Builder(context).create();
                     alertDialog.setTitle("Delete Event");
                     alertDialog.setMessage("Event Chosen: " + eventEntry.getName());
+                    Log.d(TAG, "onLongClick: "+ USER_ID);
                     alertDialog.setButton(Dialog.BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -83,7 +84,13 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
                                             getResult().modifyEventOrTodo(true, true, false, eventEntry);
                                             dbEvents.remove(eventEntry);
                                             notifyDataSetChanged();
-                                            Toast.makeText(context,"Event successfully deleted",Toast.LENGTH_SHORT).show();
+                                            UserEntry.SetUserEntry setUserEntry = new UserEntry.SetUserEntry(getResult(),USER_ID,5000) {
+                                                @Override
+                                                public void onPostExecute() {
+                                                    Toast.makeText(context,"Event successfully deleted",Toast.LENGTH_SHORT).show();
+                                                }
+                                            };
+                                            setUserEntry.start();
                                         }
                                     }
                                 };
@@ -147,6 +154,7 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
     public TextEventAdapter(ArrayList<EventEntry> data, Context context, String USER_ID) {
         this.dbEvents = data;
         this.context = context;
+        this.USER_ID = USER_ID;
         Log.d(TAG, "TextEventAdapter: " + data.toString());
 //        this.mContext = context;
     }
