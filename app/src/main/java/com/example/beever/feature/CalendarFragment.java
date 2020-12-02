@@ -47,8 +47,10 @@ public class CalendarFragment extends Fragment {
     private TextEventAdapter textEventAdapter;
     private RecyclerView mRecyclerView;
     private Utils utils;
-    private int selectedDay, selectedMonth, selectedYear;
     private Calendar calendar = Calendar.getInstance();
+    private int selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
+    private int selectedMonth = calendar.get(Calendar.MONTH);
+    private int selectedYear = calendar.get(Calendar.YEAR);
     FloatingActionButton addEvent;
     Bundle bundle = new Bundle();
     View bottom_menu;
