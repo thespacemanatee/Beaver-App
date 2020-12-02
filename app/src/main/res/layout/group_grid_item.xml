@@ -20,6 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/grid_item_text"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/beever_dark_blue"
         android:gravity="center"
         android:layout_gravity="center"/>
 

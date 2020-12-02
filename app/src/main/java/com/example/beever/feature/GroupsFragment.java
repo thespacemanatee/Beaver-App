@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,11 +47,11 @@ public class GroupsFragment extends Fragment implements Populatable{
     ArrayList<String> grpIds = new ArrayList<>();
 
     String addGrpBtnImg = Integer.toString(R.drawable.plus);
-    String addGrpBtnText = "Add group...";
+    String addGrpBtnText = "Create group";
     GridAdapter adapter;
     View bottom_menu;
-
-
+    ImageView imageView;
+    TextView textView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,6 +61,9 @@ public class GroupsFragment extends Fragment implements Populatable{
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Groups");
 
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
+
+        imageView = rootView.findViewById(R.id.no_group_image);
+        textView = rootView.findViewById(R.id.no_group_text);
 
         //Fade in Nav Bar
         bottom_menu = getActivity().findViewById(R.id.bottom_menu);
@@ -121,6 +125,10 @@ public class GroupsFragment extends Fragment implements Populatable{
                                         grpImages.add("null");
                                     } else {
                                         grpImages.add(getResult().getDisplay_picture());
+                                    }
+                                    if (grpIds.size() > 0) {
+                                        imageView.setVisibility(View.GONE);
+                                        textView.setVisibility(View.GONE);
                                     }
                                     adapter.notifyDataSetChanged();
                                 }
