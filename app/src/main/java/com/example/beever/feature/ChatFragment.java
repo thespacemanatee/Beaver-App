@@ -77,9 +77,7 @@ public class ChatFragment extends Fragment implements Populatable{
         groupImage = bundle.getString("groupImage");
         groupMemberIDs = bundle.getStringArrayList("grpMemberIDs");
         groupMemberNames = (HashMap<String, String>) bundle.getSerializable("grpMemberNames");
-        Log.d("MEMBER NAMES", groupMemberNames.toString());
         groupMemberImgs = (HashMap<String, String>) bundle.getSerializable("grpMemberImgs");
-        Log.d("MEMBER IMGS", groupMemberImgs.toString());
         mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
         //Show Chat Bubbles

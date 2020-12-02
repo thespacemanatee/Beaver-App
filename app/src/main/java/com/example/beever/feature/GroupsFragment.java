@@ -134,29 +134,22 @@ public class GroupsFragment extends Fragment implements Populatable{
         HashMap<String, String> grpMemberImgs = new HashMap<>();
 
         //Get grpMemberIds, grpMemberNames, grpMemberImgs from FireStore
-        Log.d("GROUP ENTRY START", "getting group info");
         GroupEntry.GetGroupEntry grpGetter = new GroupEntry.GetGroupEntry(groupID, 100000) {
             @Override
             public void onPostExecute() {
                 if (isSuccessful()) {
-                    Log.d("GROUP ENTRY SUCCESSFUL", "managed to get group information");
                     for (Object o: getResult().getMember_list()) {
                         Log.d("MEMBER ID", (String)o);
                         int full = getResult().getMember_list().size();
                         grpMemberIDs.add((String)o);
-                        Log.d("USER ENTRY START", "getting member info");
                         UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry((String)o, 100000) {
                             @Override
                             public void onPostExecute() {
                                 if (isSuccessful()) {
-                                    Log.d("USER ENTRY SUCCESSFUL", "managed to get member information");
                                     grpMemberImgs.put((String)o, getResult().getDisplay_picture());
                                     grpMemberNames.put((String)o, getResult().getName());
 
-                                    if (grpMemberIDs.size() == full) {
-                                        Log.d("MEMBER NAMES", "the onClick database caller, "+ grpMemberNames.toString());
-                                        Log.d("MEMBER IMGS", "the onClick database caller, "+ grpMemberImgs.toString());
-
+                                    if (grpMemberNames.size() == full) {
                                         //Add everything to bundle
                                         bundle.putStringArrayList("grpMemberIDs", grpMemberIDs);
                                         bundle.putSerializable("grpMemberImgs", grpMemberImgs);
