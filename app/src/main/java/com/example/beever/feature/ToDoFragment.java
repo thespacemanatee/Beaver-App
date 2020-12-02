@@ -69,6 +69,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userID;
     private String groupID;
+    private ToDoHelper helper;
 
     protected List<String> ARCHIVED = new ArrayList<>();
     protected List<TodoEntry> archivedList = new ArrayList<>();
@@ -138,11 +139,26 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
             }
         });
 
+        // set on child click listener for expandable list
+        toDoArchivedListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                try {
+                    helper = new ToDoHelper(getContext(), getFragmentManager(), toDoList, toDoAdapter, archivedList, toDoArchivedAdapter, groupID);
+                    helper.showDeleteAlertDialog(getContext(), (TodoEntry) toDoArchivedAdapter.getChild(groupPosition, childPosition), false, expandableListDetail);
+                    return true;
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Can't Click", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }
+        });
+
         // set To Do Form for FloatingActionButton
         toDoAddButton = rootView.findViewById(R.id.toDoAddButton);
         toDoAddButton.setOnClickListener(v -> {
             if (groupID != null) {
-                ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_dialog, toDoAdapter);
+                ToDoDialogFragment toDoDialogFragment = new ToDoDialogFragment(groupID, R.layout.fragment_to_do_dialog, toDoAdapter, helper);
                 assert getFragmentManager() != null;
                 toDoDialogFragment.show(getFragmentManager(), ADD_TO_DO);
             } else {

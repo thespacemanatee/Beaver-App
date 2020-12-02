@@ -51,6 +51,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     private ExpandableListAdapter toDoArchivedAdapter;
 
     private Utils utils;
+    private ToDoHelper helper;
 
     /**
      * Initialise the toDoList with strings from Firebase
@@ -64,6 +65,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         this.manager = manager;
         this.archivedList = archivedList;
         this.toDoArchivedAdapter = toDoArchivedAdapter;
+        this.helper = new ToDoHelper(context, manager, toDoList, this, archivedList, toDoArchivedAdapter, groupID);
     }
 
     /**
@@ -88,7 +90,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
                 public boolean onLongClick(View v) {
                     int position = getLayoutPosition();
                     TodoEntry todoEntry = toDoList.get(position);
-                    showDeleteAlertDialog(context, todoEntry);
+                    helper.showDeleteAlertDialog(context, todoEntry, true, null);
                     return true;
                 }
             });
@@ -103,161 +105,9 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             utils = new Utils(v.getContext());
             utils.fadeOut();
 
-            showOptionsAlertDialog(context, todoEntry);
+            helper.showOptionsAlertDialog(context, todoEntry, utils);
         }
 
-    }
-
-    private void showOptionsAlertDialog(Context context, TodoEntry todoEntry) {
-        AlertDialog dialog = new AlertDialog.Builder(context).create();
-        dialog.setTitle("Choose an Option: ");
-        dialog.setMessage("To-Do: " + todoEntry.getName());
-
-        dialog.setButton(Dialog.BUTTON_POSITIVE, "View Full To-Do", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                manager.beginTransaction()
-                        .replace(R.id.fragment_container, ToDoViewFragment.newInstance(todoEntry, ToDoAdapter.this))
-                        .addToBackStack("ToDoFragment")
-                        .commit();
-            }
-        });
-
-        dialog.setButton(Dialog.BUTTON_NEUTRAL, "Mark as Completed", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(context, "Completed", Toast.LENGTH_SHORT).show();
-                utils.fadeIn();
-                markAsCompleted(todoEntry);
-            }
-        });
-
-        dialog.setButton(Dialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                utils.fadeIn();
-            }
-        });
-
-        dialog.show();
-    }
-
-
-    private void showDeleteAlertDialog(Context context, TodoEntry todoEntry) {
-        AlertDialog dialog = new AlertDialog.Builder(context).create();
-        dialog.setTitle("Delete To-Do?");
-        dialog.setMessage("To-Do Chosen: " + todoEntry.getName());
-
-        dialog.setButton(Dialog.BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                removeItem(todoEntry);
-            }
-        });
-
-        dialog.setButton(Dialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-    }
-
-    public void removeItem(TodoEntry todoEntry) {
-        int currPosition = toDoList.indexOf(todoEntry);
-        GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onPostExecute() {
-                if (isSuccessful()) {
-                    getResult().modifyEventOrTodo(false, true, false, todoEntry);
-
-                    GroupEntry.SetGroupEntry setGroupEntry = new GroupEntry.SetGroupEntry(getResult(), groupID, 5000) {
-                        @Override
-                        public void onPostExecute() {
-                            Toast.makeText(context, "To-Do removed :)", Toast.LENGTH_SHORT).show();
-                        }
-                    };
-
-                    setGroupEntry.start();
-
-                    toDoList.remove(todoEntry);
-                    notifyItemRemoved(currPosition);
-
-                } else {
-                    Toast.makeText(context, "Cannot remove to-do", Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
-
-        groupEntry.start();
-
-    }
-
-    public void addItem(TodoEntry todoEntry) {
-        Log.d("GROUP ID", groupID);
-        GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onPostExecute() {
-                if (isSuccessful()) {
-                    getResult().modifyEventOrTodo(false, true, true, todoEntry);
-
-                    GroupEntry.SetGroupEntry setGroupEntry = new GroupEntry.SetGroupEntry(getResult(), groupID, 5000) {
-                        @Override
-                        public void onPostExecute() {
-                            Toast.makeText(context, "To-Do added :)", Toast.LENGTH_SHORT).show();
-                        }
-                    };
-
-                    setGroupEntry.start();
-
-                    toDoList.add(0, todoEntry);
-                    notifyItemInserted(0);
-
-                } else {
-                    Toast.makeText(context, "Cannot add to-do", Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
-
-        groupEntry.start();
-    }
-
-    public void markAsCompleted(TodoEntry todoEntry) {
-        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
-            @Override
-            public void onPostExecute() {
-                if (isSuccessful()) {
-                    getResult().modifyEventOrTodo(false, true, false, todoEntry);
-                    getResult().modifyEventOrTodo(false, false, true, todoEntry);
-
-                    GroupEntry.SetGroupEntry setGroupEntry = new GroupEntry.SetGroupEntry(getResult(), groupID, 5000) {
-                        @Override
-                        public void onPostExecute() {
-                            Toast.makeText(context, "Marked!", Toast.LENGTH_SHORT).show();
-                        }
-                    };
-
-                    setGroupEntry.start();
-
-                    toDoList.remove(todoEntry);
-                    notifyDataSetChanged();
-
-                    try {
-                        archivedList.add(todoEntry);
-                        toDoArchivedAdapter.notifyDataSetChanged();
-                    } catch (NullPointerException e) {
-
-                    }
-                }
-            }
-        };
-
-        getGroupEntry.start();
     }
 
     /**

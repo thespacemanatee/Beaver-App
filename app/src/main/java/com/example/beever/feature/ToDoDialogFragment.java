@@ -55,6 +55,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected ArrayAdapter<String> spinnerAdapter;
 
     private ToDoAdapter toDoAdapter;
+    private ToDoHelper helper;
 
     private String groupID;
     private int layoutResource;
@@ -64,10 +65,11 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected String taskDescr;
     protected Date dueDate;
 
-    public ToDoDialogFragment(String groupID, int layoutResource, ToDoAdapter adapter) {
+    public ToDoDialogFragment(String groupID, int layoutResource, ToDoAdapter adapter, ToDoHelper helper) {
         this.groupID = groupID;
         this.layoutResource = layoutResource;
         this.toDoAdapter = adapter;
+        this.helper = helper;
     }
 
     @Override
@@ -182,6 +184,6 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
     private void addNewToDo(String taskTitle, String taskDescr, String assignedTo, Date dueDate) {
         TodoEntry newToDo = new TodoEntry(taskTitle, taskDescr, assignedTo, new Timestamp(dueDate), groupID);
-        toDoAdapter.addItem(newToDo);
+        helper.addItem(newToDo);
     }
 }

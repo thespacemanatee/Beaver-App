@@ -40,10 +40,12 @@ public class ToDoViewFragment extends Fragment {
 
     private TodoEntry todoEntry;
     private ToDoAdapter adapter;
+    private ToDoHelper helper;
 
-    public ToDoViewFragment(TodoEntry todoEntry, ToDoAdapter adapter) {
+    public ToDoViewFragment(TodoEntry todoEntry, ToDoAdapter adapter, ToDoHelper helper) {
         this.todoEntry = todoEntry;
         this.adapter = adapter;
+        this.helper = helper;
     }
 
     @Nullable
@@ -94,8 +96,8 @@ public class ToDoViewFragment extends Fragment {
         return rootView;
     }
 
-    public static ToDoViewFragment newInstance(TodoEntry todoEntry, ToDoAdapter adapter) {
-        return new ToDoViewFragment(todoEntry, adapter);
+    public static ToDoViewFragment newInstance(TodoEntry todoEntry, ToDoAdapter adapter, ToDoHelper helper) {
+        return new ToDoViewFragment(todoEntry, adapter, helper);
     }
 
     private void showDeleteAlertDialog(Context context, TodoEntry todoEntry) {
@@ -106,7 +108,7 @@ public class ToDoViewFragment extends Fragment {
         dialog.setButton(Dialog.BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                adapter.removeItem(todoEntry);
+                helper.removeItem(todoEntry);
                 adapter.notifyDataSetChanged();
 
                 getFragmentManager().beginTransaction()
