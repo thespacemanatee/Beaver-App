@@ -306,7 +306,7 @@ public class ChatFragment extends Fragment implements Populatable{
             String time = getTimeData(i);
             String member = getMemberData(i);
 
-            if (img.equals("null")) {
+            if (img == null) {
                 Glide.with(context).load(R.drawable.pink_circle).centerCrop().into(viewHolder.getMemberImg());
             } else {
                 Glide.with(context).load(img).centerCrop().into(viewHolder.getMemberImg());
