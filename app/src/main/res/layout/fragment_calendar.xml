@@ -54,7 +54,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:maxImageSize="40dp"
-            app:backgroundTint="@color/beever_dark_blue_transparent"/>
+            app:backgroundTint="@color/beever_dark_blue_transparent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

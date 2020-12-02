@@ -88,16 +88,18 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/toDoAddButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="36dp"
-        android:layout_marginBottom="116dp"
-
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:elevation="8dp"
         android:backgroundTint="@color/beever_light_blue"
-        android:contentDescription="@string/to_do"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="100dp"
+        android:tint="@android:color/white"
         android:src="@drawable/ic_baseline_add_40"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:maxImageSize="40dp"
+        app:backgroundTint="@color/beever_dark_blue_transparent"
+        android:contentDescription="@string/to_do" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
