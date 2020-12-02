@@ -107,6 +107,9 @@ public class ChatInfoFragment extends Fragment implements Populatable{
 
     @Override
     public void populateRecyclerView() {
+        grpMembers.clear();
+        grpMemberImg.clear();
+
         DocumentReference documentReference = fStore.collection("groups").document(groupId);
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
