@@ -1,37 +1,56 @@
 package com.example.beever.feature;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.OrientationHelper;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
+import com.example.beever.database.EventEntry;
+import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import android.util.Log;
-import android.widget.CalendarView;
-import android.widget.LinearLayout;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class CalendarFragment extends Fragment {
-    FloatingActionButton addEvent;
+    private static final String TAG = "CalendarFragment";
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    ArrayList<Events> list = new ArrayList<>();
+    protected ArrayList<EventEntry> list = new ArrayList<>();
+    protected Map<String,Object> map = new HashMap<>();
     private final String[] months = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+    private String USER_ID;
+    private UserEntry userEntry;
+    private TextEventAdapter textEventAdapter;
+    private RecyclerView mRecyclerView;
+    private Utils utils;
+    private int selectedDay, selectedMonth, selectedYear;
+    private Calendar calendar = Calendar.getInstance();
+    FloatingActionButton addEvent;
+    Bundle bundle = new Bundle();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,37 +58,40 @@ public class CalendarFragment extends Fragment {
         // Inflate the layout for this fragment
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_calendar, container, false);
 
+        /**
+         * Get user ID from firebase authentication
+         */
+        FirebaseUser fUser = fAuth.getCurrentUser();
+        USER_ID = fUser.getUid();
+
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Calendar");
         list.clear();
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
-        list.add(new Events(Events.TEXT_TYPE,0,"Hello"));
 
-        TextEventAdapter adapter = new TextEventAdapter(list, getContext());
+        textEventAdapter = new TextEventAdapter(list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
-        RecyclerView mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
+        mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setAdapter(textEventAdapter);
+
+        populateEventsList();
 
         addEvent = root.findViewById(R.id.addEvent);
         addEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "onClick: opening dialog");
+//                AddEventFragment dialog = new AddEventFragment();
+//                dialog.show(getFragmentManager(),"AddEventDialog");
+                utils = new Utils(v.getContext());
+                utils.fadeOut();
+                bundle.putInt("selectedDay",selectedDay);
+                bundle.putInt("selectedMonth",selectedMonth);
+                bundle.putInt("selectedYear",selectedYear);
                 Fragment addEventFragment = new AddEventFragment();
-                System.out.println("click");
+                addEventFragment.setArguments(bundle);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_container, addEventFragment).addToBackStack(null).commit();
+//                customDialog("New Event", "Edit new event", "cancel", "save");
             }
         });
 
@@ -77,62 +99,86 @@ public class CalendarFragment extends Fragment {
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener(){
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                list.clear();
-                list.add(new Events(Events.TEXT_TYPE,0,"Event for " + dayOfMonth + " " + months[month] + " " + year));
-                TextEventAdapter adapter = new TextEventAdapter(list, getContext());
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
-                RecyclerView mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
-                mRecyclerView.setLayoutManager(linearLayoutManager);
-                mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-                mRecyclerView.setAdapter(adapter);
+                selectedDay = dayOfMonth;
+                selectedMonth = month;
+                selectedYear = year;
+                calendar.set(year, month, dayOfMonth, 0, 0, 0);
+                populateEventsList();
             }
         });
-
-
-
-//        final CollapsibleCalendar collapsibleCalendar = root.findViewById(R.id.calendarView);
-//        collapsibleCalendar.setCalendarListener(new CollapsibleCalendar.CalendarListener() {
-//            @Override
-//            public void onDaySelect() {
-//                Day day = collapsibleCalendar.getSelectedDay();
-//                Log.i(getClass().getName(), "Selected Day: "
-//                        + day.getYear() + "/" + (day.getMonth() + 1) + "/" + day.getDay());
-//            }
-//
-//            @Override
-//            public void onItemClick(View view) {
-//
-//            }
-//
-//            @Override
-//            public void onDataUpdate() {
-//
-//            }
-//
-//            @Override
-//            public void onMonthChange() {
-//
-//            }
-//
-//            @Override
-//            public void onWeekChange(int i) {
-//
-//            }
-//
-//            @Override
-//            public void onDayChanged() {
-//
-//            }
-//
-//            @Override
-//            public void onClickListener() {
-//
-//            }
-//        });
-
 
         return root;
     }
 
+    /**
+     * Custom dialog that helps to edit the events
+     * @param title
+     * @param message
+     * @param cancelMethod
+     * @param okMethod
+     */
 
+    public void customDialog(String title, String message, final String cancelMethod, final String okMethod){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(title);
+        builder.setMessage(message);
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.show();
+
+    }
+
+    public void populateEventsList(){
+        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(USER_ID, 5000) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    userEntry = getResult();
+                    UserEntry.GetUserRelevantEvents getUserRelevantEvents = new UserEntry.GetUserRelevantEvents(userEntry, 5000, true, false) {
+                        @Override
+                        public void onPostExecute() {
+                            if (isSuccessful()) {
+                                Date date = calendar.getTime();
+                                Timestamp dateTimestamp = new Timestamp(date);
+//                                Date startDate = new GregorianCalendar(selectedYear, selectedMonth,selectedDay).getTime();
+                                Timestamp startDate = new Timestamp(new Date((dateTimestamp.getSeconds())*1000));
+                                Timestamp endDate = new Timestamp(new Date((startDate.getSeconds() + 86400)*1000));
+                                Log.d(TAG, "START DATE " + startDate);
+                                Log.d(TAG, "END DATE " + endDate);
+                                ArrayList<EventEntry> eventEntries = new ArrayList<>();
+                                for (EventEntry e : getResult()){
+                                    Log.d(TAG, "onPostExecute: " + e.getStart_time());
+                                    if (e.getStart_time().getSeconds() >= startDate.getSeconds() && e.getStart_time().getSeconds() < endDate.getSeconds()){
+                                        eventEntries.add(e);
+                                    }
+                                }
+                                list.clear();
+                                list.addAll(eventEntries);
+//                                textEventAdapter = new TextEventAdapter(list);
+//                                mRecyclerView.setAdapter(textEventAdapter);
+                                textEventAdapter.notifyDataSetChanged();
+                                Log.d(TAG, "onPostExecute: " + list.toString());
+                            }
+                        }
+                    };
+
+                    getUserRelevantEvents.start();
+                }
+            }
+        };
+        getUserEntry.start();
+    }
 }

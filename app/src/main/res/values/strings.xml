@@ -46,7 +46,7 @@
     <string name="name">Claudia.</string>
     <string name="upcoming_events">Upcoming Events</string>
     <string name="upcoming_meeting">UPCOMING MEETING</string>
-    <string name="jump_to_group">Favourite Groups</string>
+    <string name="jump_to_group">Jump to Group...</string>
     <string name="group_fragment">Groups</string>
     <string name="chat_hint">Type a message&#8230;</string>
     <string name="chat_info_grp_info">Group Information</string>
@@ -87,4 +87,11 @@
     <string name="task_name">Task Name</string>
     <string name="deadline">deadline</string>
     <string name="assigned_to1">assigned to</string>
+    <string name="add_event">Add Event</string>
+    <string name="title">Title</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="start">START</string>
+    <string name="End">END</string>
+    <string name="dateTime">DATE</string>
 </resources>
