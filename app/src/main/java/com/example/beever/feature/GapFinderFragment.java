@@ -180,7 +180,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
                     return;
                 }
                 if (getResult().size()==0){
-                    result.setText("Result: Timeslot is unavailable,and no other timings available. Try another day?");
+                    result.setText("Result: Timeslot is unavailable, and no other timings available. Try another day?");
                     timestamps.clear();
                     timestampsEnd.clear();
                     adapter.notifyDataSetChanged();
@@ -236,50 +236,60 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
 
     @Override
     public void onTimestampClick(int position) {
-        String name = eventName.getEditText().getText().toString();
-        String description = eventDesc.getEditText().getText().toString();
+        final String name = eventName.getEditText().getText().toString();
+        final String description = eventDesc.getEditText().getText().toString();
         if (!name.isEmpty()) {
-            name = eventName.getEditText().getText().toString();
             eventName.setError(null);
             eventName.setErrorEnabled(false);
         } else {
             eventName.setError("Please enter an event name!");
         }
         if (!description.isEmpty()) {
-            description = eventDesc.getEditText().getText().toString();
             eventDesc.setError(null);
             eventDesc.setErrorEnabled(false);
         } else {
             eventDesc.setError("Please enter an event name!");
         }
         if (!name.isEmpty() && !description.isEmpty()) {
-            EventEntry eventEntry = new EventEntry();
-            eventEntry.setName(name);
-            eventEntry.setDescription(description);
-            eventEntry.setGroup_id_source(groupID);
-            eventEntry.setStart_time(timestamps.get(position));
-            eventEntry.setEnd_time(timestampsEnd.get(position));
-            groupEntry.modifyEventOrTodo(true, true, true, eventEntry);
-            GroupEntry.SetGroupEntry setEvent = new GroupEntry.SetGroupEntry(groupEntry, groupID, 5000) {
+            GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID,5000){
                 @Override
                 public void onPostExecute() {
-                    if (!isSuccessful()) {
+                    if (!isSuccessful()){
                         Toast toast = Toast.makeText(getContext(), "There was an error. Please try again.", Toast.LENGTH_SHORT);
                         toast.show();
+                        return;
                     }
-                    else{
-                        Toast toast = Toast.makeText(getContext(), "Event added!", Toast.LENGTH_SHORT);
-                        toast.show();
-                        timestamps.clear();
-                        timestampsEnd.clear();
-                        eventName.getEditText().setText("");
-                        eventDesc.getEditText().setText("");
-                        adapter.notifyDataSetChanged();
-                        result.setText("");
-                    }
+                    groupEntry = getResult();
+                    EventEntry eventEntry = new EventEntry();
+                    eventEntry.setName(name);
+                    eventEntry.setDescription(description);
+                    eventEntry.setGroup_id_source(groupID);
+                    eventEntry.setStart_time(timestamps.get(position));
+                    eventEntry.setEnd_time(timestampsEnd.get(position));
+                    groupEntry.modifyEventOrTodo(true, true, true, eventEntry);
+                    GroupEntry.SetGroupEntry setEvent = new GroupEntry.SetGroupEntry(groupEntry, groupID, 5000) {
+                        @Override
+                        public void onPostExecute() {
+                            if (!isSuccessful()) {
+                                Toast toast = Toast.makeText(getContext(), "There was an error. Please try again.", Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                            else{
+                                Toast toast = Toast.makeText(getContext(), "Event added!", Toast.LENGTH_SHORT);
+                                toast.show();
+                                timestamps.clear();
+                                timestampsEnd.clear();
+                                eventName.getEditText().setText("");
+                                eventDesc.getEditText().setText("");
+                                adapter.notifyDataSetChanged();
+                                result.setText("");
+                            }
+                        }
+                    };
+                    setEvent.start();
                 }
             };
-            setEvent.start();
+            getGroupEntry.start();
         }
     }
 
