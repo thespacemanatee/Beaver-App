@@ -51,6 +51,7 @@ public class CalendarFragment extends Fragment {
     private Calendar calendar = Calendar.getInstance();
     FloatingActionButton addEvent;
     Bundle bundle = new Bundle();
+    View bottom_menu;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,6 +67,13 @@ public class CalendarFragment extends Fragment {
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Calendar");
         list.clear();
+
+        //Fade in Nav Bar
+        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
+        if (bottom_menu.getVisibility() == View.GONE) {
+            Utils utils = new Utils(getContext());
+            utils.fadeIn();
+        }
 
         textEventAdapter = new TextEventAdapter(list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
@@ -108,6 +116,17 @@ public class CalendarFragment extends Fragment {
         });
 
         return root;
+    }
+
+    @Override
+    public void onAttachFragment(@NonNull Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+        //Fade in Nav Bar
+        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
+        if (bottom_menu.getVisibility() == View.GONE) {
+            Utils utils = new Utils(getContext());
+            utils.fadeIn();
+        }
     }
 
     /**
