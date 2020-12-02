@@ -17,6 +17,7 @@ import com.google.firebase.Timestamp;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -24,28 +25,33 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
     public static final String TAG = "ToDoAdapter";
 
-    private ArrayList<TodoEntry> toDoList;
-    private Context context;
+    private final ArrayList<TodoEntry> toDoList;
+    private final Context context;
 
-    private Utils utils;
-    private ToDoHelper helper;
+    private final ToDoHelper helper;
 
     /**
-     * Initialise the toDoList with strings from Firebase
-     * @param toDoList
+     * Constructor for ToDoAdapter
+     * @param toDoList  to display the current to-dos
+     * @param groupID   to specify the current group the user is looking at
+     * @param context   to specify the context for dialog to show
+     * @param manager   to change the fragments accordingly
+     * @param expandableListDetail  just to initialise helper
+     * @param toDoArchivedAdapter   just to initialise helper
      */
     public ToDoAdapter(ArrayList<TodoEntry> toDoList, String groupID, Context context, FragmentManager manager,
-                       List<TodoEntry> archivedList, ExpandableListAdapter toDoArchivedAdapter) {
+                       HashMap<String, List<TodoEntry>> expandableListDetail, ExpandableListAdapter toDoArchivedAdapter) {
         this.toDoList = toDoList;
         this.context = context;
-        this.helper = new ToDoHelper(context, manager, toDoList, this, archivedList, toDoArchivedAdapter, groupID);
+        this.helper = new ToDoHelper(context, manager, toDoList, this, expandableListDetail , toDoArchivedAdapter, groupID);
     }
 
     /**
-     * Provides a reference to the type of views that you are using
+     * VIEWHOLDER CLASS : provides a reference to the view that we are looking at
      */
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        // components in the view
         protected TextView toDoTaskContent;
         protected TextView toDoDeadline;
         protected TextView toDoAssignedTo;
@@ -56,14 +62,18 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             this.toDoDeadline = view.findViewById(R.id.toDoDeadline);
             this.toDoAssignedTo = view.findViewById(R.id.toDoAssignedTo);
 
+            // set an OnClickListener for user to select from options
+            // to mark to-do as completed or to view the full to-do with description
             view.setOnClickListener(this);
 
+            // set OnLongClickListener to allow the user to delete a to-do
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     int position = getLayoutPosition();
                     TodoEntry todoEntry = toDoList.get(position);
-                    helper.showDeleteAlertDialog(context, todoEntry, true, null);
+                    // shows the delete alert dialog
+                    helper.showDeleteAlertDialog(context, todoEntry, true, false);
                     return true;
                 }
             });
@@ -75,24 +85,24 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             TodoEntry todoEntry = toDoList.get(position);
 
             //Fade Out Nav Bar
-            utils = new Utils(v.getContext());
+            Utils utils = new Utils(v.getContext());
             utils.fadeOut();
 
+            // shows the options alert dialog
             helper.showOptionsAlertDialog(context, todoEntry, utils);
         }
 
     }
 
     /**
-     * Creates new views (invoked by layout manager)
-     * @param parent parent viewgroup
+     * onCreateViewHolder : helps to hold a new view of the list item
+     * @param parent
      * @param viewType
      * @return
      */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // creates a new view of the list item
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_to_do_task_, parent, false);
 
@@ -116,13 +126,16 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
         TodoEntry toDo = toDoList.get(position);
 
+        // sets the corresponding text of the to-dos
         toDoTaskContent.setText(toDo.getName());
+        toDoAssignedTo.setText(toDo.getAssigned_to());
+
+        // format the timestamp into a readable date dd-MM
         Timestamp deadline = toDo.getDeadline();
         SimpleDateFormat sf = new SimpleDateFormat("dd-MM");
         sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
         String deadlineStr = sf.format(deadline.toDate());
         toDoDeadline.setText(deadlineStr);
-        toDoAssignedTo.setText(toDo.getAssigned_to());
 
     }
 

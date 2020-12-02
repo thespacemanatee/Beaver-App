@@ -15,7 +15,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.beever.R;
 import com.example.beever.database.TodoEntry;
@@ -28,19 +27,9 @@ import java.util.TimeZone;
 
 public class ToDoViewFragment extends Fragment {
 
-    private static String TAG = "ToDoViewFragment";
-
-    private View rootView;
-    private TextView toDoFullTaskTitle;
-    private TextView toDoFullTaskDescr;
-    private TextView toDoFullTaskAssignedTo;
-    private TextView toDoFullTaskDueDate;
-    private Button toDoFullBackBtn;
-    private Button toDoFullDeleteBtn;
-
-    private TodoEntry todoEntry;
-    private ToDoAdapter adapter;
-    private ToDoHelper helper;
+    private final TodoEntry todoEntry;
+    private final ToDoAdapter adapter;
+    private final ToDoHelper helper;
 
     public ToDoViewFragment(TodoEntry todoEntry, ToDoAdapter adapter, ToDoHelper helper) {
         this.todoEntry = todoEntry;
@@ -53,27 +42,31 @@ public class ToDoViewFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Objects.requireNonNull(((NavigationDrawer) Objects.requireNonNull(getActivity())).getSupportActionBar()).setTitle("To-Do View");
 
-        rootView = inflater.inflate(R.layout.fragment_to_do_view, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_to_do_view, container, false);
+        String TAG = "ToDoViewFragment";
         rootView.setTag(TAG);
 
-        toDoFullTaskTitle = rootView.findViewById(R.id.toDoFullTaskTitle);
-        toDoFullTaskDescr = rootView.findViewById(R.id.toDoFullTaskDescr);
-        toDoFullTaskAssignedTo = rootView.findViewById(R.id.toDoFullTaskAssignedTo);
-        toDoFullTaskDueDate = rootView.findViewById(R.id.toDoFullTaskDueDate);
+        // components in the view
+        TextView toDoFullTaskTitle = rootView.findViewById(R.id.toDoFullTaskTitle);
+        TextView toDoFullTaskDescr = rootView.findViewById(R.id.toDoFullTaskDescr);
+        TextView toDoFullTaskAssignedTo = rootView.findViewById(R.id.toDoFullTaskAssignedTo);
+        TextView toDoFullTaskDueDate = rootView.findViewById(R.id.toDoFullTaskDueDate);
 
-        toDoFullBackBtn = rootView.findViewById(R.id.toDoFullBackBtn);
-        toDoFullDeleteBtn = rootView.findViewById(R.id.toDoFullDeleteBtn);
+        Button toDoFullBackBtn = rootView.findViewById(R.id.toDoFullBackBtn);
+        Button toDoFullDeleteBtn = rootView.findViewById(R.id.toDoFullDeleteBtn);
 
+        // setting the text in the components from todoEntry
         toDoFullTaskTitle.setText(todoEntry.getName());
         toDoFullTaskDescr.setText(todoEntry.getDescription());
         toDoFullTaskAssignedTo.setText(todoEntry.getAssigned_to());
-
+        // formatting the timestamp to human readable format
         Timestamp deadline = todoEntry.getDeadline();
         SimpleDateFormat sf = new SimpleDateFormat("dd-MM-YYYY");
         sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
         String deadlineStr = sf.format(deadline.toDate());
         toDoFullTaskDueDate.setText(deadlineStr);
 
+        // goes back to previous fragment
         toDoFullBackBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,44 +79,20 @@ public class ToDoViewFragment extends Fragment {
             }
         });
 
+        // deletes the to do
         toDoFullDeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDeleteAlertDialog(getContext(), todoEntry);
+                helper.showDeleteAlertDialog(getContext(), todoEntry, true, true);
             }
         });
 
         return rootView;
     }
 
+    // creates a new instance of the fragment
     public static ToDoViewFragment newInstance(TodoEntry todoEntry, ToDoAdapter adapter, ToDoHelper helper) {
         return new ToDoViewFragment(todoEntry, adapter, helper);
     }
 
-    private void showDeleteAlertDialog(Context context, TodoEntry todoEntry) {
-        AlertDialog dialog = new AlertDialog.Builder(context).create();
-        dialog.setTitle("Delete To-Do?");
-        dialog.setMessage("To-Do Chosen: " + todoEntry.getName());
-
-        dialog.setButton(Dialog.BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                helper.removeItem(todoEntry);
-                adapter.notifyDataSetChanged();
-
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new ToDoFragment())
-                        .commit();
-            }
-        });
-
-        dialog.setButton(Dialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-    }
 }
