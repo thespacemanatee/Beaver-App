@@ -8,7 +8,8 @@
     android:background="@drawable/rounded_corners_nav"
     android:backgroundTint="@color/beever_light_blue"
     android:padding="16dp"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    android:elevation="10dp">
 
     <TextView
         android:id="@+id/event_title"

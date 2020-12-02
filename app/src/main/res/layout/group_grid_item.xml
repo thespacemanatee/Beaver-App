@@ -14,7 +14,8 @@
         android:scaleType="fitCenter"
         android:gravity="center"
         android:layout_gravity="center"
-        android:foreground="@drawable/my_selector"/>
+        android:foreground="@drawable/my_selector"
+        android:elevation="10dp"/>
 
     <TextView
         android:layout_width="match_parent"

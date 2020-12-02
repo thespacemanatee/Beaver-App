@@ -76,8 +76,8 @@
             android:id="@+id/toDoRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:nestedScrollingEnabled="true"
-            app:layout_constraintTop_toTopOf="@+id/imageView2" />
+            android:nestedScrollingEnabled="true" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
