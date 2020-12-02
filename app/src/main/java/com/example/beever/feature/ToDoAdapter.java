@@ -132,7 +132,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
         // format the timestamp into a readable date dd-MM
         Timestamp deadline = toDo.getDeadline();
-        SimpleDateFormat sf = new SimpleDateFormat("dd-MM");
+        SimpleDateFormat sf = new SimpleDateFormat("dd MMM");
         sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
         String deadlineStr = sf.format(deadline.toDate());
         toDoDeadline.setText(deadlineStr);
