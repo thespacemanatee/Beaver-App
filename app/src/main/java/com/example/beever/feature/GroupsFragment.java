@@ -32,6 +32,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class GroupsFragment extends Fragment implements Populatable{
@@ -122,6 +123,67 @@ public class GroupsFragment extends Fragment implements Populatable{
             }
         };
         userGetter.start();
+    }
+
+    public void getGroupMemberInfo(String groupID, String groupImg, String groupName, Bundle bundle) {
+
+        //Create ArrayList to store grpMemberIDs, HashMaps to store grpMemberNames and grpMemberImgs
+        ArrayList<String> grpMemberIDs = new ArrayList<>();
+        HashMap<String, String> grpMemberNames = new HashMap<>();
+        HashMap<String, String> grpMemberImgs = new HashMap<>();
+
+        //Get grpMemberIds, grpMemberNames, grpMemberImgs from FireStore
+        Log.d("GROUP ENTRY START", "getting group info");
+        GroupEntry.GetGroupEntry grpGetter = new GroupEntry.GetGroupEntry(groupID, 100000) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    Log.d("GROUP ENTRY SUCCESSFUL", "managed to get group information");
+                    for (Object o: getResult().getMember_list()) {
+                        Log.d("MEMBER ID", (String)o);
+                        int full = getResult().getMember_list().size();
+                        grpMemberIDs.add((String)o);
+                        Log.d("USER ENTRY START", "getting member info");
+                        UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry((String)o, 100000) {
+                            @Override
+                            public void onPostExecute() {
+                                if (isSuccessful()) {
+                                    Log.d("USER ENTRY SUCCESSFUL", "managed to get member information");
+                                    grpMemberImgs.put((String)o, getResult().getDisplay_picture());
+                                    grpMemberNames.put((String)o, getResult().getName());
+
+                                    if (grpMemberIDs.size() == full) {
+                                        Log.d("MEMBER NAMES", "the onClick database caller, "+ grpMemberNames.toString());
+                                        Log.d("MEMBER IMGS", "the onClick database caller, "+ grpMemberImgs.toString());
+
+                                        //Add everything to bundle
+                                        bundle.putStringArrayList("grpMemberIDs", grpMemberIDs);
+                                        bundle.putSerializable("grpMemberImgs", grpMemberImgs);
+                                        bundle.putSerializable("grpMemberNames", grpMemberNames);
+                                        bundle.putString("groupImage", groupImg);
+                                        bundle.putString("groupName", groupName);
+                                        bundle.putString("groupId", groupID);
+
+                                        //Fade Out Nav Bar
+                                        Utils utils = new Utils(getContext());
+                                        utils.fadeOut();
+
+                                        //Go to IndivChatFragment
+                                        IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
+                                        indivGroupFragment.setArguments(bundle);
+                                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                        transaction.add(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack(null).commit();
+                                    }
+                                }
+                            }
+                        };
+                        userGetter.start();
+                    }
+                }
+            }
+        };
+        grpGetter.start();
+
     }
 
     //Class to populate GridView
@@ -231,20 +293,7 @@ public class GroupsFragment extends Fragment implements Populatable{
                     public void onClick(View v) {
                         //Bundle arguments to send to ChatFragment
                         Bundle bundle = new Bundle();
-                        //bundle.putParcelable("selectedGrpImg", selectedGrpImg);
-                        bundle.putString("groupImage", selectedGrpImg);
-                        bundle.putString("groupName", selectedGrpName);
-                        bundle.putString("groupId", selectedGrpId);
-
-                        //Fade Out Nav Bar
-                        Utils utils = new Utils(getContext());
-                        utils.fadeOut();
-
-                        //Go to IndivChatFragment
-                        IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
-                        indivGroupFragment.setArguments(bundle);
-                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.add(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack(null).commit();
+                        getGroupMemberInfo(selectedGrpId, selectedGrpImg, selectedGrpName, bundle);
                     }
                 });
             }
