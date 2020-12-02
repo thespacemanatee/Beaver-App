@@ -103,6 +103,21 @@ public class ChatFragment extends Fragment implements Populatable{
         };
         getGroupEntry.start();;
 
+        GroupEntry.GroupEntryListener groupEntryListener = new GroupEntry.GroupEntryListener(groupId,5000){
+            public void onPreListening(){}
+
+            public void onSetupFailure(){
+                Toast.makeText(getContext(),"Group entry loading failed, please retry.", Toast.LENGTH_SHORT).show();
+
+            }
+
+            public void onListenerUpdate(){
+                if (getStateChange()==StateChange.CHAT) populateRecyclerView();
+            }
+
+        };
+        groupEntryListener.start();
+
         return rootView;
     }
 
@@ -113,8 +128,8 @@ public class ChatFragment extends Fragment implements Populatable{
         GroupEntry.SetGroupEntry addMessage = new GroupEntry.SetGroupEntry(groupEntry, groupId, 5000) {
             @Override
             public void onPostExecute() {
-                Toast.makeText(getContext(), "Chat sent successfully", Toast.LENGTH_SHORT).show();
-                populateRecyclerView();
+                // if (isSuccessful()) Toast.makeText(getContext(), "Chat sent successfully", Toast.LENGTH_SHORT).show();
+                // Do we need this? Usually in telegram etc we don't hv anything like this
             }
         };
         addMessage.start();
