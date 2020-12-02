@@ -77,7 +77,7 @@ public class CalendarFragment extends Fragment {
             utils.fadeIn();
         }
 
-        textEventAdapter = new TextEventAdapter(list);
+        textEventAdapter = new TextEventAdapter(list,getContext(),USER_ID);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
         mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(linearLayoutManager);

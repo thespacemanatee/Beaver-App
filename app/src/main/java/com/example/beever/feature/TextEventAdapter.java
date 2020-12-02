@@ -1,12 +1,16 @@
 package com.example.beever.feature;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -14,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
 import com.example.beever.database.EventEntry;
+import com.example.beever.database.UserEntry;
+import com.google.firebase.firestore.auth.User;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,12 +28,14 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
 
     private static final String TAG = "help";
     private ArrayList<EventEntry> dbEvents;
+    private Context context;
+    private String USER_ID;
     static int moreThanDay;
     SimpleDateFormat sfDate = new SimpleDateFormat("dd MMM");
     SimpleDateFormat sfTime = new SimpleDateFormat("HH:mm");
 
 
-    public static class TextEventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class TextEventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView eventName;
         LinearLayout eventTiming;
@@ -53,6 +61,49 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
             }
 
             itemView.setOnClickListener(this);
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int itemPos = getLayoutPosition();
+                    EventEntry eventEntry = dbEvents.get(itemPos);
+                    AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+                    alertDialog.setTitle("Delete Event");
+                    alertDialog.setMessage("Event Chosen: " + eventEntry.getName());
+                    alertDialog.setButton(Dialog.BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (eventEntry.getGroup_id_source() != null){
+                                Toast.makeText(context,"Group event cannot be deleted",Toast.LENGTH_SHORT).show();
+                            } else {
+                                UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(USER_ID, 5000) {
+                                    @Override
+                                    public void onPostExecute() {
+                                        if(isSuccessful()) {
+                                            getResult().modifyEventOrTodo(true, true, false, eventEntry);
+                                            dbEvents.remove(eventEntry);
+                                            notifyDataSetChanged();
+                                            Toast.makeText(context,"Event successfully deleted",Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                };
+                                getUserEntry.start();
+
+                            }
+                        }
+                    });
+                    alertDialog.setButton(Dialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    alertDialog.show();
+
+                    return true;
+                }
+            });
         }
 
         public TextView getEventName() {
@@ -83,18 +134,24 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
             return endTime;
         }
 
+
+
         @Override
         public void onClick(View v) {
-            System.out.println("clicked");
+            int itemPos = getLayoutPosition();
+            EventEntry eventEntry = dbEvents.get(itemPos);
 
         }
     }
 
-    public TextEventAdapter(ArrayList<EventEntry> data) {
+    public TextEventAdapter(ArrayList<EventEntry> data, Context context, String USER_ID) {
         this.dbEvents = data;
+        this.context = context;
         Log.d(TAG, "TextEventAdapter: " + data.toString());
 //        this.mContext = context;
     }
+
+
 
     @Override
     public int getItemViewType(int position) {

@@ -125,6 +125,8 @@ public class AddEventFragment extends Fragment {
                 utils = new Utils(v.getContext());
                 String input = mInput.getText().toString();
                 String description = mDescription.getText().toString();
+                InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(),0);
                 if (input.isEmpty()){
                     Toast.makeText(getContext(),"No information added. Event not saved.", Toast.LENGTH_SHORT).show();
                     getFragmentManager().popBackStackImmediate();
