@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.database.ChatEntry;
+import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -61,6 +62,7 @@ public class ChatFragment extends Fragment implements Populatable{
     private ArrayList<String> sender = new ArrayList<>();
     private ArrayList<Timestamp> times = new ArrayList<>();
     private SharedPreferences mSharedPref;
+    private GroupEntry groupEntry;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -101,19 +103,29 @@ public class ChatFragment extends Fragment implements Populatable{
             }
         });
 
+        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupId, 5000) {
+            @Override
+            public void onPostExecute() {
+                groupEntry = getResult();
+            }
+        };
+        getGroupEntry.start();;
+
         return rootView;
     }
 
     private void addMessage(String text, Timestamp timestamp) {
         ChatEntry chatEntry = new ChatEntry(userID, text, null, timestamp);
-        DocumentReference documentReference = fStore.collection("groups").document(groupId);
-        documentReference.update("chat", FieldValue.arrayUnion(chatEntry)).addOnCompleteListener(new OnCompleteListener<Void>() {
+        groupEntry.addChatEntry(chatEntry);
+
+        GroupEntry.SetGroupEntry addMessage = new GroupEntry.SetGroupEntry(groupEntry, groupId, 5000) {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
+            public void onPostExecute() {
                 Toast.makeText(getContext(), "Chat sent successfully", Toast.LENGTH_SHORT).show();
                 populateRecyclerView();
             }
-        });
+        };
+        addMessage.start();
     }
 
     @Override
@@ -124,32 +136,64 @@ public class ChatFragment extends Fragment implements Populatable{
         times.clear();
         sender.clear();
 
-        DocumentReference documentReference = fStore.collection("groups").document(groupId);
-        Log.d("testId",groupId);
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        GroupEntry.GetGroupEntry getMessages = new GroupEntry.GetGroupEntry(groupId, 5000) {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        List<Map<String, Object>> chatList = (ArrayList<Map<String, Object>>) document.get("chat");
-                        if (chatList != null) {
-                            for (Object o: chatList) {
-                                ChatEntry chatEntry = new ChatEntry(o);
-                                texts.add(chatEntry.getMessage());
-                                times.add(chatEntry.getTime());
-//                                sender.add(chatEntry.getSender());
-//                                senderImg.add("null");
-
-                                sender.add(groupMemberNames.get(chatEntry.getSender()));
-                                senderImg.add(groupMemberImgs.get(chatEntry.getSender()));
-                            }
-                            adapter.notifyDataSetChanged();
-                        }
+            public void onPostExecute() {
+                ArrayList<ChatEntry> chats = getResult().getGroupChat();
+                if (chats != null) {
+                    for (ChatEntry entry: chats) {
+                        texts.add(entry.getMessage());
+                        times.add(entry.getTime());
+                        sender.add(groupMemberNames.get(entry.getSender()));
+                        senderImg.add(groupMemberImgs.get(entry.getSender()));
+                        adapter.notifyDataSetChanged();
                     }
                 }
             }
-        });
+        };
+        getMessages.start();
+
+//        DocumentReference documentReference = fStore.collection("groups").document(groupId);
+//        Log.d("testId",groupId);
+//        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    DocumentSnapshot document = task.getResult();
+//                    if (document.exists()) {
+//                        List<Map<String, Object>> chatList = (ArrayList<Map<String, Object>>) document.get("chat");
+//                        if (chatList != null) {
+//                            for (Object o: chatList) {
+//                                ChatEntry chatEntry = new ChatEntry(o);
+//                                texts.add(chatEntry.getMessage());
+//                                times.add(chatEntry.getTime());
+//                                sender.add(chatEntry.getSender());
+//                                senderImg.add("null");
+//
+//                                //getSenderInfo(chatEntry.getSender());
+//
+////                                UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(chatEntry.getSender(), 5000) {
+////                                    @Override
+////                                    public void onPostExecute() {
+////                                        Log.d("HEEERRREE", "i hvae arrived in the User Entry");
+////                                        sender.add(getResult().getName());
+////                                        if (getResult().getDisplay_picture() == null) {
+////                                            senderImg.add("null");
+////                                        } else {
+////                                            senderImg.add(getResult().getDisplay_picture());
+////                                        }
+////                                        Log.d("SENDER", getResult().getName());
+////                                        Log.d("SENDER IMG", getResult().getDisplay_picture());
+////                                    }
+////                                };
+////                                userGetter.start();
+//                            }
+//                            adapter.notifyDataSetChanged();
+//                        }
+//                    }
+//                }
+//            }
+//        });
     }
 
     class BubblesAdapter extends RecyclerView.Adapter<BubblesAdapter.ViewHolder> {
