@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/rounded_corners_nav"
     android:backgroundTint="@color/beever_pink"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:layout_margin="8dp">
 
     <TextView
         android:id="@+id/event_title"
