@@ -182,7 +182,6 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
     private void addNewToDo(String taskTitle, String taskDescr, String assignedTo, Date dueDate) {
         TodoEntry newToDo = new TodoEntry(taskTitle, taskDescr, assignedTo, new Timestamp(dueDate), groupID);
-
         toDoAdapter.addItem(newToDo);
     }
 }

@@ -75,4 +75,6 @@
     <string name="assigned_to">Assigned To:</string>
     <string name="description">Description:</string>
     <string name="task_name">Task Name:</string>
+    <string name="deadline">deadline</string>
+    <string name="assigned_to1">assigned to</string>
 </resources>

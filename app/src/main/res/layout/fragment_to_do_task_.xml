@@ -1,70 +1,105 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     app:cardCornerRadius="10dp"
     app:cardBackgroundColor="@color/white"
     android:layout_marginHorizontal="4dp"
-    android:layout_marginVertical="10dp"
+    android:layout_marginVertical="4dp"
     android:id="@+id/toDoCardView" >
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toDoTaskView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
-        android:id="@+id/toDoTaskView">
+        android:layout_marginEnd="4dp">
 
-        <CheckBox
-            android:id="@+id/toDoCheckBox"
-            android:layout_width="30dp"
+        <LinearLayout
+            android:id="@+id/toDoIconLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:button="@drawable/checkbox_selector"
-            android:buttonTint="@color/beever_blue"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/toDoTaskContent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:fontFamily="@font/poppins"
-            android:text="Hello World"
-            android:textAlignment="textStart"
-            android:textColor="@color/beever_blue"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/toDoCheckBox"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.521" />
+            <ImageView
+                android:id="@+id/toDoIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:contentDescription="TODO"
+                android:src="@drawable/ic_baseline_chevron_right_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/toDoDeadline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="6dp"
-            android:layout_marginBottom="4dp"
-            android:fontFamily="@font/poppins"
-            android:text="deadline"
-            android:textColor="@color/beever_blue"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/toDoIconLayout"
+                app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/toDoAssignedTo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="6dp"
-            android:fontFamily="@font/poppins"
-            android:text="assigned to"
-            android:textColor="@color/beever_pink"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/toDoDeadline" />
+                <TextView
+                    android:id="@+id/toDoTaskContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="6dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/poppins"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
+                    android:text="Hello World"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/beever_blue"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/toDoIcon"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.521" />
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/toDoAssignedTo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="6dp"
+                        android:fontFamily="@font/poppins"
+                        android:text="@string/assigned_to1"
+                        android:textColor="@color/beever_pink"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/toDoDeadline" />
+
+                    <TextView
+                        android:id="@+id/toDoDeadline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginBottom="6dp"
+                        android:fontFamily="@font/poppins"
+                        android:text="@string/deadline"
+                        android:textColor="@color/beever_blue"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

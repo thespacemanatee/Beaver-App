@@ -55,18 +55,31 @@
             android:nestedScrollingEnabled="true" />
     </LinearLayout>
 
-    <ExpandableListView
-        android:id="@+id/toDoArchivedListView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="36dp"
-        android:divider="@color/beever_blue"
-        android:indicatorLeft="?android:attr/expandableListPreferredChildIndicatorLeft"
+        android:layout_height="180dp"
+        android:layout_marginBottom="100dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
-        app:layout_constraintVertical_bias="0.045" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+        <ExpandableListView
+            android:id="@+id/toDoArchivedListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="36dp"
+            android:layout_marginEnd="36dp"
+            android:divider="@color/beever_blue"
+            android:indicatorLeft="?android:attr/expandableListPreferredChildIndicatorLeft"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
+            app:layout_constraintVertical_bias="0.045" />
+
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/toDoAddButton"

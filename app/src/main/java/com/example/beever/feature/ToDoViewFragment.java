@@ -87,7 +87,7 @@ public class ToDoViewFragment extends Fragment {
         toDoFullDeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAlertDialog(getContext(), todoEntry);
+                showDeleteAlertDialog(getContext(), todoEntry);
             }
         });
 
@@ -98,9 +98,10 @@ public class ToDoViewFragment extends Fragment {
         return new ToDoViewFragment(todoEntry, adapter);
     }
 
-    private void showAlertDialog(Context context, TodoEntry todoEntry) {
+    private void showDeleteAlertDialog(Context context, TodoEntry todoEntry) {
         AlertDialog dialog = new AlertDialog.Builder(context).create();
-        dialog.setMessage("Delete To-Do?");
+        dialog.setTitle("Delete To-Do?");
+        dialog.setMessage("To-Do Chosen: " + todoEntry.getName());
 
         dialog.setButton(Dialog.BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
             @Override

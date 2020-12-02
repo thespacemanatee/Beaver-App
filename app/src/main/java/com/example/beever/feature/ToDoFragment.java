@@ -120,7 +120,23 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         // set Archived to dos for Expandable View
         toDoArchivedListView = rootView.findViewById(R.id.toDoArchivedListView);
         ARCHIVED = new ArrayList<>();
-        ARCHIVED.add("Archived");
+        ARCHIVED.add("Completed");
+
+        // set on group expand listener for to do archived
+        toDoArchivedListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
+                    @Override
+                    public void onPostExecute() {
+                        archivedList = getResult().getGroupTodo(false, true);
+                        toDoArchivedAdapter.notifyDataSetChanged();
+                    }
+                };
+
+                groupEntry.start();
+            }
+        });
 
         // set To Do Form for FloatingActionButton
         toDoAddButton = rootView.findViewById(R.id.toDoAddButton);
@@ -177,8 +193,6 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         groupID = groupsList.get(position);
         Log.d("GROUP ID", groupID);
 
-        toDoAdapter = new ToDoAdapter(toDoList, groupID, getContext(), getFragmentManager());
-
         GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000 ) {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -193,24 +207,33 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
                         Log.d("ARCHIVED LIST", String.valueOf(archivedList));
                         archivedList.sort(new ToDoComparator());
 
+                        // set expandable list for archived todos
+                        expandableListDetail.put("Completed", archivedList);
+                        toDoArchivedAdapter = new ExpandableListAdapter(getContext(), ARCHIVED, expandableListDetail);
+                        toDoArchivedListView.setAdapter(toDoArchivedAdapter);
+
                         // set toDoAdapter for RecyclerView in onPostExecute so that groupID is not null
-                        toDoAdapter = new ToDoAdapter(toDoList, groupID, getContext(), getFragmentManager());
+                        toDoAdapter = new ToDoAdapter(toDoList, groupID, getContext(), getFragmentManager(),
+                                archivedList, toDoArchivedAdapter);
                         toDoRecyclerView.setAdapter(toDoAdapter);
                         Log.d(TAG, RECYCLERVIEW);
 
-                        // set expandable list for archived todos
-                        expandableListDetail.put("Archived", archivedList);
-                        toDoArchivedAdapter = new ExpandableListAdapter(getContext(), ARCHIVED, expandableListDetail);
-                        toDoArchivedListView.setAdapter(toDoArchivedAdapter);
-                        toDoArchivedListView.setOnGroupExpandListener(groupPosition -> Toast.makeText(getContext(), "Archive Expanded.", Toast.LENGTH_SHORT).show());
-
                         toDoAdapter.notifyDataSetChanged();
                         toDoArchivedAdapter.notifyDataSetChanged();
+
                     } catch (NullPointerException e) {
-                        Toast.makeText(parent.getContext(), "To Do List Not Found", Toast.LENGTH_LONG).show();
-                        int size = toDoList.size();
-                        toDoList.clear();
-                        toDoAdapter.notifyItemRangeRemoved(0, size);
+                        if (toDoList == null) {
+                            Toast.makeText(parent.getContext(), "To Do List Not Found", Toast.LENGTH_LONG).show();
+                            toDoAdapter = new ToDoAdapter(new ArrayList<TodoEntry>(), groupID, getContext(), getFragmentManager(),
+                                    archivedList, toDoArchivedAdapter);
+                            toDoRecyclerView.setAdapter(toDoAdapter);
+                            toDoAdapter.notifyDataSetChanged();
+                        } else if (archivedList == null) {
+                            toDoArchivedAdapter = new ExpandableListAdapter(getContext(), ARCHIVED, new HashMap<>());
+                            toDoArchivedListView.setAdapter(toDoArchivedAdapter);
+                            toDoArchivedAdapter.notifyDataSetChanged();
+                        }
+
                     }
                 } else {
                     Toast.makeText(parent.getContext(), "Unsuccessful :(", Toast.LENGTH_LONG).show();
