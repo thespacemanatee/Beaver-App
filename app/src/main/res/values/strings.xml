@@ -99,4 +99,5 @@
     <string name="you_have_no_groups">You have no groups!</string>
     <string name="no_upcoming_events">No upcoming events!</string>
     <string name="no_favourite_groups">No favourite groups!</string>
+    <string name="no_to_dos">You have no To Dos</string>
 </resources>

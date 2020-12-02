@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -68,6 +70,9 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     protected Map<String, Object> map = new HashMap<>();
     protected int scrollPosition = 0;
 
+    ImageView noTodoImage;
+    TextView noTodoText;
+
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
 
@@ -80,6 +85,9 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
 
         View rootView = layoutInflater.inflate(R.layout.fragment_to_do, viewGroup, false);
         rootView.setTag(TAG);
+
+        noTodoImage = rootView.findViewById(R.id.no_todo_image);
+        noTodoText = rootView.findViewById(R.id.no_todo_text);
 
         //Fade in Nav Bar
         View bottom_menu = getActivity().findViewById(R.id.bottom_menu);
@@ -259,6 +267,12 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
                         Log.d(TAG, RECYCLERVIEW);
 
                         // notify changes to the adapters for them to refresh the view
+
+                        if (toDoList.size() > 0) {
+                            noTodoImage.setVisibility(View.GONE);
+                            noTodoText.setVisibility(View.GONE);
+                        }
+
                         toDoAdapter.notifyDataSetChanged();
                         toDoArchivedAdapter.notifyDataSetChanged();
 
