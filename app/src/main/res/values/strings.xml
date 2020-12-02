@@ -93,8 +93,8 @@
     <string name="cancel">Cancel</string>
     <string name="start">START</string>
     <string name="End">END</string>
-    <string name="date">DATE</string>
-    <string name="time">TIME</string>
+    <string name="date">SET DATE</string>
+    <string name="time">SET TIME</string>
     <string name="delete_group">Delete Group</string>
     <string name="you_have_no_groups">You have no groups!</string>
 </resources>

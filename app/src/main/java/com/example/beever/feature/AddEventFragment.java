@@ -61,6 +61,8 @@ public class AddEventFragment extends Fragment {
     private Utils utils;
     private Calendar calendar = Calendar.getInstance();
     private int selectedDay, selectedMonth, selectedYear;
+    private int startMinute, startHour, startDay, startMonth, startYear;
+    private int endMinute, endHour, endDay, endMonth, endYear;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -93,10 +95,10 @@ public class AddEventFragment extends Fragment {
         start = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
         end = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
 
-        startDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear);
-        startTime.setText(calendar.getTime().toString().substring(11,19));
-        endDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear);
-        endTime.setText(calendar.getTime().toString().substring(11,19));
+//        startDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear);
+//        startTime.setText(calendar.getTime().toString().substring(11,19));
+//        endDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear);
+//        endTime.setText(calendar.getTime().toString().substring(11,19));
 
 
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -172,10 +174,11 @@ public class AddEventFragment extends Fragment {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                                 startDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
-                                calendar.set(year,monthOfYear,dayOfMonth);
-                                start = calendar.getTime();
-
-
+                                startDay = dayOfMonth;
+                                startMonth = monthOfYear;
+                                startYear = year;
+//                                calendar.set(year,monthOfYear,dayOfMonth);
+//                                start = calendar.getTime();
                             }
                         }, year, month, day);
                 picker.getDatePicker().setMinDate(cldr.getTimeInMillis());
@@ -192,8 +195,11 @@ public class AddEventFragment extends Fragment {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                                 endDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
-                                calendar.set(year, monthOfYear, dayOfMonth);
-                                end = calendar.getTime();
+                                endDay = dayOfMonth;
+                                endMonth = monthOfYear;
+                                endYear = year;
+//                                calendar.set(year, monthOfYear, dayOfMonth);
+//                                end = calendar.getTime();
                             }
                         }, year, month, day);
                 picker.getDatePicker().setMinDate(cldr.getTimeInMillis());
@@ -204,17 +210,17 @@ public class AddEventFragment extends Fragment {
         startTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                TimePickerDialog picker = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
-//                    @Override
-//                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-//
-//                    }
-//                }, 0, 0, false);
-//                picker.show();
-                DialogFragment timeSelectFragment = new AddEventFragment.TimeSelectFragment(AddEventFragment.this);
+                DialogFragment timeSelectFragment = new AddEventFragment.TimeSelectFragment(AddEventFragment.this, true);
                 timeSelectFragment.show(getFragmentManager(),"TimeSelectFragment");
             }
+        });
 
+        endTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment timeSelectFragment = new AddEventFragment.TimeSelectFragment(AddEventFragment.this, false);
+                timeSelectFragment.show(getFragmentManager(),"TimeSelectFragment");
+            }
         });
 
         return root;
@@ -225,14 +231,16 @@ public class AddEventFragment extends Fragment {
         private AddEventFragment addEventFragment = null;
         private NumberPicker add_event_select_hour = null;
         private NumberPicker add_event_select_minute = null;
+        private boolean start;
 
         private final String[] hourPicks = new String[] {"0","8","9","10","11","12","13","14",
                 "15","16","17","18","19","20","21","22","23"};
         private final String[] minutePicks = new String[] {"00","15","30","45"};
 
-        public TimeSelectFragment(AddEventFragment addEventFragment){
+        public TimeSelectFragment(AddEventFragment addEventFragment, Boolean start){
             super();
             this.addEventFragment = addEventFragment;
+            this.start = start;
         }
 
         @NotNull
@@ -265,6 +273,34 @@ public class AddEventFragment extends Fragment {
                 public void onClick(DialogInterface dialog, int which) {
 //                    gapFinderFragment.setHourMinute(hourPicks[gap_finder_select_hour.getValue()],
 //                            minutePicks[gap_finder_select_minute.getValue()]);
+                    if (start) {
+                        addEventFragment.startHour = Integer.parseInt(hourPicks[add_event_select_hour.getValue()]);
+                        addEventFragment.startMinute = Integer.parseInt(minutePicks[add_event_select_minute.getValue()]);
+                        if (addEventFragment.startMinute == 0){
+                            addEventFragment.startTime.setText(addEventFragment.startHour + ":00");
+                        } else {
+                            addEventFragment.startTime.setText(addEventFragment.startHour + ":" + addEventFragment.startMinute);
+                        }
+                        addEventFragment.calendar.set(addEventFragment.startYear,addEventFragment.startMonth,addEventFragment.startDay,addEventFragment.startHour,addEventFragment.startMinute, 0);
+                        addEventFragment.calendar.getTime();
+//                        addEventFragment.calendar.set(addEventFragment.startYear,addEventFragment.startMonth,addEventFragment.startDay);
+//                        addEventFragment.start = new GregorianCalendar(addEventFragment.startYear,addEventFragment.startMonth,addEventFragment.startDay,addEventFragment.startHour,addEventFragment.startMinute, 0).getTime();
+                        Log.d(TAG, "onClick: "+ addEventFragment.start.toString());
+                    } else {
+                        addEventFragment.endHour = Integer.parseInt(hourPicks[add_event_select_hour.getValue()]);
+                        addEventFragment.endMinute = Integer.parseInt(minutePicks[add_event_select_minute.getValue()]);
+                        if (addEventFragment.endMinute == 0){
+                            addEventFragment.endTime.setText(addEventFragment.endHour + ":00");
+                        } else {
+                            addEventFragment.endTime.setText(addEventFragment.endHour + ":" + addEventFragment.endMinute);
+                        }
+                        addEventFragment.calendar.set(addEventFragment.endYear, addEventFragment.endMonth, addEventFragment.endDay, addEventFragment.endHour, addEventFragment.endMinute, 0);
+                        addEventFragment.end = addEventFragment.calendar.getTime();
+//                        addEventFragment.calendar.set(addEventFragment.endYear, addEventFragment.endMonth, addEventFragment.endDay);
+//                        addEventFragment.end = new GregorianCalendar(addEventFragment.endYear, addEventFragment.endMonth, addEventFragment.endDay, addEventFragment.endHour, addEventFragment.endMinute, 0).getTime();
+                        Log.d(TAG, "onClick: " + addEventFragment.end.toString());
+                    }
+
                 }
             });
             return builder.create();
