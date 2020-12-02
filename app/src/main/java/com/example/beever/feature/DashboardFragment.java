@@ -290,7 +290,7 @@ public class DashboardFragment extends Fragment {
     class DashboardEventsAdapter extends RecyclerView.Adapter<DashboardEventsAdapter.ViewHolder> {
 
         int moreThanDay;
-        SimpleDateFormat sfDate = new SimpleDateFormat("dd MM");
+        SimpleDateFormat sfDate = new SimpleDateFormat("dd MMM");
         SimpleDateFormat sfTime = new SimpleDateFormat("HH:mm");
 
         Context context;
