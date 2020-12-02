@@ -193,11 +193,15 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
                 if (isSuccessful()) {
                     List<Object> groups = getResult().getGroups();
                     for (Object group : groups) {
-                        Log.d("PROJECT LIST", (String) group);
-                        // for projectList: add the group name only (without the userID in front)
-                        projectList.add(((String) group).substring(28));
-                        // for groupsList: add the full groupID
-                        groupsList.add((String) group);
+                        try {
+                            Log.d("PROJECT LIST", (String) group);
+                            // for projectList: add the group name only (without the userID in front)
+                            projectList.add(((String) group).substring(28));
+                            // for groupsList: add the full groupID
+                            groupsList.add((String) group);
+                        } catch (IndexOutOfBoundsException e) {
+                            Toast.makeText(getContext(), "You are in no groups currently!", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     // update the data displayed in spinner component
                     arrayAdapter.notifyDataSetChanged();
