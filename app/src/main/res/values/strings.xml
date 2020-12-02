@@ -93,6 +93,7 @@
     <string name="cancel">Cancel</string>
     <string name="start">START</string>
     <string name="End">END</string>
-    <string name="dateTime">DATE</string>
+    <string name="date">DATE</string>
+    <string name="time">TIME</string>
     <string name="delete_group">Delete Group</string>
 </resources>

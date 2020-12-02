@@ -55,15 +55,15 @@ import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 public class ChatInfoFragment extends Fragment implements Populatable{
 
     private CircularProgressButton addUsersBtn, deleteGroup;
-    private ArrayList<String> grpMembers = new ArrayList<>();
+    private ArrayList<String> grpMemberNames = new ArrayList<>();
     private ArrayList<String> grpMemberImg = new ArrayList<>();
+    private ArrayList<String> grpMemberIds = new ArrayList<>();
     private GroupMemberAdapter adapter;
     private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private String groupId;
     private String groupName;
     private GroupEntry groupEntry;
     List<Object> members;
-    View bottom_menu;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,13 +91,13 @@ public class ChatInfoFragment extends Fragment implements Populatable{
         layout.setScrollContainer(false);
         adapter = new GroupMemberAdapter(getActivity());
         layout.setAdapter(adapter);
-        populateRecyclerView();
 
         GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupId, 5000) {
             @Override
             public void onPostExecute() {
                 groupEntry = getResult();
                 members = groupEntry.getMember_list();
+                populateRecyclerView();
             }
         };
         getGroupEntry.start();
@@ -133,39 +133,26 @@ public class ChatInfoFragment extends Fragment implements Populatable{
 
     @Override
     public void populateRecyclerView() {
-        grpMembers.clear();
+        grpMemberNames.clear();
         grpMemberImg.clear();
+        grpMemberIds.clear();
 
-        DocumentReference documentReference = fStore.collection("groups").document(groupId);
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        List<String> members = (List<String>) document.get("member_list");
-                        Toast.makeText(getContext(), "Grabbed members", Toast.LENGTH_SHORT).show();
-                        if (members != null) {
-                            for (String member: members) {
-                                UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(member, 5000) {
-                                    @Override
-                                    public void onPostExecute() {
-                                        grpMembers.add(getResult().getName());
-                                        if (getResult().getDisplay_picture() == null) {
-                                            grpMemberImg.add("null");
-                                        } else {
-                                            grpMemberImg.add(getResult().getDisplay_picture());
-                                        }
-                                        adapter.notifyDataSetChanged();
-                                    }
-                                };
-                                userGetter.start();
-                            }
-                        }
+        for (Object member: members) {
+            UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry((String) member, 5000) {
+                @Override
+                public void onPostExecute() {
+                    grpMemberIds.add((String) member);
+                    grpMemberNames.add(getResult().getName());
+                    if (getResult().getDisplay_picture() == null) {
+                        grpMemberImg.add("null");
+                    } else {
+                        grpMemberImg.add(getResult().getDisplay_picture());
                     }
+                    adapter.notifyDataSetChanged();
                 }
-            }
-        });
+            };
+            userGetter.start();
+        }
     }
 
     class GroupMemberAdapter extends BaseAdapter {
@@ -178,7 +165,7 @@ public class ChatInfoFragment extends Fragment implements Populatable{
         }
 
         @Override
-        public int getCount() { return grpMembers.size(); }
+        public int getCount() { return grpMemberNames.size(); }
 
         @Override
         public Object getItem(int i) {
@@ -218,7 +205,8 @@ public class ChatInfoFragment extends Fragment implements Populatable{
 
             //Set variables to allow multiple access of same image and text
             String selectedMemberImg = grpMemberImg.get(i);
-            String selectedMember = grpMembers.get(i);
+            String selectedMemberName = grpMemberNames.get(i);
+            String selectedMemberId = grpMemberIds.get(i);
 
             //setImageResource for ImageButton and setText for TextView
             if (selectedMemberImg.equals("null")) {
@@ -226,7 +214,19 @@ public class ChatInfoFragment extends Fragment implements Populatable{
             } else {
                 Glide.with(context).load(selectedMemberImg).centerCrop().into(viewHolder.memberImg);
             }
-            viewHolder.member.setText(selectedMember);
+            viewHolder.member.setText(selectedMemberName);
+
+            viewHolder.memberImg.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Toast.makeText(getContext(), selectedMemberId, Toast.LENGTH_SHORT).show();
+                    DeleteUserDialogFragment deleteUserDialogFragment = new DeleteUserDialogFragment(selectedMemberId, groupId, adapter,
+                            grpMemberIds, grpMemberImg, grpMemberNames,
+                            selectedMemberImg, selectedMemberName);
+                    deleteUserDialogFragment.show(getFragmentManager(), "chatInfo");
+                    return true;
+                }
+            });
 
             return view;
         }

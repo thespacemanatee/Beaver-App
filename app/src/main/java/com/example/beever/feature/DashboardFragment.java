@@ -48,6 +48,7 @@ public class DashboardFragment extends Fragment {
     private ArrayList<String> dbGrpNames = new ArrayList<>();
     private ArrayList<String> dbGrpIds = new ArrayList<>();
     private ArrayList<EventEntry> dbEvents = new ArrayList<>();
+    private ArrayList<Long> dbColours = new ArrayList<>();
     TextView greeting, name;
     DashboardGroupsAdapter grpAdapter;
     DashboardEventsAdapter eventsAdapter;
@@ -114,13 +115,18 @@ public class DashboardFragment extends Fragment {
                 if (isSuccessful()) {
                     Log.d("USER ENTRY", "success");
 
-                    ArrayList<EventEntry> events = getResult().getUserEvents(true, false);
-                    events.sort(new DashboardEventComparator());
-                    dbEvents.add(events.get(0));
-                    dbEvents.add(events.get(1));
-                    dbEvents.add(events.get(2));
-                    eventsAdapter.notifyDataSetChanged();
-                    Log.d("EVENTS", dbEvents.toString());
+
+                    try {
+                        ArrayList<EventEntry> events = getResult().getUserEvents(true, false);
+                        events.sort(new DashboardEventComparator());
+                        dbEvents.add(events.get(0));
+                        dbEvents.add(events.get(1));
+                        dbEvents.add(events.get(2));
+                        eventsAdapter.notifyDataSetChanged();
+                        Log.d("EVENTS", dbEvents.toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                     for (Object o: getResult().getDashboard_grps()) {
                         if (o != null) {
@@ -289,7 +295,7 @@ public class DashboardFragment extends Fragment {
     class DashboardEventsAdapter extends RecyclerView.Adapter<DashboardEventsAdapter.ViewHolder> {
 
         int moreThanDay;
-        SimpleDateFormat sfDate = new SimpleDateFormat("dd MM");
+        SimpleDateFormat sfDate = new SimpleDateFormat("dd MMM");
         SimpleDateFormat sfTime = new SimpleDateFormat("HH:mm");
 
         Context context;
