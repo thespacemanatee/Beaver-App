@@ -58,7 +58,6 @@ public class DashboardFragment extends Fragment {
     TextView greeting, name, noUpcomingText, noFavouriteText;
     DashboardGroupsAdapter grpAdapter;
     DashboardEventsAdapter eventsAdapter;
-    View bottom_menu;
     ImageView noUpcomingImage, noFavouriteImage;
 
 
@@ -112,17 +111,6 @@ public class DashboardFragment extends Fragment {
         getUserEntry.start();
 
         return root;
-    }
-
-    @Override
-    public void onAttachFragment(@NonNull Fragment childFragment) {
-        super.onAttachFragment(childFragment);
-        //Fade in Nav Bar
-        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
-        if (bottom_menu.getVisibility() == View.GONE) {
-            Utils utils = new Utils(getContext());
-            utils.fadeIn();
-        }
     }
     
     public void populateRecyclerView(UserEntry userEntry) {

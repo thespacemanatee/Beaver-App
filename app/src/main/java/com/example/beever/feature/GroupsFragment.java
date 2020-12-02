@@ -49,7 +49,6 @@ public class GroupsFragment extends Fragment implements Populatable{
     String addGrpBtnImg = Integer.toString(R.drawable.plus);
     String addGrpBtnText = "Create group";
     GridAdapter adapter;
-    View bottom_menu;
     ImageView imageView;
     TextView textView;
 
@@ -64,13 +63,6 @@ public class GroupsFragment extends Fragment implements Populatable{
 
         imageView = rootView.findViewById(R.id.no_group_image);
         textView = rootView.findViewById(R.id.no_group_text);
-
-        //Fade in Nav Bar
-        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
-        if (bottom_menu.getVisibility() == View.GONE) {
-            Utils utils = new Utils(getContext());
-            utils.fadeIn();
-        }
 
         grpNames.clear();
         grpImages.clear();
@@ -90,17 +82,6 @@ public class GroupsFragment extends Fragment implements Populatable{
         populateRecyclerView();
 
         return rootView;
-    }
-
-    @Override
-    public void onAttachFragment(@NonNull Fragment childFragment) {
-        super.onAttachFragment(childFragment);
-        //Fade in Nav Bar
-        bottom_menu = getActivity().findViewById(R.id.bottom_menu);
-        if (bottom_menu.getVisibility() == View.GONE) {
-            Utils utils = new Utils(getContext());
-            utils.fadeIn();
-        }
     }
 
     @Override
