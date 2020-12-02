@@ -42,15 +42,19 @@ public class GroupsFragment extends Fragment implements Populatable{
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userID = fAuth.getUid();
 
+    //Initialise global ArrayLists for storing information of Groups a User is in
     ArrayList<String> grpImages = new ArrayList<>();
     ArrayList<String> grpNames = new ArrayList<>();
     ArrayList<String> grpIds = new ArrayList<>();
 
+    //For the Add Groups Button
     String addGrpBtnImg = Integer.toString(R.drawable.plus);
     String addGrpBtnText = "Create group";
-    GridAdapter adapter;
+
     ImageView imageView;
     TextView textView;
+
+    GridAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,17 +68,6 @@ public class GroupsFragment extends Fragment implements Populatable{
         imageView = rootView.findViewById(R.id.no_group_image);
         textView = rootView.findViewById(R.id.no_group_text);
 
-        grpNames.clear();
-        grpImages.clear();
-        grpIds.clear();
-
-        {
-            //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
-            grpNames.add(addGrpBtnText);
-            grpImages.add(addGrpBtnImg);
-            grpIds.add(null);
-        }
-
         //Populate GridView in fragment_groups.xml with Groups
         GridView layout = rootView.findViewById(R.id.groupButtons);
         adapter = new GridAdapter(getActivity());
@@ -86,27 +79,27 @@ public class GroupsFragment extends Fragment implements Populatable{
 
     @Override
     public void populateRecyclerView() {
+        grpNames.clear();
+        grpImages.clear();
+        grpIds.clear();
+
+        //Append addGrpBtnImg and addGrpBtnText to beginning of each ArrayList
+        grpNames.add(addGrpBtnText);
+        grpImages.add(addGrpBtnImg);
+        grpIds.add(null);
+
         UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
             public void onPostExecute() {
                 if (isSuccessful()) {
-                    Log.d("USER ENTRY", "success");
                     for (Object o: getResult().getGroups()) {
-                        Log.d("GROUP", (String)o);
                         GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String)o, 5000) {
                             @Override
                             public void onPostExecute() {
                                 if (isSuccessful()) {
-                                    Log.d("GROUP ENTRY", getResult().getName());
-                                    Log.d("GROUP RESULT", getResult().toString());
-                                    Log.d("GROUP ID", getGroupId());
                                     grpIds.add(getGroupId());
                                     grpNames.add(getResult().getName());
-                                    if (getResult().getDisplay_picture() == null) {
-                                        grpImages.add("null");
-                                    } else {
-                                        grpImages.add(getResult().getDisplay_picture());
-                                    }
+                                    grpImages.add(getResult().getDisplay_picture());
                                     if (grpIds.size() > 0) {
                                         imageView.setVisibility(View.GONE);
                                         textView.setVisibility(View.GONE);
@@ -123,6 +116,7 @@ public class GroupsFragment extends Fragment implements Populatable{
         userGetter.start();
     }
 
+    //Load Group Information from FireStore before going to next Fragment
     public void getGroupMemberInfo(String groupID, String groupImg, String groupName, Bundle bundle) {
 
         //Create ArrayList to store grpMemberIDs, HashMaps to store grpMemberNames and grpMemberImgs
@@ -235,13 +229,12 @@ public class GroupsFragment extends Fragment implements Populatable{
 
             //setText for TextView
             viewHolder.gridTxt.setText(selectedGrpName);
-            Log.d("CURRENTLY ADAPTING", selectedGrpName + " to make it not fail");
 
             //Set onClick
             if (selectedGrpImg.equals(addGrpBtnImg) && selectedGrpName.equals(addGrpBtnText)) {
-                //If gridImg is addGrpBtnImg and gridImgText is addGrpBtnText,
+                //If gridImg is addGrpBtnImg and gridImgText is addGrpBtnText, the Add Group Button is created.
 
-                //Set image for ShapeableImageView
+                //Set Add Group image for ShapeableImageView
                 Glide.with(context).load(Integer.parseInt(selectedGrpImg)).into(viewHolder.gridImg);
 
                 //Go to CreateGroupFragment
@@ -272,7 +265,7 @@ public class GroupsFragment extends Fragment implements Populatable{
                 });
 
                 //Set image for ShapeableImageView
-                if (selectedGrpImg.equals("null")) {
+                if (selectedGrpImg ==  null) {
                     Glide.with(context).load(R.drawable.pink_circle).centerCrop().into(viewHolder.gridImg);
                 } else {
                     Glide.with(context).load(selectedGrpImg).centerCrop().into(viewHolder.gridImg);

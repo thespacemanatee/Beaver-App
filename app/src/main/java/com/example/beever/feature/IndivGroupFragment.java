@@ -62,6 +62,7 @@ public class IndivGroupFragment extends Fragment {
                 (tab, position) -> tab.setText(tabTitles.get(position))
         ).attach();
 
+        //To ensure the Fragment Name is set correctly
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -76,12 +77,12 @@ public class IndivGroupFragment extends Fragment {
                 }
             }
         };
-
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
 
         return rootView;
     }
 
+    //To create the tabs functionality
     class StateAdapter extends FragmentStateAdapter {
         Bundle bundle;
 

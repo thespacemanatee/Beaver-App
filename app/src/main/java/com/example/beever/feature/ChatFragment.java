@@ -46,24 +46,28 @@ import java.util.Map;
 
 public class ChatFragment extends Fragment implements Populatable{
 
-    private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userID = fAuth.getUid();
 
+    //Bundle-related variables
     private String groupName;
     private String groupId;
     private String groupImage;
     private ArrayList<String> groupMemberIDs;
     private HashMap<String, String> groupMemberNames;
     private HashMap<String, String> groupMemberImgs;
+
+    //For populating the Chat
     private BubblesAdapter adapter;
     private RecyclerView layout;
 
+    //Initialise global ArrayLists for storing Chat message information
     private ArrayList<String> senderImg = new ArrayList<>();
     private ArrayList<String> texts = new ArrayList<>();
     private ArrayList<String> sender = new ArrayList<>();
     private ArrayList<Timestamp> times = new ArrayList<>();
     private SharedPreferences mSharedPref;
+
     private GroupEntry groupEntry;
 
     @Override
@@ -73,6 +77,7 @@ public class ChatFragment extends Fragment implements Populatable{
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_chat, container, false);
 
+        //Get Bundled arguments
         Bundle bundle = this.getArguments();
         groupName = bundle.getString("groupName");
         groupId = bundle.getString("groupId");
@@ -96,13 +101,13 @@ public class ChatFragment extends Fragment implements Populatable{
             public void onClick(View v) {
                 String newText = editText.getText().toString();
                 if (!newText.equals("")) {
-                    Log.d("CHECK NEW TEXT", newText);
                     addMessage(newText, new Timestamp(new Date()));
                     editText.setText("");
                 }
             }
         });
 
+        //For listening to FireStore and updating the Chat in real time
         GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupId, 5000) {
             @Override
             public void onPostExecute() {
@@ -132,11 +137,11 @@ public class ChatFragment extends Fragment implements Populatable{
                             sender.add(groupMemberNames.get(chatEntry.getSender()));
                             senderImg.add(groupMemberImgs.get(chatEntry.getSender()));
 
+                            //Scroll to latest message
                             adapter.notifyItemInserted(chats.size() - 1);
                             layout.smoothScrollToPosition(chats.size() - 1);
                         }
                     };
-
                     getGroupEntry1.start();
                 }
             }
@@ -147,6 +152,7 @@ public class ChatFragment extends Fragment implements Populatable{
         return rootView;
     }
 
+    // To add messages sent to the Chat to FireStore
     private void addMessage(String text, Timestamp timestamp) {
         ChatEntry chatEntry = new ChatEntry(userID, text, null, timestamp);
         groupEntry.addChatEntry(chatEntry);
@@ -161,6 +167,7 @@ public class ChatFragment extends Fragment implements Populatable{
         addMessage.start();
     }
 
+    //Read information from FireStore
     @Override
     public void populateRecyclerView() {
 
@@ -189,8 +196,8 @@ public class ChatFragment extends Fragment implements Populatable{
 
     class BubblesAdapter extends RecyclerView.Adapter<BubblesAdapter.ViewHolder> {
 
-        String name = mSharedPref.getString("registeredName", "");
-        int fromUser = 0;
+        String name = mSharedPref.getString("registeredName", "");      //Current User's Name
+        int fromUser = 0;       //"Boolean" to see if the Chat message being adapted is from Current User
 
         Context context;
         LayoutInflater inflater;

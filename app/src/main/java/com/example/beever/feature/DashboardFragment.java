@@ -54,7 +54,7 @@ public class DashboardFragment extends Fragment {
     private ArrayList<String> dbGrpNames = new ArrayList<>();
     private ArrayList<String> dbGrpIds = new ArrayList<>();
     private ArrayList<EventEntry> dbEvents = new ArrayList<>();
-    private ArrayList<Long> dbColours = new ArrayList<>();
+    private Timestamp upcomingEvent;
     TextView greeting, name, noUpcomingText, noFavouriteText;
     DashboardGroupsAdapter grpAdapter;
     DashboardEventsAdapter eventsAdapter;
@@ -64,6 +64,8 @@ public class DashboardFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        //Inflate layout for this fragment
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.dashboard_fragment, container, false);
 
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Dashboard");
@@ -75,8 +77,10 @@ public class DashboardFragment extends Fragment {
         noFavouriteImage = root.findViewById(R.id.no_fav_groups_image);
         noFavouriteText = root.findViewById(R.id.no_fav_groups_text);
 
+        //Save User's Name
         name.setText(mSharedPref.getString("registeredName", "Beever") + ".");
 
+        //Greeting
         if (currentTime < 12) {
             greeting.setText(R.string.greetings_morning);
         } else if (currentTime < 18) {
@@ -90,12 +94,14 @@ public class DashboardFragment extends Fragment {
         grpAdapter = new DashboardGroupsAdapter(getActivity());
         grpLayout.setAdapter(grpAdapter);
 
+        //Populate RecyclerView in dashboard_fragment.xml with 3 Upcoming Events
         RecyclerView eventLayout = root.findViewById(R.id.dashboard_events);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         eventLayout.setLayoutManager(layoutManager);
         eventsAdapter = new DashboardEventsAdapter(getContext());
         eventLayout.setAdapter(eventsAdapter);
 
+        //Placeholders for if nothing loads
         UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
             public void onPostExecute() {
@@ -112,7 +118,7 @@ public class DashboardFragment extends Fragment {
 
         return root;
     }
-    
+
     public void populateRecyclerView(UserEntry userEntry) {
         dbGrpIds.clear();
         dbGrpImgs.clear();
