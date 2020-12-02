@@ -151,7 +151,7 @@ public class DashboardFragment extends Fragment {
                     }
 
                     for (int i = 0; i < 3; i++) {
-                        if (events.get(i) != null) {
+                        if (i < upcomingEvents.size()) {
                             dbEvents.add(upcomingEvents.get(i));
                         }
                     }

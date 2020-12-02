@@ -113,7 +113,7 @@ public class ChatInfoFragment extends Fragment implements Populatable{
                 addUsersBtn.startAnimation();
                 AddUsersFragment addUsersFragment = new AddUsersFragment();
                 addUsersFragment.setArguments(bundle);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction().addToBackStack("chatInfo");
                 transaction.replace(R.id.fragment_container, addUsersFragment).commit();
             }
         });

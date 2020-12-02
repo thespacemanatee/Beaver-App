@@ -35,9 +35,6 @@ import java.util.List;
 
 public class IndivGroupFragment extends Fragment {
 
-    private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
