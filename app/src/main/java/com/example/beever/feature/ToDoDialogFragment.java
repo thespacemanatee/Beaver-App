@@ -3,6 +3,7 @@ package com.example.beever.feature;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -206,5 +207,6 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
         TodoEntry newToDo = new TodoEntry(taskTitle, taskDescr, assignedTo, new Timestamp(dueDate), groupID);
         // uses helper to add this to-do
         helper.addItem(newToDo);
+
     }
 }
