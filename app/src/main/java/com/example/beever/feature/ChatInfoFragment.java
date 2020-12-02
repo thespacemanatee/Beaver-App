@@ -92,7 +92,7 @@ public class ChatInfoFragment extends Fragment implements Populatable{
                 Bundle bundle = new Bundle();
                 bundle.putString("groupName", groupName);
                 bundle.putString("groupId", groupId);
-//                bundle.putInt("imageUri", selectedGrpImg);
+                bundle.putBoolean("groupExists", true);
                 addUsersBtn.startAnimation();
                 AddUsersFragment addUsersFragment = new AddUsersFragment();
                 addUsersFragment.setArguments(bundle);

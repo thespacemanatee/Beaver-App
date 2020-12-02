@@ -66,6 +66,7 @@ public class AddUsersFragment extends Fragment {
 //    private String groupImage;
     private String groupName;
     private String groupID;
+    private boolean groupExists;
     private List<Map<String, Object>> users;
     private ArrayList<UserEntry> adaptedUsers = new ArrayList<>();
     private RecyclerView mRecyclerView;
@@ -83,6 +84,7 @@ public class AddUsersFragment extends Fragment {
 //        groupImage = bundle.getString("imageUri");
         groupName = bundle.getString("groupName");
         groupID = bundle.getString("groupId");
+        groupExists = bundle.getBoolean("groupExists");
 
 //        imageUri = Uri.parse(groupImage);
 //        chatImg = rootView.findViewById(R.id.chat_img);
@@ -128,15 +130,20 @@ public class AddUsersFragment extends Fragment {
         confirmUsersBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                confirmUsersBtn.startAnimation();
-                Bundle bundle = new Bundle();
-                bundle.putString("groupId", groupID);
-                bundle.putString("groupName", groupName);
-                //Go to Individual Groups Fragment
-                IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
-                indivGroupFragment.setArguments(bundle);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, indivGroupFragment, "openChat").commit();
+                if (!groupExists) {
+                    confirmUsersBtn.startAnimation();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("groupId", groupID);
+                    bundle.putString("groupName", groupName);
+                    //Go to Individual Groups Fragment
+                    IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
+                    indivGroupFragment.setArguments(bundle);
+                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container, indivGroupFragment, "openChat").commit();
+                } else if (groupExists) {
+                    getFragmentManager().popBackStack();
+                }
+
             }
         });
 

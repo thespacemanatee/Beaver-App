@@ -174,6 +174,7 @@ public class CreateGroupFragment extends Fragment {
                                                 bundle.putString("imageUri", imageUri);
                                                 bundle.putString("groupName", groupName);
                                                 bundle.putString("groupId", groupID);
+                                                bundle.putBoolean("groupExists", false);
 
                                                 AddUsersFragment addUsersFragment = new AddUsersFragment();
                                                 addUsersFragment.setArguments(bundle);
