@@ -29,16 +29,16 @@ import com.google.firebase.firestore.auth.User;
 
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class CalendarFragment extends Fragment {
     private static final String TAG = "CalendarFragment";
-    FloatingActionButton addEvent;
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     protected ArrayList<EventEntry> list = new ArrayList<>();
     protected Map<String,Object> map = new HashMap<>();
     private final String[] months = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
@@ -46,6 +46,11 @@ public class CalendarFragment extends Fragment {
     private UserEntry userEntry;
     private TextEventAdapter textEventAdapter;
     private RecyclerView mRecyclerView;
+    private Utils utils;
+    private int selectedDay, selectedMonth, selectedYear;
+    private Calendar calendar = Calendar.getInstance();
+    FloatingActionButton addEvent;
+    Bundle bundle = new Bundle();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,8 +83,13 @@ public class CalendarFragment extends Fragment {
                 Log.d(TAG, "onClick: opening dialog");
 //                AddEventFragment dialog = new AddEventFragment();
 //                dialog.show(getFragmentManager(),"AddEventDialog");
+                utils = new Utils(v.getContext());
+                utils.fadeOut();
+                bundle.putInt("selectedDay",selectedDay);
+                bundle.putInt("selectedMonth",selectedMonth);
+                bundle.putInt("selectedYear",selectedYear);
                 Fragment addEventFragment = new AddEventFragment();
-                System.out.println("click");
+                addEventFragment.setArguments(bundle);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_container, addEventFragment).addToBackStack(null).commit();
 //                customDialog("New Event", "Edit new event", "cancel", "save");
             }
@@ -89,28 +99,11 @@ public class CalendarFragment extends Fragment {
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener(){
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                list.clear();
-                EventEntry eventEntry = new EventEntry();
-                eventEntry.setName("Event for " + dayOfMonth + " " + months[month] + " " + year);
-                eventEntry.setStart_time(new Timestamp(new Date()));
-                eventEntry.setEnd_time(new Timestamp(new Date()));
-                eventEntry.setUser_id_source(USER_ID);
-                userEntry.modifyEventOrTodo(true, true, true, eventEntry);
-                UserEntry.SetUserEntry setEvent = new UserEntry.SetUserEntry(userEntry, USER_ID, 5000) {
-                    @Override
-                    public void onPostExecute() {
-                        populateEventsList();
-                        textEventAdapter.notifyDataSetChanged();
-//                        TextEventAdapter adapter = new TextEventAdapter(list, getContext());
-//                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
-//                        RecyclerView mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
-//                        mRecyclerView.setLayoutManager(linearLayoutManager);
-//                        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//                        mRecyclerView.setAdapter(adapter);
-                    }
-                };
-//                setEvent.start();
-
+                selectedDay = dayOfMonth;
+                selectedMonth = month;
+                selectedYear = year;
+                calendar.set(year, month, dayOfMonth, 0, 0, 0);
+                populateEventsList();
             }
         });
 
@@ -158,9 +151,24 @@ public class CalendarFragment extends Fragment {
                         @Override
                         public void onPostExecute() {
                             if (isSuccessful()) {
-                                list = getResult();
-                                textEventAdapter = new TextEventAdapter(list);
-                                mRecyclerView.setAdapter(textEventAdapter);
+                                Date date = calendar.getTime();
+                                Timestamp dateTimestamp = new Timestamp(date);
+//                                Date startDate = new GregorianCalendar(selectedYear, selectedMonth,selectedDay).getTime();
+                                Timestamp startDate = new Timestamp(new Date((dateTimestamp.getSeconds())*1000));
+                                Timestamp endDate = new Timestamp(new Date((startDate.getSeconds() + 86400)*1000));
+                                Log.d(TAG, "START DATE " + startDate);
+                                Log.d(TAG, "END DATE " + endDate);
+                                ArrayList<EventEntry> eventEntries = new ArrayList<>();
+                                for (EventEntry e : getResult()){
+                                    Log.d(TAG, "onPostExecute: " + e.getStart_time());
+                                    if (e.getStart_time().getSeconds() >= startDate.getSeconds() && e.getStart_time().getSeconds() < endDate.getSeconds()){
+                                        eventEntries.add(e);
+                                    }
+                                }
+                                list.clear();
+                                list.addAll(eventEntries);
+//                                textEventAdapter = new TextEventAdapter(list);
+//                                mRecyclerView.setAdapter(textEventAdapter);
                                 textEventAdapter.notifyDataSetChanged();
                                 Log.d(TAG, "onPostExecute: " + list.toString());
                             }
