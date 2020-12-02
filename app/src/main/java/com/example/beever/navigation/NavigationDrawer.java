@@ -7,15 +7,18 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -26,9 +29,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.beever.admin.Login;
 import com.example.beever.R;
+import com.example.beever.database.EventEntry;
 import com.example.beever.database.UserEntry;
+import com.example.beever.feature.DashboardEventComparator;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
@@ -37,6 +43,7 @@ import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -56,6 +63,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     private SlidingRootNav slidingRootNav;
     private SharedPreferences mSharedPref;
     private DrawerAdapter adapter;
+    private Timestamp upcomingEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +75,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         getSupportActionBar().setTitle("My title");
 
         mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
+        String userId = fAuth.getCurrentUser().getUid();
 
         slidingRootNav = new SlidingRootNavBuilder(this)
                 .withDragDistance(140)
@@ -97,17 +106,46 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
         list.setAdapter(adapter);
         adapter.setSelected(POS_DASHBOARD);
 
-        TextView countdown = (TextView) findViewById(R.id.countdown);
-        new CountDownTimer(600000000, 1000) {
+        TextView countdown = findViewById(R.id.countdown);
 
-            public void onTick(long millisUntilFinished) {
-                countdown.setText(new SimpleDateFormat("HH:mm").format(new Date(millisUntilFinished)));
-            }
+        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userId, 5000) {
+            @Override
+            public void onPostExecute() {
+                UserEntry.GetUserRelevantEvents getUserRelevantEvents = new UserEntry.GetUserRelevantEvents(getResult(), 5000, true, false) {
+                    @RequiresApi(api = Build.VERSION_CODES.N)
+                    @Override
+                    public void onPostExecute() {
+                        try {
+                            Date currentTime = new Date();
+                            ArrayList<EventEntry> events = getResult();
+                            events.sort(new DashboardEventComparator());
 
-            public void onFinish() {
-                countdown.setText("No upcoming meetings!");
+                            for (int i = 0; i < events.size(); i++) {
+                                if (events.get(i).getStart_time().toDate().getTime() < currentTime.getTime()) {
+                                    upcomingEvent = events.get(i+1).getStart_time();
+                                    Log.d("UPCOMING EVENT", "onTick: " + events.get(i));
+                                }
+                            }
+
+                            new CountDownTimer(upcomingEvent.toDate().getTime() - currentTime.getTime(), 1000) {
+                                public void onTick(long millisUntilFinished) {
+                                    countdown.setText(new SimpleDateFormat("HH:mm").format(new Date(millisUntilFinished)));
+                                }
+
+                                public void onFinish() {
+                                    countdown.setText("No upcoming meetings!");
+                                }
+                            }.start();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                };
+                getUserRelevantEvents.start();
             }
-        }.start();
+        };
+        getUserEntry.start();
     }
 
     @SuppressWarnings("rawtypes")
