@@ -182,7 +182,7 @@ public class GroupsFragment extends Fragment implements Populatable{
                                         IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
                                         indivGroupFragment.setArguments(bundle);
                                         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                        transaction.add(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack(null).commit();
+                                        transaction.add(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack("groups").commit();
                                     }
                                 }
                             }

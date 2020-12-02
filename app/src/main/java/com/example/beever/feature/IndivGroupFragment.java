@@ -65,6 +65,23 @@ public class IndivGroupFragment extends Fragment {
                 (tab, position) -> tab.setText(tabTitles.get(position))
         ).attach();
 
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName().equals("dashboard")) {
+                    ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle("Dashboard");
+                    getFragmentManager().popBackStack();
+                } else if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName().equals("groups")) {
+                    ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle("Groups");
+                    getFragmentManager().popBackStack();
+                } else {
+                    getFragmentManager().popBackStack();
+                }
+            }
+        };
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
         return rootView;
     }
 
