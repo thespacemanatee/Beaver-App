@@ -55,8 +55,8 @@ public class ChatInfoFragment extends Fragment implements Populatable{
     private ArrayList<String> grpMemberImg = new ArrayList<>();
     private GroupMemberAdapter adapter;
     private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
-    String groupId;
-    String groupName;
+    private String groupId;
+    private String groupName;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,7 +68,7 @@ public class ChatInfoFragment extends Fragment implements Populatable{
 
         //Receive arguments from ChatFragment
         Bundle bundle = this.getArguments();
-        Bitmap selectedGrpImg = bundle.getParcelable("groupImage");
+        String selectedGrpImg = bundle.getString("groupImage");
         groupName = bundle.getString("groupName");
         groupId = bundle.getString("groupId");
 
@@ -76,7 +76,7 @@ public class ChatInfoFragment extends Fragment implements Populatable{
 
         //Get chat_info_img in fragment_chat_info.xml and setImageResource
         ShapeableImageView chatImg = rootView.findViewById(R.id.chat_info_img);
-        chatImg.setImageBitmap(selectedGrpImg);
+        Glide.with(getContext()).load(selectedGrpImg).centerCrop().into(chatImg);
 
         //Set the group members names
         ListView layout = rootView.findViewById(R.id.chat_info_group_members);
