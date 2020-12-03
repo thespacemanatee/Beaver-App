@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -54,6 +56,8 @@ public class CalendarFragment extends Fragment {
     FloatingActionButton addEvent;
     Bundle bundle = new Bundle();
     View bottom_menu;
+    ImageView noEventsImage;
+    TextView noEventsText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -83,6 +87,8 @@ public class CalendarFragment extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(textEventAdapter);
+        noEventsImage = root.findViewById(R.id.no_events_image);
+        noEventsText = root.findViewById(R.id.no_events_text);
 
         calendar.set(selectedYear,selectedMonth,selectedDay,0,0,0);
         populateEventsList();
@@ -189,6 +195,16 @@ public class CalendarFragment extends Fragment {
                                 }
                                 list.clear();
                                 list.addAll(eventEntries);
+
+                                if (list.size() > 0) {
+                                    noEventsImage.setVisibility(View.GONE);
+                                    noEventsText.setVisibility(View.GONE);
+                                }
+
+                                if (list.size() == 0) {
+                                    noEventsImage.setVisibility(View.VISIBLE);
+                                    noEventsText.setVisibility(View.VISIBLE);
+                                }
 //                                textEventAdapter = new TextEventAdapter(list);
 //                                mRecyclerView.setAdapter(textEventAdapter);
                                 textEventAdapter.notifyDataSetChanged();
