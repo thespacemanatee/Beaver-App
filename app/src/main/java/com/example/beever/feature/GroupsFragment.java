@@ -39,6 +39,7 @@ import java.util.List;
 
 public class GroupsFragment extends Fragment implements Populatable{
 
+    //TODO: Implement onListenerUpdate()
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userID = fAuth.getUid();
 

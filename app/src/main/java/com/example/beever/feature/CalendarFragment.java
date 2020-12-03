@@ -39,6 +39,8 @@ import java.util.Map;
 
 
 public class CalendarFragment extends Fragment {
+
+    //TODO: Implement onListenerUpdate()
     private static final String TAG = "CalendarFragment";
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     protected ArrayList<EventEntry> list = new ArrayList<>();

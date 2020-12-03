@@ -109,6 +109,7 @@ public class ChatFragment extends Fragment implements Populatable{
 
             }
 
+            //Todo: fix this shit
             public void onListenerUpdate(){
                 if (getStateChange()==StateChange.CHAT) {
 

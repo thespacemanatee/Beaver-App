@@ -36,6 +36,7 @@ public class MainDashboardFragment extends Fragment {
 
     private void bottomMenu() {
 
+        //TODO: Try to bundle data in when switching fragments to prefetch data
         chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
             @Override
             public void onItemSelected(int i) {
