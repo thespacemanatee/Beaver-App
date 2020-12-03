@@ -273,6 +273,11 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
                             noTodoText.setVisibility(View.GONE);
                         }
 
+                        if (toDoList.size() == 0) {
+                            noTodoImage.setVisibility(View.VISIBLE);
+                            noTodoText.setVisibility(View.VISIBLE);
+                        }
+
                         toDoAdapter.notifyDataSetChanged();
                         toDoArchivedAdapter.notifyDataSetChanged();
 

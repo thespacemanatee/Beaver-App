@@ -66,11 +66,16 @@ public class AddUsersFragment extends Fragment {
 //    private String groupImage;
     private String groupName;
     private String groupID;
+    private String groupImg;
     private boolean groupExists;
     private List<Map<String, Object>> users;
     private ArrayList<UserEntry> adaptedUsers = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private GroupEntry groupEntry;
+    //Create ArrayList to store grpMemberIDs, HashMaps to store grpMemberNames and grpMemberImgs
+    ArrayList<String> grpMemberIDs = new ArrayList<>();
+    HashMap<String, String> grpMemberNames = new HashMap<>();
+    HashMap<String, String> grpMemberImgs = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,7 +86,7 @@ public class AddUsersFragment extends Fragment {
         mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
         Bundle bundle = this.getArguments();
-//        groupImage = bundle.getString("imageUri");
+        groupImg = bundle.getString("imageUri");
         groupName = bundle.getString("groupName");
         groupID = bundle.getString("groupId");
         groupExists = bundle.getBoolean("groupExists");
@@ -132,6 +137,49 @@ public class AddUsersFragment extends Fragment {
             public void onClick(View v) {
                 if (!groupExists) {
                     confirmUsersBtn.startAnimation();
+//                    GroupEntry.GetGroupEntry grpGetter = new GroupEntry.GetGroupEntry(groupID, 100000) {
+//                        @Override
+//                        public void onPostExecute() {
+//                            if (isSuccessful()) {
+//                                for (Object o: getResult().getMember_list()) {
+//                                    Log.d("MEMBER ID", (String)o);
+//                                    int full = getResult().getMember_list().size();
+//                                    grpMemberIDs.add((String)o);
+//                                    UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry((String)o, 100000) {
+//                                        @Override
+//                                        public void onPostExecute() {
+//                                            if (isSuccessful()) {
+//                                                grpMemberImgs.put((String)o, getResult().getDisplay_picture());
+//                                                grpMemberNames.put((String)o, getResult().getName());
+//
+//                                                if (grpMemberNames.size() == full) {
+//                                                    //Add everything to bundle
+//                                                    bundle.putStringArrayList("grpMemberIDs", grpMemberIDs);
+//                                                    bundle.putSerializable("grpMemberImgs", grpMemberImgs);
+//                                                    bundle.putSerializable("grpMemberNames", grpMemberNames);
+//                                                    bundle.putString("groupImage", groupImg);
+//                                                    bundle.putString("groupName", groupName);
+//                                                    bundle.putString("groupId", groupID);
+//
+//                                                    //Fade Out Nav Bar
+//                                                    Utils utils = new Utils(getContext());
+//                                                    utils.fadeOut();
+//
+//                                                    //Go to IndivChatFragment
+//                                                    IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
+//                                                    indivGroupFragment.setArguments(bundle);
+//                                                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+//                                                    transaction.add(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack("groups").commit();
+//                                                }
+//                                            }
+//                                        }
+//                                    };
+//                                    userGetter.start();
+//                                }
+//                            }
+//                        }
+//                    };
+//                    grpGetter.start();
                     Bundle bundle = new Bundle();
                     bundle.putString("groupId", groupID);
                     bundle.putString("groupName", groupName);

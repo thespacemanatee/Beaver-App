@@ -143,6 +143,7 @@ public class CreateGroupFragment extends Fragment {
                     if (document.exists()) {
 
                       Toast.makeText(getActivity(), "Group name unavailable", Toast.LENGTH_SHORT).show();
+                      createBtn.revertAnimation();
 
                     } else {
 
