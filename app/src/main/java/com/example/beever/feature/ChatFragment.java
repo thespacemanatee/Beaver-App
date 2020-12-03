@@ -112,7 +112,7 @@ public class ChatFragment extends Fragment implements Populatable{
             public void onListenerUpdate(){
                 if (getStateChange()==StateChange.CHAT) {
 
-                    ArrayList<ChatEntry> chats = getResult().getGroupChat();
+                    ArrayList<ChatEntry> chats = getResult().retrieveGroupChat();
                     ChatEntry chatEntry = chats.get(chats.size() - 1);
 
                     texts.add(chatEntry.getMessage());
