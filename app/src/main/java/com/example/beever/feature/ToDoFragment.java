@@ -142,7 +142,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
                 GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
                     @Override
                     public void onPostExecute() {
-                        archivedList = getResult().getGroupTodos(false, true);
+                        archivedList = getResult().retrieveGroupTodos(false, true);
                         toDoArchivedAdapter.notifyDataSetChanged();
                     }
                 };
@@ -246,12 +246,12 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
                 if (isSuccessful()) {
                     try {
                         // get current group todos from GroupEntry and sort according to time
-                        toDoList = getResult().getGroupTodos(true, false);
+                        toDoList = getResult().retrieveGroupTodos(true, false);
                         Log.d("TODO LIST", String.valueOf(toDoList));
                         toDoList.sort(new ToDoComparator());
 
                         // get past group todos from GroupEntry and sort according to time as well
-                        archivedList = getResult().getGroupTodos(false, true);
+                        archivedList = getResult().retrieveGroupTodos(false, true);
                         Log.d("ARCHIVED LIST", String.valueOf(archivedList));
                         archivedList.sort(new ToDoComparator());
 

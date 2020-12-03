@@ -6,18 +6,14 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageSwitcher;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,24 +21,13 @@ import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.database.ChatEntry;
 import com.example.beever.database.GroupEntry;
-import com.example.beever.database.UserEntry;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ChatFragment extends Fragment implements Populatable{
 
@@ -126,10 +111,11 @@ public class ChatFragment extends Fragment implements Populatable{
 
             public void onListenerUpdate(){
                 if (getStateChange()==StateChange.CHAT) {
+
                     GroupEntry.GetGroupEntry getGroupEntry1 = new GroupEntry.GetGroupEntry(groupId, 5000) {
                         @Override
                         public void onPostExecute() {
-                            ArrayList<ChatEntry> chats = getResult().getGroupChat();
+                            ArrayList<ChatEntry> chats = getResult().retrieveGroupChat();
                             ChatEntry chatEntry = chats.get(chats.size() - 1);
 
                             texts.add(chatEntry.getMessage());
@@ -179,7 +165,7 @@ public class ChatFragment extends Fragment implements Populatable{
         GroupEntry.GetGroupEntry getMessages = new GroupEntry.GetGroupEntry(groupId, 5000) {
             @Override
             public void onPostExecute() {
-                ArrayList<ChatEntry> chats = getResult().getGroupChat();
+                ArrayList<ChatEntry> chats = getResult().retrieveGroupChat();
                 if (chats != null) {
                     for (ChatEntry entry: chats) {
                         texts.add(entry.getMessage());

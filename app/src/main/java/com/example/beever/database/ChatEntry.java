@@ -102,7 +102,7 @@ public class ChatEntry {
      * for addition to UserEntry/GroupEntry
      * @return Map object representation
      */
-    public Map<String, Object> getRepresentation(){
+    public Map<String, Object> retrieveRepresentation(){
         HashMap<String, Object> ret = new HashMap<String, Object>();
         ret.put("sender", sender);
         ret.put("message", message);
@@ -120,7 +120,7 @@ public class ChatEntry {
         if (o==this) return true;
         if (!(o instanceof ChatEntry)){return false;}
         ChatEntry other = (ChatEntry) o;
-        return getRepresentation().equals(other.getRepresentation());
+        return retrieveRepresentation().equals(other.retrieveRepresentation());
     }
 
     /**

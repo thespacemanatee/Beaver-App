@@ -103,7 +103,7 @@ public class TodoEntry extends EventTodoEntry {
      * Get id of todo source, whether user or group.
      * @return ID of todo creator
      */
-    public String getSource(){
+    public String retrieveSource(){
         return isGroupEntry()? group_id_source : assigned_to;
     }
 
@@ -112,7 +112,7 @@ public class TodoEntry extends EventTodoEntry {
      * for addition to UserEntry/GroupEntry
      * @return Map object representation
      */
-    public Map<String,Object> getRepresentation(){
+    public Map<String,Object> retrieveRepresentation(){
         Map<String,Object> map = new HashMap<String,Object>();
         map.put("name",name);
         map.put("description",description);
@@ -131,7 +131,7 @@ public class TodoEntry extends EventTodoEntry {
         if (o==this) return true;
         if (!(o instanceof TodoEntry)){return false;}
         TodoEntry other = (TodoEntry) o;
-        return getRepresentation().equals(other.getRepresentation());
+        return retrieveRepresentation().equals(other.retrieveRepresentation());
     }
 
     /**

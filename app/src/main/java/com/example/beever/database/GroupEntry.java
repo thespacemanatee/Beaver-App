@@ -186,9 +186,9 @@ public class GroupEntry {
         Map<String,Object> selectCat = isEvent? group_events : todo_list;
         List<Object> selectList = isCurrent? (List<Object>) selectCat.get("current") : (List<Object>) selectCat.get("past");
         if (isAdd){
-            selectList.add(eventOrTodo.getRepresentation());
+            selectList.add(eventOrTodo.retrieveRepresentation());
         }
-        else selectList.remove(eventOrTodo.getRepresentation());
+        else selectList.remove(eventOrTodo.retrieveRepresentation());
     }
 
     /**
@@ -206,7 +206,7 @@ public class GroupEntry {
      * @param chatEntry chatEntry object to add (will be converted to suitable type)
      */
     public void addChatEntry(ChatEntry chatEntry){
-        chat.add(chatEntry.getRepresentation());
+        chat.add(chatEntry.retrieveRepresentation());
     }
 
     // Getters
@@ -250,7 +250,7 @@ public class GroupEntry {
      * @param getPast if true, get past events
      * @return list of events represented as EventEntry objects
      */
-    public ArrayList<EventEntry> getGroupEvents(boolean getCurrent, boolean getPast){
+    public ArrayList<EventEntry> retrieveGroupEvents(boolean getCurrent, boolean getPast){
         ArrayList<EventEntry> ret = new ArrayList<EventEntry>();
         if (getCurrent){
             List<Object> currentEvents = (List<Object>) group_events.get("current");
@@ -282,7 +282,7 @@ public class GroupEntry {
      * @param getPast if true, get past todos
      * @return list of todos represented as TodoEntry objects
      */
-    public ArrayList<TodoEntry> getGroupTodos(boolean getCurrent, boolean getPast){
+    public ArrayList<TodoEntry> retrieveGroupTodos(boolean getCurrent, boolean getPast){
         ArrayList<TodoEntry> ret = new ArrayList<TodoEntry>();
         if (getCurrent){
             List<Object> currentTodo = (List<Object>) todo_list.get("current");
@@ -312,7 +312,7 @@ public class GroupEntry {
      * Get list of group chat messages represented as ChatEntry objects.
      * @return list of ChatEntry objects
      */
-    public ArrayList<ChatEntry> getGroupChat(){
+    public ArrayList<ChatEntry> retrieveGroupChat(){
         ArrayList<ChatEntry> ret = new ArrayList<ChatEntry>();
         for (Object o:chat) {
             ret.add(new ChatEntry(o));
@@ -849,7 +849,7 @@ public class GroupEntry {
                     result = null;
                     return;
                 }
-                result.addAll(u.getUserEvents(true,false));
+                result.addAll(u.retrieveUserEvents(true,false));
             }
 
             for (GroupEntry g:finalGroups){
@@ -857,7 +857,7 @@ public class GroupEntry {
                     result = null;
                     return;
                 }
-                result.addAll(g.getGroupEvents(true,false));
+                result.addAll(g.retrieveGroupEvents(true,false));
             }
 
             return;

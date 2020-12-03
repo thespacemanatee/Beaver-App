@@ -152,7 +152,7 @@ public class EventEntry extends EventTodoEntry {
      * the first constructor.
      * @return ID of event creator
      */
-    public String getSource(){
+    public String retrieveSource(){
         return isGroupEntry()? group_id_source : user_id_source;
     }
 
@@ -161,7 +161,7 @@ public class EventEntry extends EventTodoEntry {
      * for addition to UserEntry/GroupEntry
      * @return Map object representation
      */
-    public Map<String, Object> getRepresentation(){
+    public Map<String, Object> retrieveRepresentation(){
         HashMap<String, Object> ret = new HashMap<String, Object>();
         ret.put("name", name);
         ret.put("description", description);
@@ -181,7 +181,7 @@ public class EventEntry extends EventTodoEntry {
         if (o==this) return true;
         if (!(o instanceof EventEntry)){return false;}
         EventEntry other = (EventEntry) o;
-        return getRepresentation().equals(other.getRepresentation());
+        return retrieveRepresentation().equals(other.retrieveRepresentation());
     }
 
     /**

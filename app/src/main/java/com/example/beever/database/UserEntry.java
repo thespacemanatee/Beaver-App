@@ -212,9 +212,9 @@ public class UserEntry {
         Map<String,Object> selectCat = isEvent? user_events : todo_list;
         List<Object> selectList = isCurrent? (List<Object>) selectCat.get("current") : (List<Object>) selectCat.get("past");
         if (isAdd){
-            selectList.add(eventOrTodo.getRepresentation());
+            selectList.add(eventOrTodo.retrieveRepresentation());
         }
-        else selectList.remove(eventOrTodo.getRepresentation());
+        else selectList.remove(eventOrTodo.retrieveRepresentation());
     }
 
     // Getters
@@ -264,7 +264,7 @@ public class UserEntry {
      * @param getPast if true, get past events
      * @return list of events represented as EventEntry objects
      */
-    public ArrayList<EventEntry> getUserEvents(boolean getCurrent, boolean getPast){
+    public ArrayList<EventEntry> retrieveUserEvents(boolean getCurrent, boolean getPast){
         ArrayList<EventEntry> ret = new ArrayList<EventEntry>();
         if (getCurrent){
             List<Object> currentEvents = (List<Object>) user_events.get("current");
@@ -294,7 +294,7 @@ public class UserEntry {
      * @param getPast if true, get past todos
      * @return list of events represented as EventEntry objects
      */
-    public ArrayList<TodoEntry> getUserTodos(boolean getCurrent, boolean getPast){
+    public ArrayList<TodoEntry> retrieveUserTodos(boolean getCurrent, boolean getPast){
         ArrayList<TodoEntry> ret = new ArrayList<TodoEntry>();
         if (getCurrent){
             List<Object> currentTodo = (List<Object>) todo_list.get("current");
@@ -802,9 +802,9 @@ public class UserEntry {
                     result = null;
                     return;
                 }
-                result.addAll(groupEntry.getGroupEvents(getCurrent,getPast));
+                result.addAll(groupEntry.retrieveGroupEvents(getCurrent,getPast));
             }
-            result.addAll(userEntry.getUserEvents(getCurrent,getPast));
+            result.addAll(userEntry.retrieveUserEvents(getCurrent,getPast));
             return;
         }
 
@@ -919,11 +919,11 @@ public class UserEntry {
                     result = null;
                     return;
                 }
-                for (TodoEntry te : groupEntry.getGroupTodos(getCurrent,getPast)){
+                for (TodoEntry te : groupEntry.retrieveGroupTodos(getCurrent,getPast)){
                     if (te.getAssigned_to().equals(userId)) result.add(te);
                 }
             }
-            result.addAll(userEntry.getUserTodos(getCurrent,getPast));
+            result.addAll(userEntry.retrieveUserTodos(getCurrent,getPast));
             return;
         }
 

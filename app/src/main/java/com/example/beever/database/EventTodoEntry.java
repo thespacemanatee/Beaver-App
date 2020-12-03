@@ -12,7 +12,7 @@ public abstract class EventTodoEntry {
      * Get equivalent Map object representation which obeys EventEntry/TodoEntry contract
      * @return Map object representation
      */
-    public abstract Map<String, Object> getRepresentation();
+    public abstract Map<String, Object> retrieveRepresentation();
 
     /**
      * Check whether this is a group (and not personal) event/todo
@@ -24,5 +24,5 @@ public abstract class EventTodoEntry {
      * Get user/group ID of entity containing this event/todo
      * @return user/group ID
      */
-    public abstract String getSource();
+    public abstract String retrieveSource();
 }
