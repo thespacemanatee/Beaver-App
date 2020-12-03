@@ -112,23 +112,18 @@ public class ChatFragment extends Fragment implements Populatable{
             public void onListenerUpdate(){
                 if (getStateChange()==StateChange.CHAT) {
 
-                    GroupEntry.GetGroupEntry getGroupEntry1 = new GroupEntry.GetGroupEntry(groupId, 5000) {
-                        @Override
-                        public void onPostExecute() {
-                            ArrayList<ChatEntry> chats = getResult().retrieveGroupChat();
-                            ChatEntry chatEntry = chats.get(chats.size() - 1);
+                    ArrayList<ChatEntry> chats = getResult().getGroupChat();
+                    ChatEntry chatEntry = chats.get(chats.size() - 1);
 
-                            texts.add(chatEntry.getMessage());
-                            times.add(chatEntry.getTime());
-                            sender.add(groupMemberNames.get(chatEntry.getSender()));
-                            senderImg.add(groupMemberImgs.get(chatEntry.getSender()));
+                    texts.add(chatEntry.getMessage());
+                    times.add(chatEntry.getTime());
+                    sender.add(groupMemberNames.get(chatEntry.getSender()));
+                    senderImg.add(groupMemberImgs.get(chatEntry.getSender()));
 
-                            //Scroll to latest message
-                            adapter.notifyItemInserted(chats.size() - 1);
-                            layout.smoothScrollToPosition(chats.size() - 1);
-                        }
-                    };
-                    getGroupEntry1.start();
+                    //Scroll to latest message
+                    adapter.notifyItemInserted(chats.size() - 1);
+                    layout.smoothScrollToPosition(chats.size() - 1);
+
                 }
             }
 
