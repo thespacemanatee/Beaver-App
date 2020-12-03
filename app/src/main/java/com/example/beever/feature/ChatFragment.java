@@ -39,8 +39,8 @@ public class ChatFragment extends Fragment implements Populatable{
     private String groupId;
     private String groupImage;
     private ArrayList<String> groupMemberIDs;
-    private HashMap<String, String> groupMemberNames;
-    private HashMap<String, String> groupMemberImgs;
+    private HashMap<String, String> groupMemberNames = new HashMap<>();
+    private HashMap<String, String> groupMemberImgs = new HashMap<>();
 
     //For populating the Chat
     private BubblesAdapter adapter;
@@ -112,17 +112,21 @@ public class ChatFragment extends Fragment implements Populatable{
             public void onListenerUpdate(){
                 if (getStateChange()==StateChange.CHAT) {
 
-                    ArrayList<ChatEntry> chats = getResult().retrieveGroupChat();
-                    ChatEntry chatEntry = chats.get(chats.size() - 1);
+                    try {
+                        ArrayList<ChatEntry> chats = getResult().retrieveGroupChat();
+                        ChatEntry chatEntry = chats.get(chats.size() - 1);
 
-                    texts.add(chatEntry.getMessage());
-                    times.add(chatEntry.getTime());
-                    sender.add(groupMemberNames.get(chatEntry.getSender()));
-                    senderImg.add(groupMemberImgs.get(chatEntry.getSender()));
+                        texts.add(chatEntry.getMessage());
+                        times.add(chatEntry.getTime());
+                        sender.add(groupMemberNames.get(chatEntry.getSender()));
+                        senderImg.add(groupMemberImgs.get(chatEntry.getSender()));
 
-                    //Scroll to latest message
-                    adapter.notifyItemInserted(chats.size() - 1);
-                    layout.smoothScrollToPosition(chats.size() - 1);
+                        //Scroll to latest message
+                        adapter.notifyItemInserted(chats.size() - 1);
+                        layout.smoothScrollToPosition(chats.size() - 1);
+                    } catch (NullPointerException e) {
+                        populateRecyclerView();
+                    }
 
                 }
             }

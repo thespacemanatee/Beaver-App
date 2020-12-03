@@ -66,7 +66,12 @@ public class IndivGroupFragment extends Fragment {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName().equals("dashboard")) {
+                if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName() == null) {
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new GroupsFragment(), "groupsFragment")
+                            .addToBackStack("indivGroups")
+                            .commit();
+                } else if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName().equals("dashboard")) {
                     ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle("Dashboard");
                     getFragmentManager().popBackStack();
                 } else if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName().equals("groups")) {
