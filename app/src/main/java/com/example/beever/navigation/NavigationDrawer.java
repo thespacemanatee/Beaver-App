@@ -127,7 +127,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
                                 }
                             }
 
-                            new CountDownTimer(upcomingEvent.toDate().getTime() - currentTime.getTime(), 1000) {
+                            new CountDownTimer(upcomingEvent.toDate().getTime() - currentTime.getTime() - 27000000, 1000) {
                                 public void onTick(long millisUntilFinished) {
                                     countdown.setText(new SimpleDateFormat("HH:mm").format(new Date(millisUntilFinished)));
                                 }
