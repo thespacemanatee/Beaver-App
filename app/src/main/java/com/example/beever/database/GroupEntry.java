@@ -2,6 +2,8 @@ package com.example.beever.database;
 
 import android.annotation.SuppressLint;
 import android.os.Looper;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -51,7 +53,7 @@ import java.util.Map;
  * To create an instance of this class manually, use only the 2nd constructor.
  **/
 
-public class GroupEntry {
+public class GroupEntry implements Parcelable {
 
     private String name = null, display_picture = null;
     private Long colour = (long) 0;
@@ -91,6 +93,45 @@ public class GroupEntry {
     }
 
     // Setters
+
+    protected GroupEntry(Parcel in) {
+        name = in.readString();
+        display_picture = in.readString();
+        if (in.readByte() == 0) {
+            colour = null;
+        } else {
+            colour = in.readLong();
+        }
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(display_picture);
+        if (colour == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(colour);
+        }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<GroupEntry> CREATOR = new Creator<GroupEntry>() {
+        @Override
+        public GroupEntry createFromParcel(Parcel in) {
+            return new GroupEntry(in);
+        }
+
+        @Override
+        public GroupEntry[] newArray(int size) {
+            return new GroupEntry[size];
+        }
+    };
 
     public void setName(String name){
         this.name = name;

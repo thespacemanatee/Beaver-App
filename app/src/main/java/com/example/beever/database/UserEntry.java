@@ -2,6 +2,8 @@ package com.example.beever.database;
 
 import android.annotation.SuppressLint;
 import android.os.Looper;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -52,7 +54,7 @@ import java.util.Map;
  * To create an instance of this class manually, use only the 2nd constructor.
 **/
 
-public class UserEntry {
+public class UserEntry implements Parcelable {
 
     /**
      * Set default maximum number of groups to feature on the dashboard
@@ -97,6 +99,38 @@ public class UserEntry {
     }
 
     // Setters
+
+    protected UserEntry(Parcel in) {
+        username = in.readString();
+        name = in.readString();
+        email = in.readString();
+        display_picture = in.readString();
+    }
+
+    public static final Creator<UserEntry> CREATOR = new Creator<UserEntry>() {
+        @Override
+        public UserEntry createFromParcel(Parcel in) {
+            return new UserEntry(in);
+        }
+
+        @Override
+        public UserEntry[] newArray(int size) {
+            return new UserEntry[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(username);
+        dest.writeString(name);
+        dest.writeString(email);
+        dest.writeString(display_picture);
+    }
 
     public void setUsername(String username){
         this.username = username;
@@ -348,6 +382,8 @@ public class UserEntry {
                 + "\tuser_events=" + user_events.toString() + ",\n"
                 + "\ttodo_list=" + todo_list.toString() + "\n})";
     }
+
+
 
     /**
      * Customized Thread subclass to get UserEntry based on user ID.

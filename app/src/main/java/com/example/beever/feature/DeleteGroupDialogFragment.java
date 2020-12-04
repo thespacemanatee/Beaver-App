@@ -52,6 +52,20 @@ public class DeleteGroupDialogFragment extends DialogFragment {
                                         @Override
                                         public void onPostExecute() {
                                             Log.d("DELETE GROUP ID", "onPostExecute: " + "SUCCESS");
+
+                                            fStore.collection("groups").document(groupId).delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d("DELETE GROUP", "DocumentSnapshot successfully deleted!");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w("DELETE GROUP", "Error deleting document", e);
+                                                        }
+                                                    });
                                         }
                                     };
                                     deleteGroupId.start();
@@ -60,23 +74,11 @@ public class DeleteGroupDialogFragment extends DialogFragment {
                             getUserEntry.start();
                         }
 
-                        fStore.collection("groups").document(groupId).delete()
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d("DELETE GROUP", "DocumentSnapshot successfully deleted!");
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.w("DELETE GROUP", "Error deleting document", e);
-                                    }
-                                });
-
                         GroupsFragment fragment = new GroupsFragment();
                         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                         transaction.add(R.id.fragment_container, fragment).commit();
+                        Utils utils = new Utils(getContext());
+                        utils.fadeIn();
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

@@ -41,7 +41,13 @@ public class GroupsFragment extends Fragment implements Populatable{
 
     //TODO: Implement onListenerUpdate()
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    private String userID = fAuth.getUid();
+    private final String userId = fAuth.getUid();
+    private static final String GROUP_ENTRIES = "groupEntries";
+    private static final String GROUP_IDS = "groupIds";
+    private static final String USER_ENTRY = "userEntry";
+    private UserEntry userEntry;
+    private ArrayList<GroupEntry> groupEntries = new ArrayList<>();
+    private ArrayList<String> groupIds = new ArrayList<>();
 
     //Initialise global ArrayLists for storing information of Groups a User is in
     ArrayList<String> grpImages = new ArrayList<>();
@@ -65,7 +71,6 @@ public class GroupsFragment extends Fragment implements Populatable{
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Groups");
 
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
-
         imageView = rootView.findViewById(R.id.no_group_image);
         textView = rootView.findViewById(R.id.no_group_text);
 
@@ -73,7 +78,42 @@ public class GroupsFragment extends Fragment implements Populatable{
         GridView layout = rootView.findViewById(R.id.groupButtons);
         adapter = new GridAdapter(getActivity());
         layout.setAdapter(adapter);
-        populateRecyclerView();
+
+        Bundle bundle = this.getArguments();
+
+        if (bundle != null) {
+            userEntry = bundle.getParcelable(USER_ENTRY);
+            groupEntries = bundle.getParcelableArrayList(GROUP_ENTRIES);
+            groupIds = bundle.getStringArrayList(GROUP_IDS);
+            populateRecyclerView();
+
+        } else {
+            UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userId, 5000) {
+                @Override
+                public void onPostExecute() {
+                    userEntry = getResult();
+
+                    for (Object o: userEntry.getGroups()) {
+                        int full = getResult().getGroups().size();
+                        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry((String) o, 5000) {
+                            @Override
+                            public void onPostExecute() {
+                                if (isSuccessful()) {
+                                    groupEntries.add(getResult());
+                                    groupIds.add(getGroupId());
+                                    if (groupEntries.size() == full) {
+                                        populateRecyclerView();
+                                    }
+                                }
+                            }
+                        };
+                        getGroupEntry.start();
+
+                    }
+                }
+            };
+            getUserEntry.start();
+        }
 
         return rootView;
     }
@@ -89,32 +129,43 @@ public class GroupsFragment extends Fragment implements Populatable{
         grpImages.add(addGrpBtnImg);
         grpIds.add(null);
 
-        UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
-            @Override
-            public void onPostExecute() {
-                if (isSuccessful()) {
-                    for (Object o: getResult().getGroups()) {
-                        GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String)o, 5000) {
-                            @Override
-                            public void onPostExecute() {
-                                if (isSuccessful()) {
-                                    grpIds.add(getGroupId());
-                                    grpNames.add(getResult().getName());
-                                    grpImages.add(getResult().getDisplay_picture());
-                                    if (grpIds.size() > 0) {
-                                        imageView.setVisibility(View.GONE);
-                                        textView.setVisibility(View.GONE);
-                                    }
-                                    adapter.notifyDataSetChanged();
-                                }
-                            }
-                        };
-                        groupGetter.start();
-                    }
-                }
-            }
-        };
-        userGetter.start();
+        for (int i = 0; i < groupIds.size(); i++) {
+            grpIds.add(groupIds.get(i));
+            grpNames.add(groupEntries.get(i).getName());
+            grpImages.add(groupEntries.get(i).getDisplay_picture());
+        }
+        if (grpIds.size() > 0) {
+            imageView.setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
+        }
+        adapter.notifyDataSetChanged();
+
+//        UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
+//            @Override
+//            public void onPostExecute() {
+//                if (isSuccessful()) {
+//                    for (Object o: getResult().getGroups()) {
+//                        GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String)o, 5000) {
+//                            @Override
+//                            public void onPostExecute() {
+//                                if (isSuccessful()) {
+//                                    grpIds.add(getGroupId());
+//                                    grpNames.add(getResult().getName());
+//                                    grpImages.add(getResult().getDisplay_picture());
+//                                    if (grpIds.size() > 0) {
+//                                        imageView.setVisibility(View.GONE);
+//                                        textView.setVisibility(View.GONE);
+//                                    }
+//                                    adapter.notifyDataSetChanged();
+//                                }
+//                            }
+//                        };
+//                        groupGetter.start();
+//                    }
+//                }
+//            }
+//        };
+//        userGetter.start();
     }
 
     //Load Group Information from FireStore before going to next Fragment
@@ -258,7 +309,7 @@ public class GroupsFragment extends Fragment implements Populatable{
                 viewHolder.gridImg.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        AddToDashboardDialogFragment dialog = new AddToDashboardDialogFragment(selectedGrpId, userID);
+                        AddToDashboardDialogFragment dialog = new AddToDashboardDialogFragment(selectedGrpId, userId);
                         assert getFragmentManager() != null;
                         dialog.show(getFragmentManager(), "");
                         return true;

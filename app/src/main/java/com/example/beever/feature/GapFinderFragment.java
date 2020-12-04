@@ -51,9 +51,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
     private GroupEntry groupEntry;
     private ArrayList<Timestamp> timestamps = new ArrayList<>();
     private ArrayList<Timestamp> timestampsEnd = new ArrayList<>();
-    private ArrayList<Timestamp> startTimes = new ArrayList<>();
-    private ArrayList<Timestamp> endTimes = new ArrayList<>();
-    private ArrayList<EventEntry> groupEntries = new ArrayList<>();
     private Integer[] durations = new Integer[DURATION_BLOCK_UPPER_LIMIT];
     private int chosenDuration;
     private GapAdapter adapter;
