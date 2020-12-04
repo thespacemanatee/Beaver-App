@@ -1,5 +1,7 @@
 package com.example.beever.database;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.firebase.Timestamp;
@@ -21,7 +23,7 @@ import java.util.Map;
  *
  * To create an instance of this class manually, use only the 3rd constructor.
  **/
-public class EventEntry extends EventTodoEntry {
+public class EventEntry extends EventTodoEntry implements Parcelable {
 
     private String name = null, description = null, user_id_source = null, group_id_source = null;
     private Timestamp start_time = null, end_time = null;
@@ -73,6 +75,42 @@ public class EventEntry extends EventTodoEntry {
     }
 
     // Setters
+
+    protected EventEntry(Parcel in) {
+        name = in.readString();
+        description = in.readString();
+        user_id_source = in.readString();
+        group_id_source = in.readString();
+        start_time = in.readParcelable(Timestamp.class.getClassLoader());
+        end_time = in.readParcelable(Timestamp.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeString(user_id_source);
+        dest.writeString(group_id_source);
+        dest.writeParcelable(start_time, flags);
+        dest.writeParcelable(end_time, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<EventEntry> CREATOR = new Creator<EventEntry>() {
+        @Override
+        public EventEntry createFromParcel(Parcel in) {
+            return new EventEntry(in);
+        }
+
+        @Override
+        public EventEntry[] newArray(int size) {
+            return new EventEntry[size];
+        }
+    };
 
     public void setName(String name){
         this.name = name;
@@ -196,5 +234,4 @@ public class EventEntry extends EventTodoEntry {
                 + "\tstart_time=" + start_time.toString() + ",\n"
                 + "\tend_time=" + end_time.toString() + ",\n})";
     }
-
 }

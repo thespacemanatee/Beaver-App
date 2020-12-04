@@ -54,13 +54,28 @@ public class DashboardFragment extends Fragment {
     private ArrayList<String> dbGrpNames = new ArrayList<>();
     private ArrayList<String> dbGrpIds = new ArrayList<>();
     private ArrayList<EventEntry> dbEvents = new ArrayList<>();
-    private Timestamp upcomingEvent;
+
+    private static final String GROUP_ENTRIES = "groupEntries";
+    private static final String GROUP_IDS = "groupIds";
+    private static final String USER_ENTRY = "userEntry";
+    private static final String RELEVANT_EVENTS = "relevantEvents";
+    private static final String DASH_GROUP_ENTRIES = "dashGroupEntries";
+    private static final String DASH_GROUP_IDS = "dashGroupIds";
+
+    private UserEntry userEntry;
+    private ArrayList<GroupEntry> groupEntries = new ArrayList<>();
+    private ArrayList<GroupEntry> dashGroupEntries = new ArrayList<>();
+    private ArrayList<String> groupIds = new ArrayList<>();
+    private ArrayList<String> dashGroupIds = new ArrayList<>();
+    private ArrayList<EventEntry> events = new ArrayList<>();
+
     TextView greeting, name, noUpcomingText, noFavouriteText;
     DashboardGroupsAdapter grpAdapter;
     DashboardEventsAdapter eventsAdapter;
     ImageView noUpcomingImage, noFavouriteImage;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -77,6 +92,63 @@ public class DashboardFragment extends Fragment {
         noFavouriteImage = root.findViewById(R.id.no_fav_groups_image);
         noFavouriteText = root.findViewById(R.id.no_fav_groups_text);
 
+        //Populate RecyclerView in dashboard_fragment.xml with 3 Upcoming Events
+        RecyclerView eventLayout = root.findViewById(R.id.dashboard_events);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        eventLayout.setLayoutManager(layoutManager);
+        eventsAdapter = new DashboardEventsAdapter(getContext());
+        eventLayout.setAdapter(eventsAdapter);
+
+        //Populate GridView in dashboard_fragment.xml with Groups
+        GridView grpLayout = root.findViewById(R.id.dashboard_groups);
+        grpAdapter = new DashboardGroupsAdapter(getActivity());
+        grpLayout.setAdapter(grpAdapter);
+
+        Bundle bundle = this.getArguments();
+
+        if (bundle != null) {
+            userEntry = bundle.getParcelable(USER_ENTRY);
+            groupEntries = bundle.getParcelableArrayList(GROUP_ENTRIES);
+            groupIds = bundle.getStringArrayList(GROUP_IDS);
+            events = bundle.getParcelableArrayList(RELEVANT_EVENTS);
+            dashGroupEntries = bundle.getParcelableArrayList(DASH_GROUP_ENTRIES);
+            dashGroupIds = bundle.getStringArrayList(DASH_GROUP_IDS);
+            Log.d("WTF", "onCreateView: " + dashGroupEntries.toString());
+
+            populateRecyclerView();
+
+        } else {
+            UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
+                @Override
+                public void onPostExecute() {
+                    userEntry = getResult();
+
+                    for (Object o: userEntry.getDashboard_grps()) {
+                        if (o != null) {
+                            GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry((String) o, 5000) {
+                                @Override
+                                public void onPostExecute() {
+                                    dashGroupEntries.add(getResult());
+                                    dashGroupIds.add(getGroupId());
+                                }
+                            };
+                            getGroupEntry.start();
+                        }
+                    }
+
+                    UserEntry.GetUserRelevantEvents getUserRelevantEvents = new UserEntry.GetUserRelevantEvents(userEntry, 5000, true, false) {
+                        @Override
+                        public void onPostExecute() {
+                            events = getResult();
+                            populateRecyclerView();
+                        }
+                    };
+                    getUserRelevantEvents.start();
+                }
+            };
+            getUserEntry.start();
+        }
+
         //Save User's Name
         name.setText(mSharedPref.getString("registeredName", "Beever") + ".");
 
@@ -89,101 +161,53 @@ public class DashboardFragment extends Fragment {
             greeting.setText(R.string.greetings_evening);
         }
 
-        //Populate GridView in dashboard_fragment.xml with Groups
-        GridView grpLayout = root.findViewById(R.id.dashboard_groups);
-        grpAdapter = new DashboardGroupsAdapter(getActivity());
-        grpLayout.setAdapter(grpAdapter);
-
-        //Populate RecyclerView in dashboard_fragment.xml with 3 Upcoming Events
-        RecyclerView eventLayout = root.findViewById(R.id.dashboard_events);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        eventLayout.setLayoutManager(layoutManager);
-        eventsAdapter = new DashboardEventsAdapter(getContext());
-        eventLayout.setAdapter(eventsAdapter);
-
-        //Placeholders for if nothing loads
-        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
-            @Override
-            public void onPostExecute() {
-                populateRecyclerView(getResult());
-                for (Object group: getResult().getDashboard_grps()) {
-                    if (group != null) {
-                        noFavouriteImage.setVisibility(View.GONE);
-                        noFavouriteText.setVisibility(View.GONE);
-                    }
-                }
-            }
-        };
-        getUserEntry.start();
-
         return root;
     }
 
-    public void populateRecyclerView(UserEntry userEntry) {
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void populateRecyclerView() {
         dbGrpIds.clear();
         dbGrpImgs.clear();
         dbGrpNames.clear();
         dbEvents.clear();
 
-        UserEntry.GetUserRelevantEvents userGetter = new UserEntry.GetUserRelevantEvents(userEntry, 5000, true, false) {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onPostExecute() {
-                if (isSuccessful()) {
-                    Log.d("USER ENTRY", "success");
+        events.sort(new DashboardEventComparator());
+        ArrayList<EventEntry> upcomingEvents = new ArrayList<>();
 
+        for (int i = 0; i < events.size(); i++) {
+            if (!(events.get(i).getStart_time().toDate().getTime() < new Date().getTime())) {
+                upcomingEvents.add(events.get(i));
+            }
+        }
 
+        for (int i = 0; i < 3; i++) {
+            if (i < upcomingEvents.size()) {
+                dbEvents.add(upcomingEvents.get(i));
+            }
+        }
 
-                    ArrayList<EventEntry> events = getResult();
-                    events.sort(new DashboardEventComparator());
-                    ArrayList<EventEntry> upcomingEvents = new ArrayList<>();
+        if (dbEvents.size() > 0) {
+            noUpcomingImage.setVisibility(View.GONE);
+            noUpcomingText.setVisibility(View.GONE);
+        }
+        eventsAdapter.notifyDataSetChanged();
+        Log.d("EVENTS", dbEvents.toString());
 
-                    for (int i = 0; i < events.size(); i++) {
-                        if (!(events.get(i).getStart_time().toDate().getTime() < new Date().getTime())) {
-                            upcomingEvents.add(events.get(i));
-                        }
-                    }
-
-                    for (int i = 0; i < 3; i++) {
-                        if (i < upcomingEvents.size()) {
-                            dbEvents.add(upcomingEvents.get(i));
-                        }
-                    }
-
-                    if (dbEvents.size() > 0) {
-                        noUpcomingImage.setVisibility(View.GONE);
-                        noUpcomingText.setVisibility(View.GONE);
-                    }
-                    eventsAdapter.notifyDataSetChanged();
-                    Log.d("EVENTS", dbEvents.toString());
-
-                    for (Object o: userEntry.getDashboard_grps()) {
-                        if (o != null) {
-                            Log.d("GROUP", (String) o);
-                            GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String) o, 5000) {
-                                @Override
-                                public void onPostExecute() {
-                                    if (isSuccessful()) {
-                                        Log.d("GROUP ENTRY", "success");
-                                        Log.d("GROUP RESULT", getResult().toString());
-                                        dbGrpIds.add(getGroupId());
-                                        dbGrpNames.add(getResult().getName());
-                                        if (getResult().getDisplay_picture() == null) {
-                                            dbGrpImgs.add("null");
-                                        } else {
-                                            dbGrpImgs.add(getResult().getDisplay_picture());
-                                        }
-                                        grpAdapter.notifyDataSetChanged();
-                                    }
-                                }
-                            };
-                            groupGetter.start();
-                        }
-                    }
+        for (int i = 0; i < dashGroupIds.size(); i++) {
+            Log.d("GROUP ENTRY", "success");
+            if (dashGroupEntries.get(i) != null) {
+                dbGrpIds.add(dashGroupIds.get(i));
+                dbGrpNames.add(dashGroupEntries.get(i).getName());
+                noFavouriteImage.setVisibility(View.GONE);
+                noFavouriteText.setVisibility(View.GONE);
+                if (dashGroupEntries.get(i).getDisplay_picture() == null) {
+                    dbGrpImgs.add("null");
+                } else {
+                    dbGrpImgs.add(dashGroupEntries.get(i).getDisplay_picture());
                 }
             }
-        };
-        userGetter.start();
+        }
+        grpAdapter.notifyDataSetChanged();
     }
 
     public void getGroupMemberInfo(String groupID, String groupImg, String groupName, Bundle bundle) {
