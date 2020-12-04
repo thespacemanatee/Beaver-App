@@ -71,6 +71,8 @@ public class IndivGroupFragment extends Fragment {
                             .replace(R.id.fragment_container, new GroupsFragment(), "groupsFragment")
                             .addToBackStack("indivGroups")
                             .commit();
+                    Utils utils = new Utils(getContext());
+                    utils.fadeIn();
                 } else if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName().equals("dashboard")) {
                     ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle("Dashboard");
                     getFragmentManager().popBackStack();

@@ -169,12 +169,13 @@ public class GroupsFragment extends Fragment implements Populatable{
     }
 
     //Load Group Information from FireStore before going to next Fragment
-    public void getGroupMemberInfo(String groupID, String groupImg, String groupName, Bundle bundle) {
+    public void getGroupMemberInfo(String groupID, String groupImg, String groupName) {
 
         //Create ArrayList to store grpMemberIDs, HashMaps to store grpMemberNames and grpMemberImgs
         ArrayList<String> grpMemberIDs = new ArrayList<>();
         HashMap<String, String> grpMemberNames = new HashMap<>();
         HashMap<String, String> grpMemberImgs = new HashMap<>();
+        Bundle bundle = new Bundle();
 
         //Get grpMemberIds, grpMemberNames, grpMemberImgs from FireStore
         GroupEntry.GetGroupEntry grpGetter = new GroupEntry.GetGroupEntry(groupID, 100000) {
@@ -328,8 +329,7 @@ public class GroupsFragment extends Fragment implements Populatable{
                     @Override
                     public void onClick(View v) {
                         //Bundle arguments to send to ChatFragment
-                        Bundle bundle = new Bundle();
-                        getGroupMemberInfo(selectedGrpId, selectedGrpImg, selectedGrpName, bundle);
+                        getGroupMemberInfo(selectedGrpId, selectedGrpImg, selectedGrpName);
                     }
                 });
             }

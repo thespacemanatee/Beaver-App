@@ -185,16 +185,17 @@ public class CreateGroupFragment extends Fragment {
                                             @Override
                                             public void onPostExecute() {
                                                 Toast.makeText(getContext(), "User added successfully", Toast.LENGTH_SHORT).show();
-                                                Bundle bundle = new Bundle();
-                                                bundle.putString("imageUri", imageUri);
-                                                bundle.putString("groupName", groupName);
-                                                bundle.putString("groupId", groupID);
-                                                bundle.putBoolean("groupExists", false);
-
-                                                AddUsersFragment addUsersFragment = new AddUsersFragment();
-                                                addUsersFragment.setArguments(bundle);
-                                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                                transaction.replace(R.id.fragment_container, addUsersFragment).commit();
+                                                getGroupMemberInfo(groupID);
+//                                                Bundle bundle = new Bundle();
+//                                                bundle.putString("imageUri", imageUri);
+//                                                bundle.putString("groupName", groupName);
+//                                                bundle.putString("groupId", groupID);
+//                                                bundle.putBoolean("groupExists", false);
+//
+//                                                AddUsersFragment addUsersFragment = new AddUsersFragment();
+//                                                addUsersFragment.setArguments(bundle);
+//                                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+//                                                transaction.replace(R.id.fragment_container, addUsersFragment).commit();
                                             }
                                         };
                                         addUser.start();
@@ -210,5 +211,59 @@ public class CreateGroupFragment extends Fragment {
         });
 
 
+    }
+
+    private void getGroupMemberInfo(String groupID) {
+        //Create ArrayList to store grpMemberIDs, HashMaps to store grpMemberNames and grpMemberImgs
+        ArrayList<String> grpMemberIDs = new ArrayList<>();
+        HashMap<String, String> grpMemberNames = new HashMap<>();
+        HashMap<String, String> grpMemberImgs = new HashMap<>();
+        Bundle bundle = new Bundle();
+
+        //Get grpMemberIds, grpMemberNames, grpMemberImgs from FireStore
+        GroupEntry.GetGroupEntry grpGetter = new GroupEntry.GetGroupEntry(groupID, 100000) {
+            @Override
+            public void onPostExecute() {
+                if (isSuccessful()) {
+                    for (Object o: getResult().getMember_list()) {
+                        Log.d("MEMBER ID", (String)o);
+                        int full = getResult().getMember_list().size();
+                        grpMemberIDs.add((String)o);
+                        UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry((String)o, 100000) {
+                            @Override
+                            public void onPostExecute() {
+                                if (isSuccessful()) {
+                                    grpMemberImgs.put((String)o, getResult().getDisplay_picture());
+                                    grpMemberNames.put((String)o, getResult().getName());
+
+                                    if (grpMemberNames.size() == full) {
+                                        //Add everything to bundle
+                                        bundle.putStringArrayList("grpMemberIDs", grpMemberIDs);
+                                        bundle.putSerializable("grpMemberImgs", grpMemberImgs);
+                                        bundle.putSerializable("grpMemberNames", grpMemberNames);
+                                        bundle.putString("groupImage", String.valueOf(imageUri));
+                                        bundle.putString("groupName", groupName);
+                                        bundle.putString("groupId", groupID);
+
+                                        //Fade Out Nav Bar
+                                        Utils utils = new Utils(getContext());
+                                        utils.fadeOut();
+
+                                        //Go to IndivChatFragment
+                                        IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
+                                        indivGroupFragment.setArguments(bundle);
+                                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                        transaction.remove(CreateGroupFragment.this);
+                                        transaction.add(R.id.fragment_container, indivGroupFragment, "openChat").commit();
+                                    }
+                                }
+                            }
+                        };
+                        userGetter.start();
+                    }
+                }
+            }
+        };
+        grpGetter.start();
     }
 }

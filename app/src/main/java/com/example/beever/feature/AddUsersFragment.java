@@ -135,61 +135,18 @@ public class AddUsersFragment extends Fragment {
         confirmUsersBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                getFragmentManager().popBackStack();
                 if (!groupExists) {
-                    confirmUsersBtn.startAnimation();
-//                    GroupEntry.GetGroupEntry grpGetter = new GroupEntry.GetGroupEntry(groupID, 100000) {
-//                        @Override
-//                        public void onPostExecute() {
-//                            if (isSuccessful()) {
-//                                for (Object o: getResult().getMember_list()) {
-//                                    Log.d("MEMBER ID", (String)o);
-//                                    int full = getResult().getMember_list().size();
-//                                    grpMemberIDs.add((String)o);
-//                                    UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry((String)o, 100000) {
-//                                        @Override
-//                                        public void onPostExecute() {
-//                                            if (isSuccessful()) {
-//                                                grpMemberImgs.put((String)o, getResult().getDisplay_picture());
-//                                                grpMemberNames.put((String)o, getResult().getName());
-//
-//                                                if (grpMemberNames.size() == full) {
-//                                                    //Add everything to bundle
-//                                                    bundle.putStringArrayList("grpMemberIDs", grpMemberIDs);
-//                                                    bundle.putSerializable("grpMemberImgs", grpMemberImgs);
-//                                                    bundle.putSerializable("grpMemberNames", grpMemberNames);
-//                                                    bundle.putString("groupImage", groupImg);
-//                                                    bundle.putString("groupName", groupName);
-//                                                    bundle.putString("groupId", groupID);
-//
-//                                                    //Fade Out Nav Bar
-//                                                    Utils utils = new Utils(getContext());
-//                                                    utils.fadeOut();
-//
-//                                                    //Go to IndivChatFragment
-//                                                    IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
-//                                                    indivGroupFragment.setArguments(bundle);
-//                                                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-//                                                    transaction.add(R.id.fragment_container, indivGroupFragment, "openChat").addToBackStack("groups").commit();
-//                                                }
-//                                            }
-//                                        }
-//                                    };
-//                                    userGetter.start();
-//                                }
-//                            }
-//                        }
-//                    };
-//                    grpGetter.start();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("groupId", groupID);
-                    bundle.putString("groupName", groupName);
-                    //Go to Individual Groups Fragment
-                    IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
-                    indivGroupFragment.setArguments(bundle);
-                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_container, indivGroupFragment, "openChat").commit();
-                } else if (groupExists) {
-                    getFragmentManager().popBackStack();
+//                    confirmUsersBtn.startAnimation();
+//                    Bundle bundle = new Bundle();
+//                    bundle.putString("groupId", groupID);
+//                    bundle.putString("groupName", groupName);
+//                    //Go to Individual Groups Fragment
+//                    IndivGroupFragment indivGroupFragment = new IndivGroupFragment();
+//                    indivGroupFragment.setArguments(bundle);
+//                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+//                    transaction.replace(R.id.fragment_container, indivGroupFragment, "openChat").commit();
                 }
 
             }
