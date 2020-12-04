@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -94,6 +95,19 @@ public class CreateGroupFragment extends Fragment {
                 }
             }
         });
+
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle("Groups");
+                getFragmentManager().popBackStack();
+                //Fade in Nav Bar
+                Utils utils = new Utils(getContext());
+                utils.fadeIn();
+
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
 
 
         return rootView;
