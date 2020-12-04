@@ -114,9 +114,47 @@ public class GroupsFragment extends Fragment implements Populatable{
             };
             getUserEntry.start();
         }
+//
+//        UserEntry.UserEntryListener userEntryListener = new UserEntry.UserEntryListener(userId, 5000) {
+//            @Override
+//            public void onPreListening() {
+//
+//            }
+//
+//            @Override
+//            public void onListenerUpdate() {
+//                if (getStateChange()== StateChange.GROUPS) {
+//                    userEntry = getResult();
+//                    getGroupEntries(userEntry);
+//                }
+//            }
+//
+//            @Override
+//            public void onSetupFailure() {
+//
+//            }
+//        };
+//        userEntryListener.start();
 
         return rootView;
     }
+
+//    private void getGroupEntries(UserEntry userEntry) {
+//        groupEntries.clear();
+//        groupIds.clear();
+//        for (Object o: userEntry.getGroups()) {
+//
+//            GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry((String) o, 5000) {
+//                @Override
+//                public void onPostExecute() {
+//                    groupEntries.add(getResult());
+//                    groupIds.add(getGroupId());
+//                }
+//            };
+//            getGroupEntry.start();
+//        }
+//        adapter.notifyDataSetChanged();
+//    }
 
     @Override
     public void populateRecyclerView() {

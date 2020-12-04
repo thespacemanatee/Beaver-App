@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -67,10 +68,13 @@ public class IndivGroupFragment extends Fragment {
             @Override
             public void handleOnBackPressed() {
                 if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName() == null) {
-                    getFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new GroupsFragment(), "groupsFragment")
-                            .addToBackStack("indivGroups")
-                            .commit();
+                    GroupsFragment fragment = new GroupsFragment();
+                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container, fragment).commit();
+//                    getFragmentManager().beginTransaction()
+//                            .replace(R.id.fragment_container, new GroupsFragment(), "groupsFragment")
+//                            .addToBackStack("indivGroups")
+//                            .commit();
                     Utils utils = new Utils(getContext());
                     utils.fadeIn();
                 } else if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName().equals("dashboard")) {

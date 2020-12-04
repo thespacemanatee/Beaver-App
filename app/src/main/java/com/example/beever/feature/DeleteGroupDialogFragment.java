@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -38,6 +39,10 @@ public class DeleteGroupDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
+
+        GroupsFragment fragment = new GroupsFragment();
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Delete group?")
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
@@ -58,6 +63,7 @@ public class DeleteGroupDialogFragment extends DialogFragment {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             Log.d("DELETE GROUP", "DocumentSnapshot successfully deleted!");
+                                                            transaction.replace(R.id.fragment_container, fragment).commit();
                                                         }
                                                     })
                                                     .addOnFailureListener(new OnFailureListener() {
@@ -73,12 +79,6 @@ public class DeleteGroupDialogFragment extends DialogFragment {
                             };
                             getUserEntry.start();
                         }
-
-                        GroupsFragment fragment = new GroupsFragment();
-                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.add(R.id.fragment_container, fragment).commit();
-                        Utils utils = new Utils(getContext());
-                        utils.fadeIn();
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
