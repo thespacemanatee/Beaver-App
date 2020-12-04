@@ -232,10 +232,12 @@ public class ChatFragment extends Fragment implements Populatable{
 
         @Override
         public int getItemViewType(int i) {
-            if (getMemberData(i).equals(name)) {
-                fromUser = 1;
-            } else {
-                fromUser = 0;
+            if (getMemberData(i) != null) {
+                if (getMemberData(i).equals(name)) {
+                    fromUser = 1;
+                } else {
+                    fromUser = 0;
+                }
             }
             return fromUser;
         }
