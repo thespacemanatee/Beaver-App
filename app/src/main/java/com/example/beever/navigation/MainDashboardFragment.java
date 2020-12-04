@@ -30,6 +30,7 @@ public class MainDashboardFragment extends Fragment {
     private static final String RELEVANT_EVENTS = "relevantEvents";
     private static final String DASH_GROUP_ENTRIES = "dashGroupEntries";
     private static final String DASH_GROUP_IDS = "dashGroupIds";
+    private static final String USER_ENTRY = "userEntry";
     private UserEntry userEntry;
     private ArrayList<GroupEntry> groupEntries = new ArrayList<>();
     private ArrayList<GroupEntry> dashGroupEntries = new ArrayList<>();
@@ -38,7 +39,6 @@ public class MainDashboardFragment extends Fragment {
     private ArrayList<EventEntry> events = new ArrayList<>();
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userId;
-    private final String USER_ENTRY = "userEntry";
     ChipNavigationBar chipNavigationBar;
 
     @Override

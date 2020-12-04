@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
 import com.example.beever.database.EventEntry;
+import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -41,6 +42,14 @@ import java.util.Map;
 public class CalendarFragment extends Fragment {
 
     //TODO: Implement onListenerUpdate()
+    private static final String USER_ENTRY = "userEntry";
+    private static final String GROUP_ENTRIES = "groupEntries";
+    private static final String GROUP_IDS = "groupIds";
+    private static final String RELEVANT_EVENTS = "relevantEvents";
+    private ArrayList<EventEntry> events = new ArrayList<>();
+    private ArrayList<GroupEntry> groupEntries = new ArrayList<>();
+    private ArrayList<String> groupIds = new ArrayList<>();
+
     private static final String TAG = "CalendarFragment";
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     protected ArrayList<EventEntry> list = new ArrayList<>();
@@ -91,6 +100,61 @@ public class CalendarFragment extends Fragment {
         mRecyclerView.setAdapter(textEventAdapter);
         noEventsImage = root.findViewById(R.id.no_events_image);
         noEventsText = root.findViewById(R.id.no_events_text);
+
+        Bundle bundle = this.getArguments();
+
+        if (bundle != null) {
+            userEntry = bundle.getParcelable(USER_ENTRY);
+            groupEntries = bundle.getParcelableArrayList(GROUP_ENTRIES);
+            groupIds = bundle.getStringArrayList(GROUP_IDS);
+            events = bundle.getParcelableArrayList(RELEVANT_EVENTS);
+
+            populateEventsList();
+
+        } else {
+            UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(USER_ID, 5000) {
+                @Override
+                public void onPostExecute() {
+                    userEntry = getResult();
+
+                    UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(USER_ID, 5000) {
+                        @Override
+                        public void onPostExecute() {
+                            userEntry = getResult();
+
+                            for (Object o: userEntry.getGroups()) {
+                                int full = getResult().getGroups().size();
+                                GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry((String) o, 5000) {
+                                    @Override
+                                    public void onPostExecute() {
+                                        if (isSuccessful()) {
+                                            groupEntries.add(getResult());
+                                            groupIds.add(getGroupId());
+                                            if (groupEntries.size() == full) {
+                                                populateEventsList();
+                                            }
+                                        }
+                                    }
+                                };
+                                getGroupEntry.start();
+
+                            }
+                        }
+                    };
+                    getUserEntry.start();
+
+                    UserEntry.GetUserRelevantEvents getUserRelevantEvents = new UserEntry.GetUserRelevantEvents(userEntry, 5000, true, false) {
+                        @Override
+                        public void onPostExecute() {
+                            events = getResult();
+                            populateEventsList();
+                        }
+                    };
+                    getUserRelevantEvents.start();
+                }
+            };
+            getUserEntry.start();
+        }
 
         calendar.set(selectedYear,selectedMonth,selectedDay,0,0,0);
         populateEventsList();
@@ -172,53 +236,56 @@ public class CalendarFragment extends Fragment {
     }
 
     public void populateEventsList(){
-        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(USER_ID, 5000) {
-            @Override
-            public void onPostExecute() {
-                if (isSuccessful()) {
-                    userEntry = getResult();
-                    UserEntry.GetUserRelevantEvents getUserRelevantEvents = new UserEntry.GetUserRelevantEvents(userEntry, 5000, true, false) {
-                        @Override
-                        public void onPostExecute() {
-                            if (isSuccessful()) {
-                                Date date = calendar.getTime();
-                                Timestamp dateTimestamp = new Timestamp(date);
+
+        Date date = calendar.getTime();
+        Timestamp dateTimestamp = new Timestamp(date);
 //                                Date startDate = new GregorianCalendar(selectedYear, selectedMonth,selectedDay).getTime();
-                                Timestamp startDate = new Timestamp(new Date((dateTimestamp.getSeconds())*1000));
-                                Timestamp endDate = new Timestamp(new Date((startDate.getSeconds() + 86400)*1000));
-                                Log.d(TAG, "START DATE " + startDate);
-                                Log.d(TAG, "END DATE " + endDate);
-                                ArrayList<EventEntry> eventEntries = new ArrayList<>();
-                                for (EventEntry e : getResult()){
-                                    Log.d(TAG, "onPostExecute: " + e.getStart_time());
-                                    if (!(e.getStart_time().getSeconds() >= endDate.getSeconds() || e.getEnd_time().getSeconds() < startDate.getSeconds())){
-                                        eventEntries.add(e);
-                                    }
-                                }
-                                list.clear();
-                                list.addAll(eventEntries);
+        Timestamp startDate = new Timestamp(new Date((dateTimestamp.getSeconds())*1000));
+        Timestamp endDate = new Timestamp(new Date((startDate.getSeconds() + 86400)*1000));
+        Log.d(TAG, "START DATE " + startDate);
+        Log.d(TAG, "END DATE " + endDate);
+        ArrayList<EventEntry> eventEntries = new ArrayList<>();
+        for (EventEntry e : events){
+            Log.d(TAG, "onPostExecute: " + e.getStart_time());
+            if (!(e.getStart_time().getSeconds() >= endDate.getSeconds() || e.getEnd_time().getSeconds() < startDate.getSeconds())){
+                eventEntries.add(e);
+            }
+        }
+        list.clear();
+        list.addAll(eventEntries);
 
-                                if (list.size() > 0) {
-                                    noEventsImage.setVisibility(View.GONE);
-                                    noEventsText.setVisibility(View.GONE);
-                                }
+        if (list.size() > 0) {
+            noEventsImage.setVisibility(View.GONE);
+            noEventsText.setVisibility(View.GONE);
+        }
 
-                                if (list.size() == 0) {
-                                    noEventsImage.setVisibility(View.VISIBLE);
-                                    noEventsText.setVisibility(View.VISIBLE);
-                                }
+        if (list.size() == 0) {
+            noEventsImage.setVisibility(View.VISIBLE);
+            noEventsText.setVisibility(View.VISIBLE);
+        }
 //                                textEventAdapter = new TextEventAdapter(list);
 //                                mRecyclerView.setAdapter(textEventAdapter);
-                                textEventAdapter.notifyDataSetChanged();
-                                Log.d(TAG, "onPostExecute: " + list.toString());
-                            }
-                        }
-                    };
+        textEventAdapter.notifyDataSetChanged();
+        Log.d(TAG, "onPostExecute: " + list.toString());
 
-                    getUserRelevantEvents.start();
-                }
-            }
-        };
-        getUserEntry.start();
+//        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(USER_ID, 5000) {
+//            @Override
+//            public void onPostExecute() {
+//                if (isSuccessful()) {
+//                    userEntry = getResult();
+//                    UserEntry.GetUserRelevantEvents getUserRelevantEvents = new UserEntry.GetUserRelevantEvents(userEntry, 5000, true, false) {
+//                        @Override
+//                        public void onPostExecute() {
+//                            if (isSuccessful()) {
+//
+//                            }
+//                        }
+//                    };
+//
+//                    getUserRelevantEvents.start();
+//                }
+//            }
+//        };
+//        getUserEntry.start();
     }
 }
