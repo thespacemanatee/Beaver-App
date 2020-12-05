@@ -291,7 +291,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
             toDoArchivedListView.setAdapter(toDoArchivedAdapter);
 
             // set toDoAdapter for RecyclerView in onPostExecute so that groupID is not null
-            toDoAdapter = new ToDoAdapter(toDoList, getContext(), getFragmentManager(), toDoAdapter, expandableListDetail, toDoArchivedAdapter,
+            toDoAdapter = new ToDoAdapter(toDoList, getContext(), getFragmentManager(), expandableListDetail, toDoArchivedAdapter,
                     groupID, noTodoImage, noTodoText);
             toDoRecyclerView.setAdapter(toDoAdapter);
             Log.d(TAG, RECYCLERVIEW);
@@ -321,7 +321,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
 
                 Toast.makeText(parent.getContext(), "To Do List Not Found", Toast.LENGTH_LONG).show();
                 toDoList = new ArrayList<>();
-                toDoAdapter = new ToDoAdapter(toDoList, getContext(), getFragmentManager(), toDoAdapter, expandableListDetail, toDoArchivedAdapter,
+                toDoAdapter = new ToDoAdapter(toDoList, getContext(), getFragmentManager(), expandableListDetail, toDoArchivedAdapter,
                         groupID, noTodoImage, noTodoText);
                 helper = new ToDoHelper(getContext(), getFragmentManager(), toDoList, toDoAdapter, expandableListDetail, toDoArchivedAdapter,
                         groupID, noTodoImage, noTodoText);

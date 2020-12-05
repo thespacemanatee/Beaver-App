@@ -37,12 +37,12 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
      * @param context   to specify the context for dialog to show
      * ...
      */
-    public ToDoAdapter(ArrayList<TodoEntry> toDoList, Context context, FragmentManager fragmentManager, ToDoAdapter adapter,
+    public ToDoAdapter(ArrayList<TodoEntry> toDoList, Context context, FragmentManager fragmentManager,
                        HashMap<String, List<TodoEntry>> expandableListDetail, ExpandableListAdapter toDoArchivedAdapter,
                        String groupID, ImageView noTodoImage, TextView noTodoText) {
         this.toDoList = toDoList;
         this.context = context;
-        this.helper = new ToDoHelper(context, fragmentManager, toDoList, adapter, expandableListDetail, toDoArchivedAdapter, groupID, noTodoImage, noTodoText);
+        this.helper = new ToDoHelper(context, fragmentManager, toDoList, this, expandableListDetail, toDoArchivedAdapter, groupID, noTodoImage, noTodoText);
     }
 
     /**

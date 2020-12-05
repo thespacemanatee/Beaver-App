@@ -187,11 +187,7 @@ public class ToDoHelper {
                     toDoList.remove(todoEntry);
                     adapter.notifyItemRemoved(currPosition);
 
-                    if (toDoList.size() > 0) {
-                        noTodoImage.setVisibility(View.GONE);
-                        noTodoText.setVisibility(View.GONE);
-                    }
-
+                    // if there are no todos, display a visual cue to user
                     if (toDoList.size() == 0) {
                         noTodoImage.setVisibility(View.VISIBLE);
                         noTodoText.setVisibility(View.VISIBLE);
@@ -234,14 +230,10 @@ public class ToDoHelper {
                     adapter.notifyItemInserted(0);
                     recyclerView.smoothScrollToPosition(0);
 
+                    // if there are no todos, display a visual cue to user
                     if (toDoList.size() > 0) {
                         noTodoImage.setVisibility(View.GONE);
                         noTodoText.setVisibility(View.GONE);
-                    }
-
-                    if (toDoList.size() == 0) {
-                        noTodoImage.setVisibility(View.VISIBLE);
-                        noTodoText.setVisibility(View.VISIBLE);
                     }
 
                 } else {
@@ -280,11 +272,7 @@ public class ToDoHelper {
                     toDoList.remove(todoEntry);
                     adapter.notifyDataSetChanged();
 
-                    if (toDoList.size() > 0) {
-                        noTodoImage.setVisibility(View.GONE);
-                        noTodoText.setVisibility(View.GONE);
-                    }
-
+                    // if there are no todos, display a visual cue to user
                     if (toDoList.size() == 0) {
                         noTodoImage.setVisibility(View.VISIBLE);
                         noTodoText.setVisibility(View.VISIBLE);
