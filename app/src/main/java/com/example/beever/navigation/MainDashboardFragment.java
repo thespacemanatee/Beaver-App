@@ -75,15 +75,10 @@ public class MainDashboardFragment extends Fragment {
 
             @Override
             public void onListenerUpdate() {
-                if (getStateChange()== StateChange.DASHBOARD_GRPS || getStateChange()== StateChange.DISPLAY_PICTURE
-                        || getStateChange()== StateChange.EMAIL || getStateChange()== StateChange.GROUPS
-                        || getStateChange()== StateChange.NAME || getStateChange()== StateChange.TODO_LIST
-                        || getStateChange()== StateChange.USER_EVENTS || getStateChange()== StateChange.USERNAME) {
-                    userEntry = getResult();
-                    getGroupEntries(userEntry);
-                    getUserRelevantEvents(userEntry);
-                    getDashboardGroups(userEntry);
-                }
+                userEntry = getResult();
+                getGroupEntries(userEntry);
+                getUserRelevantEvents(userEntry);
+                getDashboardGroups(userEntry);
             }
 
             @Override
