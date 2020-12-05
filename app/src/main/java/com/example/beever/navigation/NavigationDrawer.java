@@ -46,7 +46,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -131,13 +133,27 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
                             new CountDownTimer(upcomingEvent.toDate().getTime() - currentTime.getTime(), 1000) {
                                 public void onTick(long millisUntilFinished) {
-                                    SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
-                                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                    countdown.setText(formatter.format(millisUntilFinished));
+
+                                    long days = TimeUnit.MILLISECONDS.toDays(millisUntilFinished);
+                                    millisUntilFinished -= TimeUnit.DAYS.toMillis(days);
+
+                                    long hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
+                                    millisUntilFinished -= TimeUnit.HOURS.toMillis(hours);
+
+                                    long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
+                                    millisUntilFinished -= TimeUnit.MINUTES.toMillis(minutes);
+
+                                    long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
+
+                                    countdown.setText(days + " Days " + hours + "Hours " + minutes + "Minutes"); //You can compute the millisUntilFinished on hours/minutes/seconds
+
+//                                    SimpleDateFormat formatter = new SimpleDateFormat("d 'Days, 'HH'hr 'm'm'", Locale.getDefault());
+//                                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+//                                    countdown.setText(formatter.format(millisUntilFinished));
                                 }
 
                                 public void onFinish() {
-                                    countdown.setText(" No upcoming\n meetings!");
+                                    countdown.setText(" No\n upcoming\n meetings!");
                                     countdown.setTextSize(20);
                                 }
                             }.start();
