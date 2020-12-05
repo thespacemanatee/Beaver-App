@@ -31,12 +31,14 @@ public class MainDashboardFragment extends Fragment {
     private static final String DASH_GROUP_ENTRIES = "dashGroupEntries";
     private static final String DASH_GROUP_IDS = "dashGroupIds";
     private static final String USER_ENTRY = "userEntry";
+    private static final String GROUP_ENTRY_LISTENERS = "groupEntryListeners";
     private UserEntry userEntry;
     private ArrayList<GroupEntry> groupEntries = new ArrayList<>();
     private ArrayList<GroupEntry> dashGroupEntries = new ArrayList<>();
     private ArrayList<String> groupIds = new ArrayList<>();
     private ArrayList<String> dashGroupIds = new ArrayList<>();
     private ArrayList<EventEntry> events = new ArrayList<>();
+    private ArrayList<GroupEntry.GroupEntryListener> groupEntryListeners = new ArrayList<>();
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userId;
     ChipNavigationBar chipNavigationBar;
@@ -129,15 +131,44 @@ public class MainDashboardFragment extends Fragment {
         groupIds.clear();
         for (Object o: userEntry.getGroups()) {
 
+            int full = userEntry.getGroups().size();
             GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry((String) o, 5000) {
                 @Override
                 public void onPostExecute() {
                     groupEntries.add(getResult());
                     groupIds.add(getGroupId());
+                    if (groupEntries.size() == full) {
+                        getGroupEntryListeners();
+                    }
                 }
             };
             getGroupEntry.start();
 
+        }
+    }
+
+    private void getGroupEntryListeners() {
+        groupEntryListeners.clear();
+        for (String groupId: groupIds) {
+
+            GroupEntry.GroupEntryListener groupEntryListener = new GroupEntry.GroupEntryListener((String) groupId, 5000) {
+                @Override
+                public void onPreListening() {
+
+                }
+
+                @Override
+                public void onListenerUpdate() {
+                    getGroupEntries(userEntry);
+                }
+
+                @Override
+                public void onSetupFailure() {
+
+                }
+            };
+            groupEntryListener.start();
+            groupEntryListeners.add(groupEntryListener);
         }
     }
 
