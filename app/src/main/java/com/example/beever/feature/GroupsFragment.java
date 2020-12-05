@@ -89,7 +89,9 @@ public class GroupsFragment extends Fragment implements Populatable{
         if (bundle != null) {
             userEntry = bundle.getParcelable(USER_ENTRY);
             groupEntries = bundle.getParcelableArrayList(GROUP_ENTRIES);
+            Log.d("GROUP ENTRIES", groupEntries.toString());
             groupIds = bundle.getStringArrayList(GROUP_IDS);
+            Log.d("GROUP IDS", groupIds.toString());
             populateRecyclerView();
 
         } else {

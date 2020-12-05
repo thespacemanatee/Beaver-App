@@ -101,7 +101,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
             utils.fadeIn();
         }
 
-        /**
+        /*
          * SPINNER COMPONENT: Showcases what groups/ projects the user is in
          * Allows the user to select a group/ project and display the to-do list for that group
          */
@@ -114,7 +114,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoSpinner.setAdapter(arrayAdapter);
         Log.d(TAG, SPINNER);
 
-        /**
+        /*
          * RECYCLER VIEW COMPONENT: Showcases the to-do list
          */
         // set Linear Layout for RecyclerView To Do List
@@ -127,7 +127,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
         toDoRecyclerView.setItemAnimator(new DefaultItemAnimator());
         toDoRecyclerView.scrollToPosition(scrollPosition);
 
-        /**
+        /*
          * EXPANDABLE VIEW COMPONENT: Showcases the completed to-dos when clicked
          */
         // set Archived to dos for Expandable View

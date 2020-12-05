@@ -84,7 +84,7 @@ public class ToDoHelper {
                 // do a fragment transaction to a new ToDoViewFragment that displays the full to-do
                 // add the current fragment to back stack for the user to return to
                 fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, ToDoViewFragment.newInstance(todoEntry, adapter, ToDoHelper.this))
+                        .replace(R.id.fragment_container, ToDoViewFragment.newInstance(todoEntry, ToDoHelper.this))
                         .addToBackStack("ToDoFragment")
                         .commit();
             }

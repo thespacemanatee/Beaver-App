@@ -28,12 +28,10 @@ import java.util.TimeZone;
 public class ToDoViewFragment extends Fragment {
 
     private final TodoEntry todoEntry;
-    private final ToDoAdapter adapter;
     private final ToDoHelper helper;
 
-    public ToDoViewFragment(TodoEntry todoEntry, ToDoAdapter adapter, ToDoHelper helper) {
+    public ToDoViewFragment(TodoEntry todoEntry, ToDoHelper helper) {
         this.todoEntry = todoEntry;
-        this.adapter = adapter;
         this.helper = helper;
     }
 
@@ -91,8 +89,8 @@ public class ToDoViewFragment extends Fragment {
     }
 
     // creates a new instance of the fragment
-    public static ToDoViewFragment newInstance(TodoEntry todoEntry, ToDoAdapter adapter, ToDoHelper helper) {
-        return new ToDoViewFragment(todoEntry, adapter, helper);
+    public static ToDoViewFragment newInstance(TodoEntry todoEntry, ToDoHelper helper) {
+        return new ToDoViewFragment(todoEntry, helper);
     }
 
 }
