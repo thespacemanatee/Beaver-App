@@ -89,8 +89,7 @@
             android:id="@+id/dashboard_events"
             android:layout_width="match_parent"
             android:layout_height="220dp"
-
-            android:paddingHorizontal="34dp"
+            android:paddingHorizontal="16dp"
             android:paddingBottom="34dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
