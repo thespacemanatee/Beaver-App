@@ -32,10 +32,10 @@
             android:id="@+id/send_message"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:inputType="text"
+            android:inputType="textMultiLine"
             android:layout_toStartOf="@+id/send_button"
             android:hint="@string/chat_hint"
-            android:layout_alignParentStart="true"/>
+            android:layout_alignParentStart="true" />
 
         <ImageButton
             android:id="@+id/send_button"
