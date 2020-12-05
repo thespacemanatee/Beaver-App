@@ -137,7 +137,8 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
                                 }
 
                                 public void onFinish() {
-                                    countdown.setText("No upcoming meetings!");
+                                    countdown.setText(" No upcoming\n meetings!");
+                                    countdown.setTextSize(20);
                                 }
                             }.start();
                         } catch (Exception e) {
