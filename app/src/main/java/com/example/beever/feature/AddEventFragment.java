@@ -54,12 +54,11 @@ public class AddEventFragment extends Fragment {
     private LinearLayout eventStart, eventEnd, addEventButtons;
     private Button startDate, endDate, startTime, endTime;
     private Button cancel, save;
-    private Date start, end;
+    private Calendar start, end;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private UserEntry userEntry;
     private String USER_ID;
     private Utils utils;
-    private Calendar calendar = Calendar.getInstance();
     private int selectedDay, selectedMonth, selectedYear;
     private int startMinute, startHour, startDay, startMonth, startYear;
     private int endMinute, endHour, endDay, endMonth, endYear;
@@ -92,8 +91,29 @@ public class AddEventFragment extends Fragment {
         int month = cldr.get(Calendar.MONTH);
         int year = cldr.get(Calendar.YEAR);
 
-        start = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
-        end = new GregorianCalendar(selectedYear, selectedMonth, selectedDay).getTime();
+        startYear = selectedYear;
+        startMonth = selectedMonth;
+        startDay = selectedDay;
+        startHour = 0;
+        startMinute = 0;
+
+        endYear = selectedYear;
+        endMonth = selectedMonth;
+        endDay = selectedDay;
+        endHour = 0;
+        endMinute = 0;
+
+        start = Calendar.getInstance();
+        start.set(startYear,startMonth,startDay,startHour,startMinute,0);
+        end = Calendar.getInstance();
+        end.set(endYear,endMonth,endDay,endHour,endMinute,0);
+
+        startDate.setText(startDay + "/" + (startMonth + 1) + "/" + startYear);
+        endDate.setText(endDay + "/" + (endMonth + 1) + "/" + endYear);
+        startTime.setText(startHour + (startMinute==0? ":00" : Integer.toString(startMinute)));
+        endTime.setText(endHour + (endMinute==0? ":00" : Integer.toString(endMinute)));
+
+
 
 //        startDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear);
 //        startTime.setText(calendar.getTime().toString().substring(11,19));
@@ -128,8 +148,11 @@ public class AddEventFragment extends Fragment {
                 InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(),0);
                 if (input.isEmpty()){
-                    Toast.makeText(getContext(),"No information added. Event not saved.", Toast.LENGTH_SHORT).show();
-                    getFragmentManager().popBackStackImmediate();
+                    Toast.makeText(getContext(),"Please enter event name.", Toast.LENGTH_SHORT).show();
+                    //getFragmentManager().popBackStackImmediate();
+                }
+                else if (start.compareTo(end)>=0){
+                    Toast.makeText(getContext(),"Please enter valid start/end times.", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(USER_ID,5000) {
@@ -139,8 +162,10 @@ public class AddEventFragment extends Fragment {
                             EventEntry eventEntry = new EventEntry();
                             eventEntry.setName(input);
                             eventEntry.setDescription(description);
-                            eventEntry.setStart_time(new Timestamp(start));
-                            eventEntry.setEnd_time(new Timestamp(end));
+                            Log.d("start",start.toString());
+                            Log.d("end",end.toString());
+                            eventEntry.setStart_time(new Timestamp(start.getTime()));
+                            eventEntry.setEnd_time(new Timestamp(end.getTime()));
                             eventEntry.setUser_id_source(USER_ID);
                             userEntry.modifyEventOrTodo(true, true, true, eventEntry);
                             UserEntry.SetUserEntry setEvent = new UserEntry.SetUserEntry(userEntry, USER_ID, 5000) {
@@ -179,6 +204,7 @@ public class AddEventFragment extends Fragment {
                                 startDay = dayOfMonth;
                                 startMonth = monthOfYear;
                                 startYear = year;
+                                start.set(startYear,startMonth,startDay,startHour,startMinute,0);
 //                                calendar.set(year,monthOfYear,dayOfMonth);
 //                                start = calendar.getTime();
                             }
@@ -200,6 +226,7 @@ public class AddEventFragment extends Fragment {
                                 endDay = dayOfMonth;
                                 endMonth = monthOfYear;
                                 endYear = year;
+                                end.set(endYear,endMonth,endDay,endHour,endMinute,0);
 //                                calendar.set(year, monthOfYear, dayOfMonth);
 //                                end = calendar.getTime();
                             }
@@ -235,8 +262,8 @@ public class AddEventFragment extends Fragment {
         private NumberPicker add_event_select_minute = null;
         private boolean start;
 
-        private final String[] hourPicks = new String[] {"0","8","9","10","11","12","13","14",
-                "15","16","17","18","19","20","21","22","23"};
+        private final String[] hourPicks = new String[] {"0","1","2","3","4","5","6","7","8","9","10","11","12",
+                "13","14","15","16","17","18","19","20","21","22","23"};
         private final String[] minutePicks = new String[] {"00","15","30","45"};
 
         public TimeSelectFragment(AddEventFragment addEventFragment, Boolean start){
@@ -283,8 +310,7 @@ public class AddEventFragment extends Fragment {
                         } else {
                             addEventFragment.startTime.setText(addEventFragment.startHour + ":" + addEventFragment.startMinute);
                         }
-                        addEventFragment.calendar.set(addEventFragment.startYear,addEventFragment.startMonth,addEventFragment.startDay,addEventFragment.startHour,addEventFragment.startMinute, 0);
-                        addEventFragment.calendar.getTime();
+                        addEventFragment.start.set(addEventFragment.startYear,addEventFragment.startMonth,addEventFragment.startDay,addEventFragment.startHour,addEventFragment.startMinute, 0);
 //                        addEventFragment.calendar.set(addEventFragment.startYear,addEventFragment.startMonth,addEventFragment.startDay);
 //                        addEventFragment.start = new GregorianCalendar(addEventFragment.startYear,addEventFragment.startMonth,addEventFragment.startDay,addEventFragment.startHour,addEventFragment.startMinute, 0).getTime();
                         Log.d(TAG, "onClick: "+ addEventFragment.start.toString());
@@ -296,8 +322,7 @@ public class AddEventFragment extends Fragment {
                         } else {
                             addEventFragment.endTime.setText(addEventFragment.endHour + ":" + addEventFragment.endMinute);
                         }
-                        addEventFragment.calendar.set(addEventFragment.endYear, addEventFragment.endMonth, addEventFragment.endDay, addEventFragment.endHour, addEventFragment.endMinute, 0);
-                        addEventFragment.end = addEventFragment.calendar.getTime();
+                        addEventFragment.end.set(addEventFragment.endYear, addEventFragment.endMonth, addEventFragment.endDay, addEventFragment.endHour, addEventFragment.endMinute, 0);
 //                        addEventFragment.calendar.set(addEventFragment.endYear, addEventFragment.endMonth, addEventFragment.endDay);
 //                        addEventFragment.end = new GregorianCalendar(addEventFragment.endYear, addEventFragment.endMonth, addEventFragment.endDay, addEventFragment.endHour, addEventFragment.endMinute, 0).getTime();
                         Log.d(TAG, "onClick: " + addEventFragment.end.toString());
