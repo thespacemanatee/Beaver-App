@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
     android:orientation="vertical"
-    tools:context=".feature.ToDoFragment"
-    android:background="@color/white">
+    tools:context=".feature.ToDoFragment">
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintVertical_weight="1"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_weight="1">
 
         <TextView
             android:id="@+id/toDoProject"
@@ -44,20 +44,22 @@
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintVertical_weight="6"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout4">
+        app:layout_constraintVertical_weight="6">
 
         <ImageView
             android:id="@+id/no_todo_image"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:src="@drawable/todo"
-            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:visibility="gone"/>
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/no_todo_text"
@@ -67,12 +69,12 @@
             android:text="@string/no_to_dos"
             android:textColor="@color/beever_blue"
             android:textSize="20sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/no_todo_image"
-            app:layout_constraintVertical_bias="0"
-            android:visibility="gone"/>
+            app:layout_constraintVertical_bias="0" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/toDoRecyclerView"
@@ -83,23 +85,27 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout4"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintVertical_weight="3"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="100dp"
-        android:id="@+id/linearLayout4"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
+        app:layout_constraintVertical_weight="3">
 
         <ExpandableListView
             android:id="@+id/toDoArchivedListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@color/beever_blue"
+            android:layout_margin="8dp"
+            android:divider="@null"
+            android:dividerHeight="4.0sp"
             android:indicatorLeft="?android:attr/expandableListPreferredChildIndicatorLeft"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -113,16 +119,16 @@
         android:id="@+id/toDoAddButton"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:elevation="8dp"
-        android:backgroundTint="@color/beever_light_blue"
         android:layout_marginEnd="25dp"
         android:layout_marginBottom="100dp"
-        android:tint="@android:color/white"
+        android:backgroundTint="@color/beever_light_blue"
+        android:contentDescription="@string/to_do"
+        android:elevation="8dp"
         android:src="@drawable/ic_baseline_add_40"
+        android:tint="@android:color/white"
+        app:backgroundTint="@color/beever_dark_blue_transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:maxImageSize="40dp"
-        app:backgroundTint="@color/beever_dark_blue_transparent"
-        android:contentDescription="@string/to_do" />
+        app:maxImageSize="40dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
