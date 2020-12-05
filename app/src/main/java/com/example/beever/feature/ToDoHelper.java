@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -15,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.beever.R;
 import com.example.beever.database.GroupEntry;
 import com.example.beever.database.TodoEntry;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +37,8 @@ public class ToDoHelper {
     private final ExpandableListAdapter toDoArchivedAdapter;
     private final HashMap<String, List<TodoEntry>> expandableListDetail;
     private final String groupID;
+    ImageView noTodoImage;
+    TextView noTodoText;
 
 
     /**
@@ -46,7 +53,8 @@ public class ToDoHelper {
      */
     public ToDoHelper(Context context, FragmentManager fragmentManager,
                       ArrayList<TodoEntry> toDoList, ToDoAdapter adapter,
-                      HashMap<String, List<TodoEntry>> expandableListDetail, ExpandableListAdapter toDoArchivedAdapter, String groupID) {
+                      HashMap<String, List<TodoEntry>> expandableListDetail, ExpandableListAdapter toDoArchivedAdapter,
+                      String groupID, ImageView noTodoImage, TextView noTodoText) {
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.toDoList = toDoList;
@@ -54,6 +62,8 @@ public class ToDoHelper {
         this.expandableListDetail = expandableListDetail;
         this.toDoArchivedAdapter = toDoArchivedAdapter;
         this.groupID = groupID;
+        this.noTodoImage = noTodoImage;
+        this.noTodoText = noTodoText;
     }
 
     /**
@@ -177,6 +187,16 @@ public class ToDoHelper {
                     toDoList.remove(todoEntry);
                     adapter.notifyItemRemoved(currPosition);
 
+                    if (toDoList.size() > 0) {
+                        noTodoImage.setVisibility(View.GONE);
+                        noTodoText.setVisibility(View.GONE);
+                    }
+
+                    if (toDoList.size() == 0) {
+                        noTodoImage.setVisibility(View.VISIBLE);
+                        noTodoText.setVisibility(View.VISIBLE);
+                    }
+
                 } else {
                     Toast.makeText(context, "Cannot remove to-do", Toast.LENGTH_SHORT).show();
                 }
@@ -214,6 +234,16 @@ public class ToDoHelper {
                     adapter.notifyItemInserted(0);
                     recyclerView.smoothScrollToPosition(0);
 
+                    if (toDoList.size() > 0) {
+                        noTodoImage.setVisibility(View.GONE);
+                        noTodoText.setVisibility(View.GONE);
+                    }
+
+                    if (toDoList.size() == 0) {
+                        noTodoImage.setVisibility(View.VISIBLE);
+                        noTodoText.setVisibility(View.VISIBLE);
+                    }
+
                 } else {
                     Toast.makeText(context, "Cannot add to-do", Toast.LENGTH_SHORT).show();
                 }
@@ -250,9 +280,21 @@ public class ToDoHelper {
                     toDoList.remove(todoEntry);
                     adapter.notifyDataSetChanged();
 
+                    if (toDoList.size() > 0) {
+                        noTodoImage.setVisibility(View.GONE);
+                        noTodoText.setVisibility(View.GONE);
+                    }
+
+                    if (toDoList.size() == 0) {
+                        noTodoImage.setVisibility(View.VISIBLE);
+                        noTodoText.setVisibility(View.VISIBLE);
+                    }
+
                     Objects.requireNonNull(expandableListDetail.get("Completed")).add(todoEntry);
                     expandableListDetail.get("Completed").sort(new ToDoComparator());
                     toDoArchivedAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(context, "Unable to mark as Completed", Toast.LENGTH_SHORT).show();
                 }
             }
         };

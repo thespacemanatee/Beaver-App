@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
@@ -17,8 +16,6 @@ import com.google.firebase.Timestamp;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.TimeZone;
 
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
@@ -33,17 +30,13 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     /**
      * Constructor for ToDoAdapter
      * @param toDoList  to display the current to-dos
-     * @param groupID   to specify the current group the user is looking at
      * @param context   to specify the context for dialog to show
-     * @param manager   to change the fragments accordingly
-     * @param expandableListDetail  just to initialise helper
-     * @param toDoArchivedAdapter   just to initialise helper
+     * @param helper   just to initialise helper
      */
-    public ToDoAdapter(ArrayList<TodoEntry> toDoList, String groupID, Context context, FragmentManager manager,
-                       HashMap<String, List<TodoEntry>> expandableListDetail, ExpandableListAdapter toDoArchivedAdapter) {
+    public ToDoAdapter(ArrayList<TodoEntry> toDoList, Context context, ToDoHelper helper) {
         this.toDoList = toDoList;
         this.context = context;
-        this.helper = new ToDoHelper(context, manager, toDoList, this, expandableListDetail , toDoArchivedAdapter, groupID);
+        this.helper = helper;
     }
 
     /**

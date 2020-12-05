@@ -99,8 +99,6 @@
             android:id="@+id/toDoArchivedListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="36dp"
-            android:layout_marginEnd="36dp"
             android:divider="@color/beever_blue"
             android:indicatorLeft="?android:attr/expandableListPreferredChildIndicatorLeft"
             app:layout_constraintBottom_toBottomOf="parent"
