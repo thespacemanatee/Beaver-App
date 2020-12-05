@@ -37,8 +37,6 @@ import java.util.Objects;
 
 public class ToDoFragment extends Fragment implements AdapterView.OnItemSelectedListener{
 
-    //TODO: Implement onListenerUpdate()
-    // defining tags for main components in ToDoFragment
     public static final String TAG = "ToDoFragment";
     public static final String SPINNER = "Spinner Set-Up Successfully";
     public static final String RECYCLERVIEW = "RecyclerView Set-Up Successfully";

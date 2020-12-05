@@ -31,14 +31,12 @@ public class MainDashboardFragment extends Fragment {
     private static final String DASH_GROUP_ENTRIES = "dashGroupEntries";
     private static final String DASH_GROUP_IDS = "dashGroupIds";
     private static final String USER_ENTRY = "userEntry";
-    private static final String GROUP_ENTRY_LISTENERS = "groupEntryListeners";
     private UserEntry userEntry;
     private ArrayList<GroupEntry> groupEntries = new ArrayList<>();
     private ArrayList<GroupEntry> dashGroupEntries = new ArrayList<>();
     private ArrayList<String> groupIds = new ArrayList<>();
     private ArrayList<String> dashGroupIds = new ArrayList<>();
     private ArrayList<EventEntry> events = new ArrayList<>();
-    private ArrayList<GroupEntry.GroupEntryListener> groupEntryListeners = new ArrayList<>();
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userId;
     ChipNavigationBar chipNavigationBar;
@@ -63,6 +61,7 @@ public class MainDashboardFragment extends Fragment {
                 getGroupEntries(userEntry);
                 getUserRelevantEvents(userEntry);
                 getDashboardGroups(userEntry);
+                bottomMenu();
             }
         };
         getUserEntry.start();
@@ -87,8 +86,6 @@ public class MainDashboardFragment extends Fragment {
             }
         };
         userEntryListener.start();
-
-        bottomMenu();
 
         return root;
     }
@@ -132,6 +129,7 @@ public class MainDashboardFragment extends Fragment {
                 public void onPostExecute() {
                     groupEntries.add(getResult());
                     groupIds.add(getGroupId());
+//                    Log.d(TAG, "getGroupEntries: " + getGroupId());
                     if (groupEntries.size() == full) {
                         getGroupEntryListeners();
                     }
@@ -143,7 +141,7 @@ public class MainDashboardFragment extends Fragment {
     }
 
     private void getGroupEntryListeners() {
-        groupEntryListeners.clear();
+
         for (String groupId: groupIds) {
 
             GroupEntry.GroupEntryListener groupEntryListener = new GroupEntry.GroupEntryListener((String) groupId, 5000) {
@@ -154,7 +152,20 @@ public class MainDashboardFragment extends Fragment {
 
                 @Override
                 public void onListenerUpdate() {
-                    getGroupEntries(userEntry);
+                    groupEntries.clear();
+                    groupIds.clear();
+                    for (Object o: userEntry.getGroups()) {
+
+                        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry((String) o, 5000) {
+                            @Override
+                            public void onPostExecute() {
+                                groupEntries.add(getResult());
+                                groupIds.add(getGroupId());
+                            }
+                        };
+                        getGroupEntry.start();
+
+                    }
                 }
 
                 @Override
@@ -163,13 +174,12 @@ public class MainDashboardFragment extends Fragment {
                 }
             };
             groupEntryListener.start();
-            groupEntryListeners.add(groupEntryListener);
+
         }
     }
 
     private void bottomMenu() {
 
-        //TODO: Try to bundle data in when switching fragments to prefetch data
         chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
             @Override
             public void onItemSelected(int i) {
@@ -178,6 +188,7 @@ public class MainDashboardFragment extends Fragment {
                 bundle.putParcelable(USER_ENTRY, userEntry);
                 bundle.putParcelableArrayList(GROUP_ENTRIES, groupEntries);
                 bundle.putStringArrayList(GROUP_IDS, groupIds);
+//                Log.d(TAG, "bottomMenu: " + groupIds.toString());
                 bundle.putParcelableArrayList(RELEVANT_EVENTS, events);
                 bundle.putParcelableArrayList(DASH_GROUP_ENTRIES, dashGroupEntries);
                 bundle.putStringArrayList(DASH_GROUP_IDS, dashGroupIds);
