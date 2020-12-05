@@ -48,9 +48,8 @@
 
         <TextView
             android:id="@+id/countdown"
-            android:layout_width="120dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
             android:text=""
             android:textSize="24sp" />
 

@@ -145,7 +145,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
                                     long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
 
-                                    countdown.setText(days + " Days " + hours + "Hours " + minutes + "Minutes"); //You can compute the millisUntilFinished on hours/minutes/seconds
+                                    countdown.setText(days + " Days\n" + hours + " Hours\n" + minutes + " Minutes"); //You can compute the millisUntilFinished on hours/minutes/seconds
 
 //                                    SimpleDateFormat formatter = new SimpleDateFormat("d 'Days, 'HH'hr 'm'm'", Locale.getDefault());
 //                                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
