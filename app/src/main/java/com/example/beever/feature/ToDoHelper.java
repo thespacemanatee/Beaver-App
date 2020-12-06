@@ -92,6 +92,7 @@ public class ToDoHelper {
 
         // allows the user to mark the to-do as completed
         dialog.setButton(Dialog.BUTTON_NEUTRAL, "Mark as Completed", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 utils.fadeIn();
@@ -165,41 +166,27 @@ public class ToDoHelper {
      */
     public void removeItem(TodoEntry todoEntry) {
         int currPosition = toDoList.indexOf(todoEntry);
-        GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
-            @RequiresApi(api = Build.VERSION_CODES.N)
+
+        // removes the to-do from firebase
+        GroupEntry.UpdateGroupEntry removeItem = new GroupEntry.UpdateGroupEntry(groupID,
+                GroupEntry.UpdateGroupEntry.FieldChange.TODO_LIST_CURRENT_REMOVE, todoEntry, 5000) {
             @Override
             public void onPostExecute() {
-                if (isSuccessful()) {
-                    // removes the to-do locally first
-                    getResult().modifyEventOrTodo(false, true, false, todoEntry);
-
-                    // removes the to-do from firebase
-                    GroupEntry.SetGroupEntry setGroupEntry = new GroupEntry.SetGroupEntry(getResult(), groupID, 5000) {
-                        @Override
-                        public void onPostExecute() {
-                            Toast.makeText(context, "To-Do removed :)", Toast.LENGTH_SHORT).show();
-                        }
-                    };
-
-                    setGroupEntry.start();
-
-                    // remove the todoEntry from toDoList and notify adapter to display changes
-                    toDoList.remove(todoEntry);
-                    adapter.notifyItemRemoved(currPosition);
-
-                    // if there are no todos, display a visual cue to user
-                    if (toDoList.size() == 0) {
-                        noTodoImage.setVisibility(View.VISIBLE);
-                        noTodoText.setVisibility(View.VISIBLE);
-                    }
-
-                } else {
-                    Toast.makeText(context, "Cannot remove to-do", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(context, "To-Do removed", Toast.LENGTH_SHORT).show();
             }
         };
 
-        groupEntry.start();
+        removeItem.start();
+
+        // remove the todoEntry from toDoList and notify adapter to display changes
+        toDoList.remove(todoEntry);
+        adapter.notifyItemRemoved(currPosition);
+
+        // if there are no todos, display a visual cue to user
+        if (toDoList.size() == 0) {
+            noTodoImage.setVisibility(View.VISIBLE);
+            noTodoText.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -210,39 +197,25 @@ public class ToDoHelper {
      */
     public void addItem(TodoEntry todoEntry, RecyclerView recyclerView) {
         Log.d("GROUP ID", groupID);
-        GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
-            @RequiresApi(api = Build.VERSION_CODES.N)
+        GroupEntry.UpdateGroupEntry addItem = new GroupEntry.UpdateGroupEntry(groupID,
+                GroupEntry.UpdateGroupEntry.FieldChange.TODO_LIST_CURRENT_ADD, todoEntry, 5000) {
             @Override
             public void onPostExecute() {
-                if (isSuccessful()) {
-                    getResult().modifyEventOrTodo(false, true, true, todoEntry);
-
-                    GroupEntry.SetGroupEntry setGroupEntry = new GroupEntry.SetGroupEntry(getResult(), groupID, 5000) {
-                        @Override
-                        public void onPostExecute() {
-                            Toast.makeText(context, "To-Do added :)", Toast.LENGTH_SHORT).show();
-                        }
-                    };
-
-                    setGroupEntry.start();
-
-                    toDoList.add(0, todoEntry);
-                    adapter.notifyItemInserted(0);
-                    recyclerView.smoothScrollToPosition(0);
-
-                    // if there are no todos, display a visual cue to user
-                    if (toDoList.size() > 0) {
-                        noTodoImage.setVisibility(View.GONE);
-                        noTodoText.setVisibility(View.GONE);
-                    }
-
-                } else {
-                    Toast.makeText(context, "Cannot add to-do", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(context, "To-Do added :)", Toast.LENGTH_SHORT).show();
             }
         };
 
-        groupEntry.start();
+        addItem.start();
+
+        toDoList.add(0, todoEntry);
+        adapter.notifyItemInserted(0);
+        recyclerView.smoothScrollToPosition(0);
+
+        // if there are no todos, display a visual cue to user
+        if (toDoList.size() > 0) {
+            noTodoImage.setVisibility(View.GONE);
+            noTodoText.setVisibility(View.GONE);
+        }
     }
 
 
@@ -250,44 +223,38 @@ public class ToDoHelper {
      * markAsCompleted : removes the to-do from the current to-do list in firestore, and adds it to the past to-dos list
      * @param todoEntry
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void markAsCompleted(TodoEntry todoEntry) {
-        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
-            @RequiresApi(api = Build.VERSION_CODES.N)
+        GroupEntry.UpdateGroupEntry removeItem = new GroupEntry.UpdateGroupEntry(groupID,
+                GroupEntry.UpdateGroupEntry.FieldChange.TODO_LIST_CURRENT_REMOVE, todoEntry, 5000) {
             @Override
             public void onPostExecute() {
-                if (isSuccessful()) {
-                    getResult().modifyEventOrTodo(false, true, false, todoEntry);
-                    getResult().modifyEventOrTodo(false, false, true, todoEntry);
-
-                    GroupEntry.SetGroupEntry setGroupEntry = new GroupEntry.SetGroupEntry(getResult(), groupID, 5000) {
-                        @Override
-                        public void onPostExecute() {
-                            Toast.makeText(context, "Completed!", Toast.LENGTH_SHORT).show();
-                        }
-                    };
-
-                    setGroupEntry.start();
-
-                    // notify changes to adapter after modifying the list to display changes
-                    toDoList.remove(todoEntry);
-                    adapter.notifyDataSetChanged();
-
-                    // if there are no todos, display a visual cue to user
-                    if (toDoList.size() == 0) {
-                        noTodoImage.setVisibility(View.VISIBLE);
-                        noTodoText.setVisibility(View.VISIBLE);
+                Toast.makeText(context, "Completed To-Do", Toast.LENGTH_SHORT).show();
+                GroupEntry.UpdateGroupEntry markAsCompleted = new GroupEntry.UpdateGroupEntry(groupID,
+                        FieldChange.TODO_LIST_PAST_ADD, todoEntry, 5000) {
+                    @Override
+                    public void onPostExecute() {
+                        Toast.makeText(context, "Added to completed", Toast.LENGTH_SHORT).show();
                     }
-
-                    Objects.requireNonNull(expandableListDetail.get("Completed")).add(todoEntry);
-                    expandableListDetail.get("Completed").sort(new ToDoComparator());
-                    toDoArchivedAdapter.notifyDataSetChanged();
-                } else {
-                    Toast.makeText(context, "Unable to mark as Completed", Toast.LENGTH_SHORT).show();
-                }
+                };
+                markAsCompleted.start();
             }
         };
+        removeItem.start();
 
-        getGroupEntry.start();
+        // notify changes to adapter after modifying the list to display changes
+        toDoList.remove(todoEntry);
+        adapter.notifyDataSetChanged();
+
+        // if there are no todos, display a visual cue to user
+        if (toDoList.size() == 0) {
+            noTodoImage.setVisibility(View.VISIBLE);
+            noTodoText.setVisibility(View.VISIBLE);
+        }
+
+        Objects.requireNonNull(expandableListDetail.get("Completed")).add(todoEntry);
+        expandableListDetail.get("Completed").sort(new ToDoComparator());
+        toDoArchivedAdapter.notifyDataSetChanged();
     }
 
 
@@ -296,30 +263,17 @@ public class ToDoHelper {
      * @param todoEntry
      */
     public void removeCompleted(TodoEntry todoEntry) {
-        GroupEntry.GetGroupEntry groupEntry = new GroupEntry.GetGroupEntry(groupID, 5000) {
+        GroupEntry.UpdateGroupEntry removeCompleted = new GroupEntry.UpdateGroupEntry(groupID,
+                GroupEntry.UpdateGroupEntry.FieldChange.TODO_LIST_PAST_REMOVE, todoEntry, 5000) {
             @Override
             public void onPostExecute() {
-                if (isSuccessful()) {
-                    getResult().modifyEventOrTodo(false, false, false, todoEntry);
-
-                    GroupEntry.SetGroupEntry setGroupEntry = new GroupEntry.SetGroupEntry(getResult(), groupID, 5000) {
-                        @Override
-                        public void onPostExecute() {
-                            Toast.makeText(context, "Removed from Completed", Toast.LENGTH_SHORT).show();
-                        }
-                    };
-
-                    setGroupEntry.start();
-
-                    Objects.requireNonNull(expandableListDetail.get("Completed")).remove(todoEntry);
-                    toDoArchivedAdapter.notifyDataSetChanged();
-
-                } else {
-                    Toast.makeText(context, "Unable to remove from Completed", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(context, "Removed from Completed", Toast.LENGTH_SHORT).show();
             }
         };
 
-        groupEntry.start();
+        removeCompleted.start();
+
+        Objects.requireNonNull(expandableListDetail.get("Completed")).remove(todoEntry);
+        toDoArchivedAdapter.notifyDataSetChanged();
     }
 }

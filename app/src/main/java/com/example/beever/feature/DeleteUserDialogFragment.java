@@ -46,43 +46,27 @@ public class DeleteUserDialogFragment extends DialogFragment {
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
-                        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(selectedMemberId, 5000) {
+                        UserEntry.UpdateUserEntry deleteGroupId = new UserEntry.UpdateUserEntry(selectedMemberId,
+                                UserEntry.UpdateUserEntry.FieldChange.GROUPS_REMOVE, groupId, 5000) {
                             @Override
                             public void onPostExecute() {
-                                UserEntry userEntry = getResult();
-                                userEntry.removeGroupId(groupId);
-
-                                UserEntry.SetUserEntry deleteGroupId = new UserEntry.SetUserEntry(userEntry, selectedMemberId, 5000) {
+                                Log.d("DELETE GROUP ID", "onPostExecute: " + "SUCCESS");
+                                GroupEntry.UpdateGroupEntry deleteUser = new GroupEntry.UpdateGroupEntry(groupId,
+                                        GroupEntry.UpdateGroupEntry.FieldChange.MEMBER_LIST_REMOVE, selectedMemberId, 5000) {
                                     @Override
                                     public void onPostExecute() {
-                                        Log.d("DELETE GROUP ID", "onPostExecute: " + "SUCCESS");
-                                        GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupId, 5000) {
-                                            @Override
-                                            public void onPostExecute() {
-                                                GroupEntry groupEntry = getResult();
-                                                groupEntry.removeUserId(selectedMemberId);
+                                        Log.d("DELETE GROUP USER", "onPostExecute: " + "SUCCESS");
+                                        grpMemberId.remove(selectedMemberId);
+                                        grpMemberImg.remove(selectedMemberImg);
+                                        grpMemberName.remove(selectedMemberName);
+                                        adapter.notifyDataSetChanged();
 
-                                                GroupEntry.SetGroupEntry deleteUser = new GroupEntry.SetGroupEntry(groupEntry, groupId, 5000) {
-                                                    @Override
-                                                    public void onPostExecute() {
-                                                        Log.d("DELETE GROUP USER", "onPostExecute: " + "SUCCESS");
-                                                        grpMemberId.remove(selectedMemberId);
-                                                        grpMemberImg.remove(selectedMemberImg);
-                                                        grpMemberName.remove(selectedMemberName);
-                                                        adapter.notifyDataSetChanged();
-
-                                                    }
-                                                };
-                                                deleteUser.start();
-                                            }
-                                        };
-                                        getGroupEntry.start();
                                     }
                                 };
-                                deleteGroupId.start();
+                                deleteUser.start();
                             }
                         };
-                        getUserEntry.start();
+                        deleteGroupId.start();
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

@@ -175,9 +175,9 @@ public class ChatFragment extends Fragment implements Populatable{
     // To add messages sent to the Chat to FireStore
     private void addMessage(String text, Timestamp timestamp) {
         ChatEntry chatEntry = new ChatEntry(userID, text, null, timestamp);
-        groupEntry.addChatEntry(chatEntry);
 
-        GroupEntry.SetGroupEntry addMessage = new GroupEntry.SetGroupEntry(groupEntry, groupId, 5000) {
+        GroupEntry.UpdateGroupEntry addMessage = new GroupEntry.UpdateGroupEntry(groupId,
+                GroupEntry.UpdateGroupEntry.FieldChange.CHAT_ADD, chatEntry, 5000) {
             @Override
             public void onPostExecute() {
                 // if (isSuccessful()) Toast.makeText(getContext(), "Chat sent successfully", Toast.LENGTH_SHORT).show();

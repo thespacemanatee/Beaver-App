@@ -174,34 +174,16 @@ public class CreateGroupFragment extends Fragment {
 
                                 Toast.makeText(getContext(), "Group created successfully", Toast.LENGTH_SHORT).show();
 
-                                UserEntry.GetUserEntry getUser = new UserEntry.GetUserEntry(userID, 5000) {
+                                UserEntry.UpdateUserEntry addUser = new UserEntry.UpdateUserEntry(userID,
+                                        UserEntry.UpdateUserEntry.FieldChange.GROUPS_ADD, groupID, 5000) {
                                     @Override
                                     public void onPostExecute() {
+                                        Toast.makeText(getContext(), "User added successfully", Toast.LENGTH_SHORT).show();
+                                        getGroupMemberInfo(groupID);
 
-                                        UserEntry userEntry = getResult();
-                                        userEntry.addGroupId(groupID);
-
-                                        UserEntry.SetUserEntry addUser = new UserEntry.SetUserEntry(userEntry, userID, 5000) {
-                                            @Override
-                                            public void onPostExecute() {
-                                                Toast.makeText(getContext(), "User added successfully", Toast.LENGTH_SHORT).show();
-                                                getGroupMemberInfo(groupID);
-//                                                Bundle bundle = new Bundle();
-//                                                bundle.putString("imageUri", imageUri);
-//                                                bundle.putString("groupName", groupName);
-//                                                bundle.putString("groupId", groupID);
-//                                                bundle.putBoolean("groupExists", false);
-//
-//                                                AddUsersFragment addUsersFragment = new AddUsersFragment();
-//                                                addUsersFragment.setArguments(bundle);
-//                                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-//                                                transaction.replace(R.id.fragment_container, addUsersFragment).commit();
-                                            }
-                                        };
-                                        addUser.start();
                                     }
                                 };
-                                getUser.start();
+                                addUser.start();
                             }
                         };
                         createGroup.start();

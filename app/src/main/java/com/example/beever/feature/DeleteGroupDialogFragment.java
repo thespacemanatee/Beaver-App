@@ -29,6 +29,7 @@ public class DeleteGroupDialogFragment extends DialogFragment {
     private String groupId;
     private List<Object> members;
     private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private int counter = 0;
 
     public DeleteGroupDialogFragment(String groupId, List<Object> members) {
         this.groupId = groupId;
@@ -48,36 +49,35 @@ public class DeleteGroupDialogFragment extends DialogFragment {
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         for (Object member: members) {
-                            UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry((String) member, 5000) {
+
+                            int full = members.size();
+                            UserEntry.UpdateUserEntry deleteGroupId = new UserEntry.UpdateUserEntry((String) member,
+                                    UserEntry.UpdateUserEntry.FieldChange.GROUPS_REMOVE, groupId, 5000) {
                                 @Override
                                 public void onPostExecute() {
-                                    UserEntry userEntry = getResult();
-                                    userEntry.removeGroupId(groupId);
-                                    UserEntry.SetUserEntry deleteGroupId = new UserEntry.SetUserEntry(userEntry, (String) member, 5000) {
-                                        @Override
-                                        public void onPostExecute() {
-                                            Log.d("DELETE GROUP ID", "onPostExecute: " + "SUCCESS");
+                                    Log.d("DELETE GROUP ID", "onPostExecute: " + "SUCCESS");
 
-                                            fStore.collection("groups").document(groupId).delete()
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            Log.d("DELETE GROUP", "DocumentSnapshot successfully deleted!");
-                                                            transaction.replace(R.id.fragment_container, fragment).commit();
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.w("DELETE GROUP", "Error deleting document", e);
-                                                        }
-                                                    });
-                                        }
-                                    };
-                                    deleteGroupId.start();
+                                    counter++;
+
+                                    if (counter == full) {
+                                        fStore.collection("groups").document(groupId).delete()
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d("DELETE GROUP", "DocumentSnapshot successfully deleted!");
+                                                        transaction.replace(R.id.fragment_container, fragment).commit();
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w("DELETE GROUP", "Error deleting document", e);
+                                                    }
+                                                });
+                                    }
                                 }
                             };
-                            getUserEntry.start();
+                            deleteGroupId.start();
                         }
                     }
                 })

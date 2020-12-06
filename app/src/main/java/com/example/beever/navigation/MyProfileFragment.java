@@ -155,8 +155,8 @@ public class MyProfileFragment extends Fragment {
                     }
                 });
 
-        userEntry.setDisplay_picture(imageUri.toString());
-        UserEntry.SetUserEntry setProfileImage = new UserEntry.SetUserEntry(userEntry, userID, 5000) {
+        UserEntry.UpdateUserEntry setProfileImage = new UserEntry.UpdateUserEntry(userID,
+                UserEntry.UpdateUserEntry.FieldChange.DISPLAY_PICTURE, imageUri.toString(), 5000) {
             @Override
             public void onPostExecute() {
                 Glide.with(getActivity()).load(imageUri).into(profilePic);
@@ -187,29 +187,20 @@ public class MyProfileFragment extends Fragment {
                 name.setError(null);
                 name.setErrorEnabled(false);
 
-                UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
+                UserEntry.UpdateUserEntry setName = new UserEntry.UpdateUserEntry(userID,
+                        UserEntry.UpdateUserEntry.FieldChange.NAME, newName, 5000) {
                     @Override
                     public void onPostExecute() {
-
-                        UserEntry userEntry = getResult();
-                        userEntry.setName(newName);
-
-                        UserEntry.SetUserEntry setName = new UserEntry.SetUserEntry(userEntry, userID, 5000) {
-                            @Override
-                            public void onPostExecute() {
-                                _NAME = newName;
-                                nameLabel.setText(_NAME);
-                                SharedPreferences.Editor editor = mSharedPref.edit();
-                                editor.putString("registeredName", newName);
-                                editor.apply();
-                                update.revertAnimation();
-                                Toast.makeText(getActivity(), "Name changed successfully!", Toast.LENGTH_SHORT).show();
-                            }
-                        };
-                        setName.start();
+                        _NAME = newName;
+                        nameLabel.setText(_NAME);
+                        SharedPreferences.Editor editor = mSharedPref.edit();
+                        editor.putString("registeredName", newName);
+                        editor.apply();
+                        update.revertAnimation();
+                        Toast.makeText(getActivity(), "Name changed successfully!", Toast.LENGTH_SHORT).show();
                     }
                 };
-                getUserEntry.start();
+                setName.start();
                 return true;
             }
 

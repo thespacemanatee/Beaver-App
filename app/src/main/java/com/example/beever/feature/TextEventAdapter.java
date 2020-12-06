@@ -79,25 +79,17 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
                             if (eventEntry.getGroup_id_source() != null){
                                 Toast.makeText(context,"Group event cannot be deleted",Toast.LENGTH_SHORT).show();
                             } else {
-                                UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(USER_ID, 5000) {
+                                dbEvents.remove(eventEntry);
+                                notifyDataSetChanged();
+                                UserEntry.UpdateUserEntry updateUserEntry = new UserEntry.UpdateUserEntry(USER_ID,
+                                        UserEntry.UpdateUserEntry.FieldChange.USER_EVENTS_CURRENT_REMOVE, eventEntry, 5000) {
                                     @Override
                                     public void onPostExecute() {
-                                        if(isSuccessful()) {
-                                            getResult().modifyEventOrTodo(true, true, false, eventEntry);
-                                            dbEvents.remove(eventEntry);
-                                            notifyDataSetChanged();
-                                            UserEntry.SetUserEntry setUserEntry = new UserEntry.SetUserEntry(getResult(),USER_ID,5000) {
-                                                @Override
-                                                public void onPostExecute() {
-                                                    fragmentManager.beginTransaction().replace(R.id.fragment_container,new CalendarFragment()).commit();
-                                                    Toast.makeText(context,"Event successfully deleted",Toast.LENGTH_SHORT).show();
-                                                }
-                                            };
-                                            setUserEntry.start();
-                                        }
+                                        fragmentManager.beginTransaction().replace(R.id.fragment_container,new CalendarFragment()).commit();
+                                        Toast.makeText(context,"Event successfully deleted",Toast.LENGTH_SHORT).show();
                                     }
                                 };
-                                getUserEntry.start();
+                                updateUserEntry.start();
 
                             }
                         }

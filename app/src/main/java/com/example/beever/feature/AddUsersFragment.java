@@ -109,9 +109,9 @@ public class AddUsersFragment extends Fragment {
                    for (QueryDocumentSnapshot document : task.getResult()) {
 
                        userID = document.getId();
-                       groupEntry.addUserId(userID);
 
-                       GroupEntry.SetGroupEntry addMember = new GroupEntry.SetGroupEntry(groupEntry, groupID, 5000) {
+                       GroupEntry.UpdateGroupEntry addMember = new GroupEntry.UpdateGroupEntry(groupID,
+                               GroupEntry.UpdateGroupEntry.FieldChange.MEMBER_LIST_ADD, userID, 5000) {
                            @Override
                            public void onPostExecute() {
                                UserEntry.GetUserEntry getUser = new UserEntry.GetUserEntry(userID, 5000) {
@@ -121,7 +121,8 @@ public class AddUsersFragment extends Fragment {
                                        UserEntry userEntry = getResult();
                                        userEntry.addGroupId(groupID);
 
-                                       UserEntry.SetUserEntry addUser = new UserEntry.SetUserEntry(userEntry, userID, 5000) {
+                                       UserEntry.UpdateUserEntry addUser = new UserEntry.UpdateUserEntry(userID,
+                                               UserEntry.UpdateUserEntry.FieldChange.GROUPS_ADD, groupID, 5000) {
                                            @Override
                                            public void onPostExecute() {
                                                Toast.makeText(getContext(), "User added successfully", Toast.LENGTH_SHORT).show();
