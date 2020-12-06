@@ -111,10 +111,18 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
                             ArrayList<EventEntry> events = getResult();
                             events.sort(new DashboardEventComparator());
 
+                            Log.d("TIMER", "1: " + currentTime.getTime());
                             for (int i = 0; i < events.size(); i++) {
+//                                Log.d("TIMER", "This should be less: " + currentTime.getTime());
+//                                Log.d("TIMER", "This should be more: " + events.get(i).getStart_time().toDate().getTime());
                                 if (events.get(i).getStart_time().toDate().getTime() < currentTime.getTime()) {
+                                    Log.d("TIMER", "PRERESULT: " + events.get(i+1).getStart_time());
                                     upcomingEvent = events.get(i+1).getStart_time();
-                                    Log.d("UPCOMING EVENT", "onTick: " + events.get(i));
+                                } else if (events.get(i).getStart_time().toDate().getTime() > currentTime.getTime()) {
+                                    upcomingEvent = events.get(i).getStart_time();
+                                    break;
+                                } else {
+                                    upcomingEvent = new Timestamp(new Date());
                                 }
                             }
 
@@ -129,7 +137,11 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
                                     long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
 
-                                    countdown.setText(days + " Days\n" + hours + " Hours\n" + minutes + " Minutes");
+                                    if (days <= 0) {
+                                        countdown.setText(hours + " Hours\n" + minutes + " Minutes");
+                                    } else {
+                                        countdown.setText(days + " Days\n" + hours + " Hours\n" + minutes + " Minutes");
+                                    }
                                 }
 
                                 public void onFinish() {
@@ -138,7 +150,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
                                 }
                             }.start();
                         } catch (Exception e) {
-                            Log.d(TAG, "onPostExecute: " + e.toString());
+                            Log.d("TIMER", "onTick: " + "FAILED");
                             e.printStackTrace();
                         }
 
