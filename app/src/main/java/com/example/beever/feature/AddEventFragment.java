@@ -189,6 +189,7 @@ public class AddEventFragment extends Fragment {
                                 public void onPostExecute() {
                                     Toast.makeText(getContext(),"Event saved successfully.", Toast.LENGTH_SHORT).show();
                                     CalendarFragment calendarFragment = new CalendarFragment();
+                                    getFragmentManager().popBackStack();
                                     getFragmentManager().beginTransaction().replace(R.id.fragment_container,calendarFragment).commit();
 //                            populateEventsList();
 //                            textEventAdapter.notifyDataSetChanged();
