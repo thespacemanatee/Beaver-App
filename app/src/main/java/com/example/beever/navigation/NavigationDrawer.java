@@ -46,6 +46,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -55,6 +58,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
     private static final int POS_MY_PROFILE = 1;
     private static final int POS_SETTINGS = 2;
     private static final int POS_LOGOUT = 4;
+    private static final String TAG = "NavigationDrawer";
     private int pos;
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
 
@@ -127,16 +131,34 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
                                 }
                             }
 
-                            new CountDownTimer(upcomingEvent.toDate().getTime() - currentTime.getTime() - 27000000, 1000) {
+                            new CountDownTimer(upcomingEvent.toDate().getTime() - currentTime.getTime(), 1000) {
                                 public void onTick(long millisUntilFinished) {
-                                    countdown.setText(new SimpleDateFormat("HH:mm").format(new Date(millisUntilFinished)));
+
+                                    long days = TimeUnit.MILLISECONDS.toDays(millisUntilFinished);
+                                    millisUntilFinished -= TimeUnit.DAYS.toMillis(days);
+
+                                    long hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
+                                    millisUntilFinished -= TimeUnit.HOURS.toMillis(hours);
+
+                                    long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
+                                    millisUntilFinished -= TimeUnit.MINUTES.toMillis(minutes);
+
+                                    long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
+
+                                    countdown.setText(days + " Days\n" + hours + " Hours\n" + minutes + " Minutes"); //You can compute the millisUntilFinished on hours/minutes/seconds
+
+//                                    SimpleDateFormat formatter = new SimpleDateFormat("d 'Days, 'HH'hr 'm'm'", Locale.getDefault());
+//                                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+//                                    countdown.setText(formatter.format(millisUntilFinished));
                                 }
 
                                 public void onFinish() {
-                                    countdown.setText("No upcoming meetings!");
+                                    countdown.setText(" No\n upcoming\n meetings!");
+                                    countdown.setTextSize(20);
                                 }
                             }.start();
                         } catch (Exception e) {
+                            Log.d(TAG, "onPostExecute: " + e.toString());
                             e.printStackTrace();
                         }
 

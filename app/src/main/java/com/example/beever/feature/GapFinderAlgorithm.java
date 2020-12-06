@@ -1,5 +1,7 @@
 package com.example.beever.feature;
 
+import android.util.Log;
+
 import com.example.beever.database.EventEntry;
 import com.example.beever.database.GroupEntry;
 import com.google.firebase.Timestamp;
@@ -88,7 +90,19 @@ public abstract class GapFinderAlgorithm {
     }
 
     public void runMainGapFinder(ArrayList<EventEntry> events){
-        //Log.d("Check",events.toString());
+        //Log.d("targetStart",targetStartTimestamp.toDate().toString());
+        //Log.d("targetEnd",targetEndTimestamp.toDate().toString());
+        //Log.d("targetStart",Long.toString(targetStartTimestamp.getSeconds()));
+        //Log.d("targetEnd",Long.toString(targetEndTimestamp.getSeconds()));
+        //Calendar cd = Calendar.getInstance();
+        for (EventEntry e:events){
+            //cd.setTime(e.getStart_time().toDate());
+            //Log.d("testStart",e.getStart_time().toDate().toString());
+            //cd.setTime(e.getEnd_time().toDate());
+            //Log.d("testEnd",e.getEnd_time().toDate().toString());
+            //Log.d("testStart",Long.toString(e.getStart_time().getSeconds()));
+            //Log.d("testEnd",Long.toString(e.getEnd_time().getSeconds()));
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.set(targetYear,targetMonth,targetDay,0,0,0);
         if (isAvailable){
@@ -135,7 +149,7 @@ public abstract class GapFinderAlgorithm {
         for (int i=0;i<availableBlockCount;i++) occupancyCumulative.add(0);
         occupancyCumulative.set(availableBlockCount-1,occupancy.get(availableBlockCount-1)? 1 : 0);
         result = new ArrayList<ArrayList<Timestamp> >();
-        if (requestedBlockCount==1) {
+        if (requestedBlockCount==1 && occupancy.get(availableBlockCount-1)) {
             ArrayList<Timestamp> resultAppend = new ArrayList<Timestamp>();
             resultAppend.add(getOffsetTimestamp(targetDateBase, availableBlockCount-1));
             resultAppend.add(getOffsetTimestamp(targetDateBase, availableBlockCount-1 + requestedBlockCount));
