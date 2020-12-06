@@ -139,6 +139,8 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
                                     if (days <= 0) {
                                         countdown.setText(hours + " Hours\n" + minutes + " Minutes");
+                                    } else if (hours <= 0) {
+                                        countdown.setText(minutes + " Minutes");
                                     } else {
                                         countdown.setText(days + " Days\n" + hours + " Hours\n" + minutes + " Minutes");
                                     }
