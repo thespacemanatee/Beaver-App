@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
@@ -30,6 +31,7 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
     private ArrayList<EventEntry> dbEvents;
     private Context context;
     private String USER_ID;
+    private FragmentManager fragmentManager;
     static int moreThanDay;
     SimpleDateFormat sfDate = new SimpleDateFormat("dd MMM");
     SimpleDateFormat sfTime = new SimpleDateFormat("HH:mm");
@@ -87,6 +89,7 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
                                             UserEntry.SetUserEntry setUserEntry = new UserEntry.SetUserEntry(getResult(),USER_ID,5000) {
                                                 @Override
                                                 public void onPostExecute() {
+                                                    fragmentManager.beginTransaction().replace(R.id.fragment_container,new CalendarFragment()).commit();
                                                     Toast.makeText(context,"Event successfully deleted",Toast.LENGTH_SHORT).show();
                                                 }
                                             };
@@ -151,10 +154,11 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
         }
     }
 
-    public TextEventAdapter(ArrayList<EventEntry> data, Context context, String USER_ID) {
+    public TextEventAdapter(ArrayList<EventEntry> data, Context context, String USER_ID, FragmentManager fragmentManager) {
         this.dbEvents = data;
         this.context = context;
         this.USER_ID = USER_ID;
+        this.fragmentManager = fragmentManager;
         Log.d(TAG, "TextEventAdapter: " + data.toString());
 //        this.mContext = context;
     }

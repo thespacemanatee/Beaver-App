@@ -65,7 +65,6 @@ public class CalendarFragment extends Fragment {
     private int selectedMonth = calendar.get(Calendar.MONTH);
     private int selectedYear = calendar.get(Calendar.YEAR);
     FloatingActionButton addEvent;
-    Bundle bundle = new Bundle();
     View bottom_menu;
     ImageView noEventsImage;
     TextView noEventsText;
@@ -92,9 +91,9 @@ public class CalendarFragment extends Fragment {
             utils.fadeIn();
         }
 
-        textEventAdapter = new TextEventAdapter(list,getContext(),USER_ID);
+        textEventAdapter = new TextEventAdapter(list,getContext(),USER_ID,getFragmentManager());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
-        mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
+        mRecyclerView = root.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(textEventAdapter);
