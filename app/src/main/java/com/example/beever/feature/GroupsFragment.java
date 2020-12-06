@@ -1,28 +1,18 @@
 
 package com.example.beever.feature;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
@@ -35,7 +25,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class GroupsFragment extends Fragment implements Populatable{
 
@@ -115,47 +104,9 @@ public class GroupsFragment extends Fragment implements Populatable{
             };
             getUserEntry.start();
         }
-//
-//        UserEntry.UserEntryListener userEntryListener = new UserEntry.UserEntryListener(userId, 5000) {
-//            @Override
-//            public void onPreListening() {
-//
-//            }
-//
-//            @Override
-//            public void onListenerUpdate() {
-//                if (getStateChange()== StateChange.GROUPS) {
-//                    userEntry = getResult();
-//                    getGroupEntries(userEntry);
-//                }
-//            }
-//
-//            @Override
-//            public void onSetupFailure() {
-//
-//            }
-//        };
-//        userEntryListener.start();
 
         return rootView;
     }
-
-//    private void getGroupEntries(UserEntry userEntry) {
-//        groupEntries.clear();
-//        groupIds.clear();
-//        for (Object o: userEntry.getGroups()) {
-//
-//            GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry((String) o, 5000) {
-//                @Override
-//                public void onPostExecute() {
-//                    groupEntries.add(getResult());
-//                    groupIds.add(getGroupId());
-//                }
-//            };
-//            getGroupEntry.start();
-//        }
-//        adapter.notifyDataSetChanged();
-//    }
 
     @Override
     public void populateRecyclerView() {
@@ -178,33 +129,6 @@ public class GroupsFragment extends Fragment implements Populatable{
             textView.setVisibility(View.GONE);
         }
         adapter.notifyDataSetChanged();
-
-//        UserEntry.GetUserEntry userGetter = new UserEntry.GetUserEntry(userID, 5000) {
-//            @Override
-//            public void onPostExecute() {
-//                if (isSuccessful()) {
-//                    for (Object o: getResult().getGroups()) {
-//                        GroupEntry.GetGroupEntry groupGetter = new GroupEntry.GetGroupEntry((String)o, 5000) {
-//                            @Override
-//                            public void onPostExecute() {
-//                                if (isSuccessful()) {
-//                                    grpIds.add(getGroupId());
-//                                    grpNames.add(getResult().getName());
-//                                    grpImages.add(getResult().getDisplay_picture());
-//                                    if (grpIds.size() > 0) {
-//                                        imageView.setVisibility(View.GONE);
-//                                        textView.setVisibility(View.GONE);
-//                                    }
-//                                    adapter.notifyDataSetChanged();
-//                                }
-//                            }
-//                        };
-//                        groupGetter.start();
-//                    }
-//                }
-//            }
-//        };
-//        userGetter.start();
     }
 
     //Load Group Information from FireStore before going to next Fragment
