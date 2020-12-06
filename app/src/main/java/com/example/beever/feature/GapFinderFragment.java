@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
-import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -40,19 +39,14 @@ import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 public class GapFinderFragment extends Fragment implements AdapterView.OnItemSelectedListener, GapAdapter.OnTimestampListener {
 
     private final int DURATION_BLOCK_UPPER_LIMIT = 10;
-    private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
-    private RecyclerView mRecyclerView;
-    private String groupName;
     private String groupID;
-    private MaterialButton preferredDate, preferredTime;
     private CircularProgressButton searchBtn;
     private TextView currentTime, result;
     private TextInputLayout eventName, eventDesc;
-    private Spinner spin;
     private GroupEntry groupEntry;
-    private ArrayList<Timestamp> timestamps = new ArrayList<>();
-    private ArrayList<Timestamp> timestampsEnd = new ArrayList<>();
-    private Integer[] durations = new Integer[DURATION_BLOCK_UPPER_LIMIT];
+    private final ArrayList<Timestamp> timestamps = new ArrayList<>();
+    private final ArrayList<Timestamp> timestampsEnd = new ArrayList<>();
+    private final Integer[] durations = new Integer[DURATION_BLOCK_UPPER_LIMIT];
     private int chosenDuration;
     private GapAdapter adapter;
     private int queryYear;
@@ -70,16 +64,16 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         Bundle bundle = this.getArguments();
 
 //        groupImage = bundle.getString("imageUri");
-        groupName = bundle.getString("groupName");
+        String groupName = bundle.getString("groupName");
         groupID = bundle.getString("groupId");
 
-        mRecyclerView = rootView.findViewById(R.id.gap_finder_recycler);
-        preferredDate = rootView.findViewById(R.id.preferred_date);
-        preferredTime = rootView.findViewById(R.id.preferred_time);
+        RecyclerView mRecyclerView = rootView.findViewById(R.id.gap_finder_recycler);
+        MaterialButton preferredDate = rootView.findViewById(R.id.preferred_date);
+        MaterialButton preferredTime = rootView.findViewById(R.id.preferred_time);
         searchBtn = rootView.findViewById(R.id.search_button);
         currentTime = rootView.findViewById(R.id.current_preferred_text);
         result = rootView.findViewById(R.id.gap_result);
-        spin = rootView.findViewById(R.id.spinner);
+        Spinner spin = rootView.findViewById(R.id.spinner);
         eventName = rootView.findViewById(R.id.event_name);
         eventDesc = rootView.findViewById(R.id.event_description);
 
@@ -101,11 +95,11 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         queryMonth = c.get(Calendar.MONTH);
         queryDay = c.get(Calendar.DAY_OF_MONTH);
         queryHour = (c.get(Calendar.HOUR_OF_DAY)>=1 && c.get(Calendar.HOUR_OF_DAY)<8)? 8 : c.get(Calendar.HOUR_OF_DAY);
-        queryMinute = (int)(c.get(Calendar.MINUTE)/15)*15;
+        queryMinute = (c.get(Calendar.MINUTE)/15) *15;
         c.set(queryYear,queryMonth,queryDay,queryHour,queryMinute,0);
         setPreferredTimeIndicator(c);
 
-        ArrayAdapter aa = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, durations);
+        ArrayAdapter<Integer> aa = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, durations);
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         spin.setAdapter(aa);
@@ -146,7 +140,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         preferredDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDatePickerDialog(v);
+                showDatePickerDialog();
             }
         });
 
@@ -218,7 +212,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         setPreferredTimeIndicator(c);
     }
 
-    public void showDatePickerDialog(View v) {
+    public void showDatePickerDialog() {
         DialogFragment newFragment = new DatePickerFragment(GapFinderFragment.this);
         newFragment.show(getFragmentManager(), "datePicker");
     }
@@ -331,7 +325,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
 
     public static class TimeSelectFragment extends DialogFragment{
 
-        private GapFinderFragment gapFinderFragment = null;
+        private final GapFinderFragment gapFinderFragment;
         private NumberPicker gap_finder_select_hour = null;
         private NumberPicker gap_finder_select_minute = null;
         
@@ -367,7 +361,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            return;
                         }
                     }).setPositiveButton("Set", new DialogInterface.OnClickListener() {
                 @Override

@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
@@ -131,7 +132,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
         // format the timestamp into a readable date dd-MM
         Timestamp deadline = toDo.getDeadline();
-        SimpleDateFormat sf = new SimpleDateFormat("dd MMM");
+        SimpleDateFormat sf = new SimpleDateFormat("dd MMM", Locale.getDefault());
         sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
         String deadlineStr = sf.format(deadline.toDate());
         toDoDeadline.setText(deadlineStr);

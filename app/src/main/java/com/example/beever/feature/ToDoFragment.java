@@ -207,9 +207,6 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
             }
         });
 
-        /**
-         * FLOATING ACTION BUTTON COMPONENT: Allows the user to add a to-do
-         */
         // set To Do Form for FloatingActionButton
         toDoAddButton = rootView.findViewById(R.id.toDoAddButton);
         toDoAddButton.setOnClickListener(v -> {

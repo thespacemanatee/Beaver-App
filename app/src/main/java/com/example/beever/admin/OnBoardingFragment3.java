@@ -31,27 +31,24 @@ public class OnBoardingFragment3 extends Fragment {
         boolean isLoggedIn = mSharedPref.getBoolean("isLoggedIn", false);
 
         //Create new OnClickListener that starts the login activity when clicked
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        fab.setOnClickListener(v -> {
 
-                if (isLoggedIn) {
+            if (isLoggedIn) {
 
-                    SharedPreferences.Editor editor = mSharedPref.edit();
-                    editor.putBoolean("firstTime", false);
-                    editor.apply();
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putBoolean("firstTime", false);
+                editor.apply();
 
-                    Intent intent = new Intent(getActivity(), NavigationDrawer.class);
+                Intent intent = new Intent(getActivity(), NavigationDrawer.class);
 
-                    startActivity(intent);
+                startActivity(intent);
 
-                } else {
+            } else {
 
-                    Intent intent = new Intent(getActivity(),Login.class);
-                    startActivity(intent);
-                }
-                getActivity().finish();
+                Intent intent = new Intent(getActivity(),Login.class);
+                startActivity(intent);
             }
+            getActivity().finish();
         });
         return root;
     }
