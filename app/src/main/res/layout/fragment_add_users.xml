@@ -27,12 +27,12 @@ tools:context=".feature.AddUsersFragment">
     </RelativeLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/addUsers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/addUsers"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="@color/white"

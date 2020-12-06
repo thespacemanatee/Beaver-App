@@ -73,12 +73,6 @@ public class GroupsFragment extends Fragment implements Populatable{
         imageView = rootView.findViewById(R.id.no_group_image);
         textView = rootView.findViewById(R.id.no_group_text);
 
-        View bottom_menu = getActivity().findViewById(R.id.bottom_menu);
-        if (bottom_menu.getVisibility() == View.GONE) {
-            Utils utils = new Utils(getContext());
-            utils.fadeIn();
-        }
-
         //Populate GridView in fragment_groups.xml with Groups
         GridView layout = rootView.findViewById(R.id.groupButtons);
         adapter = new GridAdapter(getActivity());

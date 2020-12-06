@@ -3,6 +3,7 @@ package com.example.beever.feature;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -38,7 +40,7 @@ public class AddUsersFragment extends Fragment {
     private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private SharedPreferences mSharedPref;
     private String userID;
-    private TextInputEditText addUsers;
+    private TextInputLayout addUsers;
     private CircularProgressButton addUsersBtn;
     private UsersAdapter adapter;
     private String groupName;
@@ -88,9 +90,14 @@ public class AddUsersFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 addUsersBtn.startAnimation();
-                String user = addUsers.getText().toString();
-                if (!user.isEmpty()) {
+                String user = addUsers.getEditText().getText().toString();
+                if (user.isEmpty()) {
+                    addUsers.setError("Field cannot be empty");
+                    addUsersBtn.revertAnimation();
+                } else {
                     addUserToGroup(user);
+                    addUsers.setError(null);
+                    addUsers.setErrorEnabled(false);
                 }
             }
         });
@@ -105,9 +112,14 @@ public class AddUsersFragment extends Fragment {
         queryEmail.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
            @Override
            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-               if (task.isSuccessful()) {
-                   for (QueryDocumentSnapshot document : task.getResult()) {
+               Log.d("LOL", "1: " + task.getResult().toString());
 
+               if (task.isSuccessful()) {
+                   if (task.getResult().size() == 0) {
+                       addUsers.setError("Email address not found");
+                       addUsersBtn.revertAnimation();
+                   }
+                   for (QueryDocumentSnapshot document : task.getResult()) {
                        userID = document.getId();
 
                        GroupEntry.UpdateGroupEntry addMember = new GroupEntry.UpdateGroupEntry(groupID,

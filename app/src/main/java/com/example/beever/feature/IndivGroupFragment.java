@@ -77,6 +77,7 @@ public class IndivGroupFragment extends Fragment {
 //                            .commit();
                     Utils utils = new Utils(getContext());
                     utils.fadeIn();
+                    Log.d("NINO", "handleOnBackPressed: " + "HELLO");
                 } else if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName().equals("dashboard")) {
                     ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle("Dashboard");
                     getFragmentManager().popBackStack();

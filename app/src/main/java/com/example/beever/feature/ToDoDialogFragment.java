@@ -165,19 +165,19 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
                     String description = toDoDialogDescription.getEditText().getText().toString();
                     String assignedTo = toDoDialogSpinner.getSelectedItem().toString();
                     if (task.isEmpty()) {
-                        toDoDialogTask.setError("Task title cannot be empty");
+                        toDoDialogTask.setError("Field cannot be empty");
                     } else {
                         toDoDialogTask.setError(null);
                         toDoDialogTask.setErrorEnabled(false);
                     }
                     if (description.isEmpty()) {
-                        toDoDialogDescription.setError("Task description cannot be empty");
+                        toDoDialogDescription.setError("Field cannot be empty");
                     } else {
                         toDoDialogDescription.setError(null);
                         toDoDialogDescription.setErrorEnabled(false);
                     }
                     if (dueDate == null) {
-                        Toast.makeText(getContext(), "Due date cannot be empty", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Please select a due date", Toast.LENGTH_SHORT).show();
                     }
 
                     //Dismiss once everything is OK.
@@ -217,10 +217,10 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
                     } catch (NullPointerException e) {
                         // invoked when member_list in firestore is null which means
                         // no group members found
-                        Toast.makeText(getContext(), "No Group Members found :(", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "No Group Members found", Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(getContext(), "Not Successful", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Unsuccessful", Toast.LENGTH_SHORT).show();
                 }
             }
         };
