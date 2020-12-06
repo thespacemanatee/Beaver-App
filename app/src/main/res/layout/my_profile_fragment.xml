@@ -82,14 +82,8 @@
                     android:layout_height="match_parent"
                     android:padding="5dp">
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="30dp"-->
-                    <!--                        android:layout_height="30dp"-->
-                    <!--                        android:layout_centerHorizontal="true"-->
-                    <!--                        android:src="" />-->
-
                     <TextView
-                        android:id="@+id/payment_label"
+                        android:id="@+id/profile_meetings"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
@@ -103,7 +97,7 @@
                         android:id="@+id/payment_desc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/payment_label"
+                        android:layout_below="@id/profile_meetings"
                         android:layout_centerHorizontal="true"
                         android:includeFontPadding="false"
                         android:text="Upcoming Meetings"
@@ -135,7 +129,7 @@
                     <!--                        android:src="" />-->
 
                     <TextView
-                        android:id="@+id/booking_label"
+                        android:id="@+id/profile_deadlines"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
@@ -149,7 +143,7 @@
                         android:id="@+id/booking_desc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/booking_label"
+                        android:layout_below="@id/profile_deadlines"
                         android:layout_centerHorizontal="true"
                         android:includeFontPadding="false"
                         android:text="Deadlines"

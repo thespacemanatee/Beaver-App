@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.admin.MainActivity;
+import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
@@ -36,7 +37,7 @@ public class MyProfileFragment extends Fragment {
 
     //Create variables for each element
     private TextInputLayout name, email;
-    private TextView usernameLabel, nameLabel;
+    private TextView usernameLabel, nameLabel, profileMeetings, profileDeadlines;
     private CircularProgressButton update;
     private CircleImageView profilePic;
     private SharedPreferences mSharedPref;
@@ -47,7 +48,8 @@ public class MyProfileFragment extends Fragment {
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userID;
     private final String TAG = "Logcat";
-    private UserEntry userEntry;
+    private int counterDeadlines = 0;
+    private int counter = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,6 +71,8 @@ public class MyProfileFragment extends Fragment {
         email = root.findViewById(R.id.email_field);
         update = root.findViewById(R.id.update_button);
         profilePic = root.findViewById(R.id.profile_image);
+        profileMeetings = root.findViewById(R.id.profile_meetings);
+        profileDeadlines = root.findViewById(R.id.profile_deadlines);
         FloatingActionButton toOnBoarding = root.findViewById(R.id.to_onboarding);
 
 
@@ -83,7 +87,6 @@ public class MyProfileFragment extends Fragment {
         UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
             @Override
             public void onPostExecute() {
-                userEntry = getResult();
             }
         };
         getUserEntry.start();
@@ -174,6 +177,39 @@ public class MyProfileFragment extends Fragment {
         nameLabel.setText(_NAME);
         name.getEditText().setText(_NAME);
         email.getEditText().setText(_EMAIL);
+
+        UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userID, 5000) {
+            @Override
+            public void onPostExecute() {
+
+                for (Object o: getResult().getGroups()) {
+                    int full = getResult().getGroups().size();
+                    GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry((String) o, 5000) {
+                        @Override
+                        public void onPostExecute() {
+                            counter++;
+                            if (getResult().getTodo_list().size() > 0) {
+                                counterDeadlines += (getResult().retrieveGroupTodos(true, false).size());
+                            }
+                            if (counter == full) {
+                                profileDeadlines.setText(String.valueOf(counterDeadlines));
+                            }
+                        }
+                    };
+                    getGroupEntry.start();
+                }
+
+                UserEntry.GetUserRelevantEvents getUserRelevantEvents = new UserEntry.GetUserRelevantEvents(getResult(), 5000, true, false) {
+                    @Override
+                    public void onPostExecute() {
+                        int counterMeetings = getResult().size();
+                        profileMeetings.setText(String.valueOf(counterMeetings));
+                    }
+                };
+                getUserRelevantEvents.start();
+            }
+        };
+        getUserEntry.start();
     }
 
     private boolean isNameChanged() {
