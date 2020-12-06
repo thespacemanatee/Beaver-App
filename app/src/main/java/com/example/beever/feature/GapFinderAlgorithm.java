@@ -57,7 +57,9 @@ public abstract class GapFinderAlgorithm {
         targetStartTimestamp = new Timestamp(c.getTime());
         c.setTimeInMillis(c.getTimeInMillis()+(60*1000*durationInMinutes));
         targetEndTimestamp = new Timestamp(c.getTime());
-        if ((c.get(Calendar.HOUR_OF_DAY)>START_FORBIDDEN_TIMING_HOUR)&&(c.get(Calendar.HOUR_OF_DAY)<=END_FORBIDDEN_TIMING_HOUR)){
+        if (((c.get(Calendar.HOUR_OF_DAY)==START_FORBIDDEN_TIMING_HOUR)&&(c.get(Calendar.MINUTE)!=0))
+            ||((c.get(Calendar.HOUR_OF_DAY)>START_FORBIDDEN_TIMING_HOUR)&&(c.get(Calendar.HOUR_OF_DAY)<END_FORBIDDEN_TIMING_HOUR))
+            ||((c.get(Calendar.HOUR_OF_DAY)==END_FORBIDDEN_TIMING_HOUR)&&(c.get(Calendar.MINUTE)==0))){
             illegalTiming = true;
             isAvailable = false;
         }
