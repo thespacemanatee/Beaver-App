@@ -158,7 +158,6 @@ public class ChatFragment extends Fragment implements Populatable{
 
                         //Scroll to latest message
                         adapter.notifyItemRangeInserted(layout.getAdapter().getItemCount(), chats.size() - 1);
-                        layout.smoothScrollToPosition(chats.size() - 1);
                     } catch (NullPointerException e) {
                         populateRecyclerView();
                     }
