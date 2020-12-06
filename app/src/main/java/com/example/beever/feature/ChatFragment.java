@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -74,6 +75,9 @@ public class ChatFragment extends Fragment implements Populatable{
 
         //Show Chat Bubbles
         layout = rootView.findViewById(R.id.bubbles_area);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setStackFromEnd(true);
+        layout.setLayoutManager(layoutManager);
         adapter = new BubblesAdapter(getContext());
         layout.setAdapter(adapter);
         populateRecyclerView();
