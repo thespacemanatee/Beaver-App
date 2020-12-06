@@ -150,6 +150,7 @@ public class TextEventAdapter extends RecyclerView.Adapter<TextEventAdapter.Text
         public void onClick(View v) {
             int itemPos = getLayoutPosition();
             EventEntry eventEntry = dbEvents.get(itemPos);
+//            fragmentManager.beginTransaction().replace(R.id.fragment_container,new EventViewFragment()).commit();
 
         }
     }

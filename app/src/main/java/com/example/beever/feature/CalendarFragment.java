@@ -42,13 +42,17 @@ import java.util.Map;
 public class CalendarFragment extends Fragment {
 
     //TODO: Implement onListenerUpdate()
-    private static final String USER_ENTRY = "userEntry";
     private static final String GROUP_ENTRIES = "groupEntries";
     private static final String GROUP_IDS = "groupIds";
     private static final String RELEVANT_EVENTS = "relevantEvents";
-    private ArrayList<EventEntry> events = new ArrayList<>();
+    private static final String USER_ENTRY = "userEntry";
+
+    private UserEntry userEntry;
     private ArrayList<GroupEntry> groupEntries = new ArrayList<>();
     private ArrayList<String> groupIds = new ArrayList<>();
+    private ArrayList<EventEntry> events = new ArrayList<>();
+
+    private Bundle bundle1 = new Bundle();
 
     private static final String TAG = "CalendarFragment";
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
@@ -56,14 +60,13 @@ public class CalendarFragment extends Fragment {
     protected Map<String,Object> map = new HashMap<>();
     private final String[] months = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
     private String USER_ID;
-    private UserEntry userEntry;
     private TextEventAdapter textEventAdapter;
     private RecyclerView mRecyclerView;
     private Utils utils;
     private Calendar calendar = Calendar.getInstance();
-    private int selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
-    private int selectedMonth = calendar.get(Calendar.MONTH);
-    private int selectedYear = calendar.get(Calendar.YEAR);
+    private int selectedDay;
+    private int selectedMonth;
+    private int selectedYear;
     FloatingActionButton addEvent;
     View bottom_menu;
     ImageView noEventsImage;
@@ -74,6 +77,10 @@ public class CalendarFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_calendar, container, false);
+
+        selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
+        selectedMonth = calendar.get(Calendar.MONTH);
+        selectedYear = calendar.get(Calendar.YEAR);
 
         /**
          * Get user ID from firebase authentication
@@ -167,11 +174,18 @@ public class CalendarFragment extends Fragment {
 //                dialog.show(getFragmentManager(),"AddEventDialog");
                 utils = new Utils(v.getContext());
                 utils.fadeOut();
-                bundle.putInt("selectedDay",selectedDay);
-                bundle.putInt("selectedMonth",selectedMonth);
-                bundle.putInt("selectedYear",selectedYear);
                 Fragment addEventFragment = new AddEventFragment();
-                addEventFragment.setArguments(bundle);
+                if (bundle != null) {
+                    bundle.putInt("selectedDay", selectedDay);
+                    bundle.putInt("selectedMonth", selectedMonth);
+                    bundle.putInt("selectedYear", selectedYear);
+                    addEventFragment.setArguments(bundle);
+                } else {
+                    bundle1.putInt("selectedDay", selectedDay);
+                    bundle1.putInt("selectedMonth", selectedMonth);
+                    bundle1.putInt("selectedYear", selectedYear);
+                    addEventFragment.setArguments(bundle1);
+                }
                 getFragmentManager().beginTransaction().replace(R.id.fragment_container, addEventFragment).addToBackStack(null).commit();
 //                customDialog("New Event", "Edit new event", "cancel", "save");
             }
@@ -241,6 +255,7 @@ public class CalendarFragment extends Fragment {
 //                                Date startDate = new GregorianCalendar(selectedYear, selectedMonth,selectedDay).getTime();
         Timestamp startDate = new Timestamp(new Date((dateTimestamp.getSeconds())*1000));
         Timestamp endDate = new Timestamp(new Date((startDate.getSeconds() + 86400)*1000));
+        Log.d(TAG, "populateEventsList: "+ USER_ID);
         Log.d(TAG, "START DATE " + startDate);
         Log.d(TAG, "END DATE " + endDate);
         ArrayList<EventEntry> eventEntries = new ArrayList<>();
