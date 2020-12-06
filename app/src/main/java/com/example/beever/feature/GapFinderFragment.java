@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -85,7 +86,8 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         spin.setOnItemSelectedListener(this);
 
         mRecyclerView = rootView.findViewById(R.id.gap_finder_recycler);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setReverseLayout(true);
         mRecyclerView.setLayoutManager(layoutManager);
         adapter = new GapAdapter(timestamps, this);
         mRecyclerView.setAdapter(adapter);

@@ -161,7 +161,6 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
                 @Override
                 public void onClick(View v)
                 {
-                    // TODO Do something
                     String task = toDoDialogTask.getEditText().getText().toString();
                     String description = toDoDialogDescription.getEditText().getText().toString();
                     String assignedTo = toDoDialogSpinner.getSelectedItem().toString();
