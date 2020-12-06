@@ -82,53 +82,47 @@ public class MainActivity extends AppCompatActivity {
 
 
         Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
+        handler.postDelayed(() -> {
 
-                //Check if "firstTime" key value in SharedPreferences is true or false
-                boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
+            //Check if "firstTime" key value in SharedPreferences is true or false
+            boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
 //                boolean isLoggedIn = mSharedPref.getBoolean("isLoggedIn", false);
 
 
-                if (!isFirstTime) {
+            if (!isFirstTime) {
 
-                    //Check if user was registered before and still logged in from previous session
-                    if (fAuth.getCurrentUser() != null) {
+                //Check if user was registered before and still logged in from previous session
+                if (fAuth.getCurrentUser() != null) {
 
-                        //Pass stored user data into new userprofile activity as Extras
-                        Intent intent = new Intent(MainActivity.this, NavigationDrawer.class);
+                    //Pass stored user data into new userprofile activity as Extras
+                    Intent intent = new Intent(MainActivity.this, NavigationDrawer.class);
 
-                        startActivity(intent);
-                        finish();
+                    startActivity(intent);
+                    finish();
 
-                    } else {
+                } else {
 
-                        //If not the first time launching app, create intent and startActivity with animations
-                        Intent intent = new Intent(MainActivity.this, Login.class);
+                    //If not the first time launching app, create intent and startActivity with animations
+                    Intent intent = new Intent(MainActivity.this, Login.class);
 
-                        @SuppressWarnings("rawtypes")
-                        Pair[] pairs = new Pair[2];
-                        pairs[0] = new Pair<View, String>(image,"logo_image");
-                        pairs[1] = new Pair<View, String>(logo,"logo_text");
+                    @SuppressWarnings("rawtypes")
+                    Pair[] pairs = new Pair[2];
+                    pairs[0] = new Pair<View, String>(image,"logo_image");
+                    pairs[1] = new Pair<View, String>(logo,"logo_text");
 
-                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this,pairs);
-                        startActivity(intent, options.toBundle());
-                    }
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, pairs);
+                    startActivity(intent, options.toBundle());
                 }
             }
         },SPLASH_TIMEOUT);
 
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
+        handler.postDelayed(() -> {
+            boolean isFirstTime = mSharedPref.getBoolean("firstTime",true);
 
-                //If not the first time launching app then finish() after slight delay
-                if (!isFirstTime) {
-                    finish();
+            //If not the first time launching app then finish() after slight delay
+            if (!isFirstTime) {
+                finish();
 
-                }
             }
         }, SPLASH_TIMEOUT+500);
     }
@@ -137,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
     private static class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
         public ScreenSlidePagerAdapter(@NonNull FragmentManager fm) {
-            super(fm);
+            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         }
 
         @NonNull

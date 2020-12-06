@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.beever.R;
 import com.example.beever.database.EventEntry;
+import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,6 +41,7 @@ import com.google.firebase.firestore.auth.User;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -49,6 +51,17 @@ import java.util.TimeZone;
 public class AddEventFragment extends Fragment {
 
     private static final String TAG = "AddEventFragment";
+    private static final String GROUP_ENTRIES = "groupEntries";
+    private static final String GROUP_IDS = "groupIds";
+    private static final String RELEVANT_EVENTS = "relevantEvents";
+    private static final String DASH_GROUP_ENTRIES = "dashGroupEntries";
+    private static final String DASH_GROUP_IDS = "dashGroupIds";
+    private static final String USER_ENTRY = "userEntry";
+
+    private UserEntry userEntry;
+    private ArrayList<GroupEntry> groupEntries = new ArrayList<>();
+    private ArrayList<String> groupIds = new ArrayList<>();
+    private ArrayList<EventEntry> events = new ArrayList<>();
 
     private EditText mInput,mDescription;
     private LinearLayout eventStart, eventEnd, addEventButtons;
@@ -56,7 +69,6 @@ public class AddEventFragment extends Fragment {
     private Button cancel, save;
     private Calendar start, end;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-    private UserEntry userEntry;
     private String USER_ID;
     private Utils utils;
     private int selectedDay, selectedMonth, selectedYear;
@@ -82,6 +94,10 @@ public class AddEventFragment extends Fragment {
         selectedDay = bundle.getInt("selectedDay");
         selectedMonth = bundle.getInt("selectedMonth");
         selectedYear = bundle.getInt("selectedYear");
+//        userEntry = bundle.getParcelable(USER_ENTRY);
+//        groupEntries = bundle.getParcelableArrayList(GROUP_ENTRIES);
+//        groupIds = bundle.getStringArrayList(GROUP_IDS);
+//        events = bundle.getParcelableArrayList(RELEVANT_EVENTS);
 
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         USER_ID = firebaseUser.getUid();
@@ -169,7 +185,9 @@ public class AddEventFragment extends Fragment {
                         public void onPostExecute() {
                             if (isSuccessful()) {
                                 Toast.makeText(getContext(), "Event saved successfully.", Toast.LENGTH_SHORT).show();
-                                getFragmentManager().popBackStackImmediate();
+                                CalendarFragment calendarFragment = new CalendarFragment();
+                                getFragmentManager().popBackStack();
+                                getFragmentManager().beginTransaction().replace(R.id.fragment_container,calendarFragment).commit();
                                 return;
                             }
                             Toast.makeText(getContext(), "There was an error, please try again.", Toast.LENGTH_SHORT).show();

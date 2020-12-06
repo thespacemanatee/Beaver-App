@@ -4,4 +4,7 @@
     android:layout_height="wrap_content"
     android:textSize="30sp"
     android:textColor="@color/beever_blue"
-    android:fontFamily="@font/poppins_bold"/>
+    android:fontFamily="@font/poppins_bold"
+    android:ellipsize="end"
+    android:maxEms="10"
+    android:maxLines="1"/>

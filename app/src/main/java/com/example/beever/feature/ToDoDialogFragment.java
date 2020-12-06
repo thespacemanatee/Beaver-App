@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import com.example.beever.database.GroupEntry;
 import com.example.beever.database.TodoEntry;
 import com.example.beever.database.UserEntry;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
 
 import java.util.ArrayList;
@@ -43,8 +45,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     // view components plus local data
     protected View parentView;
     protected Spinner toDoDialogSpinner;
-    protected TextInputEditText toDoDialogTask;
-    protected TextInputEditText toDoDialogDescription;
+    protected TextInputLayout toDoDialogTask, toDoDialogDescription;
     protected Button toDoDialogDate;
     protected TextView addToDo;
     protected RecyclerView recyclerView;
@@ -56,9 +57,9 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
 
     private final String groupID;
 
-    protected String assignedTo;
-    protected String taskTitle;
-    protected String taskDescr;
+//    protected String assignedTo;
+//    protected String taskTitle;
+//    protected String taskDescr;
     protected Date dueDate;
 
     /**
@@ -138,16 +139,6 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
         builder.setView(parentView)
                 .setPositiveButton("Add", (dialog, which) -> {
                     // positive button adds the to-do
-                    taskTitle = Objects.requireNonNull(toDoDialogTask.getText()).toString();
-                    taskDescr = Objects.requireNonNull(toDoDialogDescription.getText()).toString();
-                    assignedTo = toDoDialogSpinner.getSelectedItem().toString();
-                    // checks if all the fields are filled in
-                    if (dueDate == null || taskTitle.isEmpty() || assignedTo.isEmpty()) {
-                        Toast.makeText(getContext(), "All fields must be filled in!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // adds a new to-do to the current to-do list
-                        addNewToDo(taskTitle, taskDescr, assignedTo, dueDate);
-                    }
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
                     // negative button just dismisses the dialog
@@ -155,6 +146,48 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
                 });
 
         return builder.create();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        final AlertDialog dialog = (AlertDialog)getDialog();
+        if(dialog != null)
+        {
+            Button positiveButton = (Button) dialog.getButton(Dialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    String task = toDoDialogTask.getEditText().getText().toString();
+                    String description = toDoDialogDescription.getEditText().getText().toString();
+                    String assignedTo = toDoDialogSpinner.getSelectedItem().toString();
+                    if (task.isEmpty()) {
+                        toDoDialogTask.setError("Task title cannot be empty");
+                    } else {
+                        toDoDialogTask.setError(null);
+                        toDoDialogTask.setErrorEnabled(false);
+                    }
+                    if (description.isEmpty()) {
+                        toDoDialogDescription.setError("Task description cannot be empty");
+                    } else {
+                        toDoDialogDescription.setError(null);
+                        toDoDialogDescription.setErrorEnabled(false);
+                    }
+                    if (dueDate == null) {
+                        Toast.makeText(getContext(), "Due date cannot be empty", Toast.LENGTH_SHORT).show();
+                    }
+
+                    //Dismiss once everything is OK.
+                    if (!(task.isEmpty() || description.isEmpty() || dueDate == null)) {
+                        addNewToDo(task, description, assignedTo, dueDate);
+                        dialog.dismiss();
+                    }
+                }
+            });
+        }
     }
 
     private void initGroupMembers() {

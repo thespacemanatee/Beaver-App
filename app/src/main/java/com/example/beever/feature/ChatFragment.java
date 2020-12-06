@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +54,7 @@ public class ChatFragment extends Fragment implements Populatable{
     private ArrayList<String> sender = new ArrayList<>();
     private ArrayList<Timestamp> times = new ArrayList<>();
     private SharedPreferences mSharedPref;
+    private boolean isAtBottom;
 
     private GroupEntry groupEntry;
 
@@ -74,8 +77,41 @@ public class ChatFragment extends Fragment implements Populatable{
 
         //Show Chat Bubbles
         layout = rootView.findViewById(R.id.bubbles_area);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setStackFromEnd(true);
         adapter = new BubblesAdapter(getContext());
         layout.setAdapter(adapter);
+
+        // makes recycler view scroll to bottom if user is at bottom
+        RecyclerView.AdapterDataObserver observer = new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+/*
+                if (isAtBottom) {
+                    layout.smoothScrollToPosition(layout.getAdapter().getItemCount());
+                }*/
+
+                layout.smoothScrollToPosition(layout.getAdapter().getItemCount());
+            }
+        };
+
+/*        layout.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (!layout.canScrollVertically(1)) {
+                    isAtBottom = true;
+                } else {
+                    isAtBottom = false;
+                }
+            }
+        });*/
+
+        // set layout manager and assign observer to adapter
+        adapter.registerAdapterDataObserver(observer);
+        layout.setLayoutManager(layoutManager);
         populateRecyclerView();
 
         //Create Send Button
@@ -109,7 +145,6 @@ public class ChatFragment extends Fragment implements Populatable{
 
             }
 
-            //Todo: fix this shit
             public void onListenerUpdate(){
                 if (getStateChange()==StateChange.CHAT) {
 
@@ -123,8 +158,7 @@ public class ChatFragment extends Fragment implements Populatable{
                         senderImg.add(groupMemberImgs.get(chatEntry.getSender()));
 
                         //Scroll to latest message
-                        adapter.notifyItemInserted(chats.size() - 1);
-                        layout.smoothScrollToPosition(chats.size() - 1);
+                        adapter.notifyItemRangeInserted(layout.getAdapter().getItemCount(), chats.size());
                     } catch (NullPointerException e) {
                         populateRecyclerView();
                     }

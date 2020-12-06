@@ -11,11 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -23,27 +21,13 @@ import com.bumptech.glide.Glide;
 import com.example.beever.R;
 import com.example.beever.admin.MainActivity;
 import com.example.beever.database.UserEntry;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -59,10 +43,8 @@ public class MyProfileFragment extends Fragment {
 
     //Global variables to hold user data inside this activity
     private static String _USERNAME,_NAME,_EMAIL;
-    private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    private FirebaseUser fUser;
     private String userID;
     private final String TAG = "Logcat";
     private UserEntry userEntry;
@@ -90,8 +72,7 @@ public class MyProfileFragment extends Fragment {
         FloatingActionButton toOnBoarding = root.findViewById(R.id.to_onboarding);
 
 
-
-        fUser = fAuth.getCurrentUser();
+        FirebaseUser fUser = fAuth.getCurrentUser();
         userID = fUser.getUid();
 
 
@@ -109,41 +90,32 @@ public class MyProfileFragment extends Fragment {
 
         showUserData();
 
-        toOnBoarding.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences.Editor editor = mSharedPref.edit();
-                editor.putBoolean("firstTime", true);
-                editor.apply();
+        toOnBoarding.setOnClickListener(v -> {
+            SharedPreferences.Editor editor = mSharedPref.edit();
+            editor.putBoolean("firstTime", true);
+            editor.apply();
 
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
-                getActivity().finish();
-            }
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            startActivity(intent);
+            getActivity().finish();
         });
 
 
-        update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        update.setOnClickListener(v -> {
 
-                update.startAnimation();
+            update.startAnimation();
 
-                //Call each method to check if user inputs are different from existing values and if not, set them to new values
-                if (!isNameChanged()) {
-                    update.revertAnimation();
-                    Toast.makeText(getActivity(), "Please enter a different value", Toast.LENGTH_SHORT).show();
-                }
+            //Call each method to check if user inputs are different from existing values and if not, set them to new values
+            if (!isNameChanged()) {
+                update.revertAnimation();
+                Toast.makeText(getActivity(), "Please enter a different value", Toast.LENGTH_SHORT).show();
             }
         });
 
-        profilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        profilePic.setOnClickListener(v -> {
 
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, 1000);
-            }
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(intent, 1000);
         });
 
         return root;
@@ -164,17 +136,7 @@ public class MyProfileFragment extends Fragment {
 
     private void uploadImage(Uri imageUri) {
         StorageReference fileReference = storageReference.child("users/" + userID + "/group_image.jpg");
-        fileReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        uploadToFirebase(uri);
-                    }
-                });
-            }
-        });
+        fileReference.putFile(imageUri).addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(this::uploadToFirebase));
     }
 
     private void uploadToFirebase(Uri imageUri) {
@@ -187,12 +149,9 @@ public class MyProfileFragment extends Fragment {
                 .build();
 
         user.updateProfile(profileUpdates)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "User profile updated.");
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "User profile updated.");
                     }
                 });
 

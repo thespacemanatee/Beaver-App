@@ -1,13 +1,7 @@
 package com.example.beever.admin;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,7 +11,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,12 +24,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -41,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class Registration extends AppCompatActivity {
 
@@ -73,21 +62,13 @@ public class Registration extends AppCompatActivity {
         mSharedPref = getSharedPreferences("SharedPref",MODE_PRIVATE);
 
         //Validate if user entered information is formatted properly by calling registerUser()
-        regButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                regButton.startAnimation();
-                registerUser(v);
-            }
+        regButton.setOnClickListener(v -> {
+            regButton.startAnimation();
+            registerUser(v);
         });
 
         //Return to sign in page
-        callLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Registration.super.onBackPressed();
-            }
-        });
+        callLogin.setOnClickListener(v -> Registration.super.onBackPressed());
     }
 
     private Boolean validateName() {
@@ -195,52 +176,41 @@ public class Registration extends AppCompatActivity {
         String email = regEmail.getEditText().getText().toString();
         String password = regPassword.getEditText().getText().toString();
 
-        fAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(Registration.this, "Registration Successful", Toast.LENGTH_SHORT).show();
-                    userID = fAuth.getCurrentUser().getUid();
-                    SharedPreferences.Editor editor = mSharedPref.edit();
-                    editor.putBoolean("isLoggedIn", true);
-                    editor.putString("registeredName", name);
-                    editor.putString("registeredUsername", userName);
-                    editor.putString("registeredEmail", email);
-                    editor.apply();
+        fAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(Registration.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                userID = fAuth.getCurrentUser().getUid();
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putBoolean("isLoggedIn", true);
+                editor.putString("registeredName", name);
+                editor.putString("registeredUsername", userName);
+                editor.putString("registeredEmail", email);
+                editor.apply();
 
-                    DocumentReference documentReference = fStore.collection("users").document(userID);
-                    Map<String, Object> user = new HashMap<>();
-                    user.put("name", name);
-                    user.put("email", email);
-                    user.put("username", userName);
-                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("Log", "onSuccess: User profile is created for " + userID);
-                        }
-                    });
+                DocumentReference documentReference = fStore.collection("users").document(userID);
+                Map<String, Object> user = new HashMap<>();
+                user.put("name", name);
+                user.put("email", email);
+                user.put("username", userName);
+                documentReference.set(user).addOnSuccessListener(aVoid -> Log.d("Log", "onSuccess: User profile is created for " + userID));
 
-                    FirebaseUser fUser = fAuth.getCurrentUser();
-                    UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
-                            .setDisplayName(name)
-                            .build();
-                    fUser.updateProfile(request);
+                FirebaseUser fUser = fAuth.getCurrentUser();
+                UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                        .setDisplayName(name)
+                        .build();
+                fUser.updateProfile(request);
 
-                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
 //                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finishAffinity();
-                        }
-                    }, 2000);
+                    startActivity(intent);
+                    finishAffinity();
+                }, 2000);
 
 
-                } else {
-                    Toast.makeText(Registration.this, "Error! " + task.getException(), Toast.LENGTH_SHORT).show();
-                    regButton.revertAnimation();
-                }
+            } else {
+                Toast.makeText(Registration.this, "Error! " + task.getException(), Toast.LENGTH_SHORT).show();
+                regButton.revertAnimation();
             }
         });
 

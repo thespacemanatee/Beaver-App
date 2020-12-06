@@ -1,14 +1,8 @@
 package com.example.beever.admin;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -19,6 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.beever.R;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,17 +23,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
@@ -79,38 +68,32 @@ public class Login extends AppCompatActivity {
         fStore = FirebaseFirestore.getInstance();
 
         //Create OnClickListener for sign up button
-        callRegistration.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        callRegistration.setOnClickListener(v -> {
 
-                //Starts new registration activity when clicked on with smooth animations
-                Intent intent = new Intent(Login.this,Registration.class);
+            //Starts new registration activity when clicked on with smooth animations
+            Intent intent = new Intent(Login.this,Registration.class);
 
-                @SuppressWarnings("rawtypes")
-                Pair[] pairs = new Pair[7];
-                pairs[0] = new Pair<View, String>(image,"logo_image");
-                pairs[1] = new Pair<View, String>(logoText,"logo_text");
-                pairs[2] = new Pair<View, String>(username,"user_tran");
-                pairs[3] = new Pair<View, String>(password,"password_tran");
-                pairs[4] = new Pair<View, String>(loginButton,"button_tran");
-                pairs[5] = new Pair<View, String>(signUpText,"sign_up_text_tran");
-                pairs[6] = new Pair<View, String>(callRegistration,"sign_up_tran");
+            @SuppressWarnings("rawtypes")
+            Pair[] pairs = new Pair[7];
+            pairs[0] = new Pair<View, String>(image,"logo_image");
+            pairs[1] = new Pair<View, String>(logoText,"logo_text");
+            pairs[2] = new Pair<View, String>(username,"user_tran");
+            pairs[3] = new Pair<View, String>(password,"password_tran");
+            pairs[4] = new Pair<View, String>(loginButton,"button_tran");
+            pairs[5] = new Pair<View, String>(signUpText,"sign_up_text_tran");
+            pairs[6] = new Pair<View, String>(callRegistration,"sign_up_tran");
 
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(Login.this, pairs);
-                startActivity(intent,options.toBundle());
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(Login.this, pairs);
+            startActivity(intent,options.toBundle());
 
-            }
         });
 
         //Create OnClickListener for login button
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        loginButton.setOnClickListener(v -> {
 
-                //Call loginUser() method on click login button
-                loginButton.startAnimation();
-                loginUser(v);
-            }
+            //Call loginUser() method on click login button
+            loginButton.startAnimation();
+            loginUser(v);
         });
     }
 
@@ -159,46 +142,40 @@ public class Login extends AppCompatActivity {
         String usernameProvided = username.getEditText().getText().toString().trim();
         String passwordProvided = password.getEditText().getText().toString().trim();
 
-        fAuth.signInWithEmailAndPassword(usernameProvided,passwordProvided).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(Login.this, "Login Successful", Toast.LENGTH_SHORT).show();
+        fAuth.signInWithEmailAndPassword(usernameProvided,passwordProvided).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(Login.this, "Login Successful", Toast.LENGTH_SHORT).show();
 
-                    userID = fAuth.getCurrentUser().getUid();
+                userID = fAuth.getCurrentUser().getUid();
 
-                    DocumentReference documentReference = fStore.collection("users").document(userID);
-                    documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()) {
-                                    SharedPreferences.Editor editor = mSharedPref.edit();
-                                    editor.putBoolean("isLoggedIn", true);
-                                    editor.putString("registeredName", document.getString("name"));
-                                    editor.putString("registeredUsername", document.getString("username"));
-                                    editor.putString("registeredEmail", document.getString("email"));
-                                    editor.apply();
-                                } else {
-                                    Log.d(TAG, "No such document");
-                                }
-                            } else {
-                                Log.d(TAG, "get failed with ", task.getException());
-                            }
+                DocumentReference documentReference = fStore.collection("users").document(userID);
+                documentReference.get().addOnCompleteListener(task1 -> {
+                    if (task1.isSuccessful()) {
+                        DocumentSnapshot document = task1.getResult();
+                        if (document.exists()) {
+                            SharedPreferences.Editor editor = mSharedPref.edit();
+                            editor.putBoolean("isLoggedIn", true);
+                            editor.putString("registeredName", document.getString("name"));
+                            editor.putString("registeredUsername", document.getString("username"));
+                            editor.putString("registeredEmail", document.getString("email"));
+                            editor.apply();
+                        } else {
+                            Log.d(TAG, "No such document");
                         }
-                    });
+                    } else {
+                        Log.d(TAG, "get failed with ", task1.getException());
+                    }
+                });
 
-                    Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Intent intent = new Intent(getApplicationContext(), NavigationDrawer.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-                    startActivity(intent);
-                    finish();
+                startActivity(intent);
+                finish();
 
-                } else {
-                    Toast.makeText(Login.this, "Error! " + task.getException(), Toast.LENGTH_SHORT).show();
-                    loginButton.revertAnimation();
-                }
+            } else {
+                Toast.makeText(Login.this, "Error! " + task.getException(), Toast.LENGTH_SHORT).show();
+                loginButton.revertAnimation();
             }
         });
 

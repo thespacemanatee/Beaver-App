@@ -29,27 +29,24 @@ public class OnBoardingFragment1 extends Fragment {
 
         MaterialButton skip = root.findViewById(R.id.skip_button);
 
-        skip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        skip.setOnClickListener(v -> {
 
-                if (isLoggedIn) {
+            if (isLoggedIn) {
 
-                    SharedPreferences.Editor editor = mSharedPref.edit();
-                    editor.putBoolean("firstTime", false);
-                    editor.apply();
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putBoolean("firstTime", false);
+                editor.apply();
 
-                    Intent intent = new Intent(getActivity(), NavigationDrawer.class);
+                Intent intent = new Intent(getActivity(), NavigationDrawer.class);
 
-                    startActivity(intent);
+                startActivity(intent);
 
-                } else {
+            } else {
 
-                    Intent intent = new Intent(getActivity(),Login.class);
-                    startActivity(intent);
-                }
-                getActivity().finish();
+                Intent intent = new Intent(getActivity(),Login.class);
+                startActivity(intent);
             }
+            getActivity().finish();
         });
 
         return root;
