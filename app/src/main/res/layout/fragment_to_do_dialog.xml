@@ -21,6 +21,7 @@
         android:background="@color/beever_light_blue_transparent"/>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/toDoDialogTask"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/task_title"
@@ -33,12 +34,12 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:id="@+id/toDoDialogTask"/>
+            android:layout_width="match_parent" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/toDoDialogDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/task_description"
@@ -51,8 +52,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:id="@+id/toDoDialogDescription" />
+            android:layout_width="match_parent" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
