@@ -87,14 +87,16 @@ public class ChatFragment extends Fragment implements Populatable{
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
-
+/*
                 if (isAtBottom) {
                     layout.smoothScrollToPosition(layout.getAdapter().getItemCount());
-                }
+                }*/
+
+                layout.smoothScrollToPosition(layout.getAdapter().getItemCount());
             }
         };
 
-        layout.addOnScrollListener(new RecyclerView.OnScrollListener() {
+/*        layout.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -105,7 +107,7 @@ public class ChatFragment extends Fragment implements Populatable{
                     isAtBottom = false;
                 }
             }
-        });
+        });*/
 
         // set layout manager and assign observer to adapter
         adapter.registerAdapterDataObserver(observer);
