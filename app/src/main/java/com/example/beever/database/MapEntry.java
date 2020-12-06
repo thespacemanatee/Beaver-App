@@ -25,26 +25,14 @@ package com.example.beever.database;
 import java.util.Map;
 
 /**
- * An abstract class on which both EventEntry and TodoEntry is based.
- * This is made mostly for convenience in modifyEventOrTodo() in UserEntry.class and GroupEntry.class.
+ * Interface for entry objects convertible to Map<String,Object> objects
  */
-public abstract class EventTodoEntry implements MapEntry {
+public interface MapEntry {
 
     /**
-     * Get equivalent Map object representation which obeys EventEntry/TodoEntry contract
+     * Get Map representation of entry
      * @return Map object representation
      */
-    public abstract Map<String, Object> retrieveRepresentation();
+    public Map<String,Object> retrieveRepresentation();
 
-    /**
-     * Check whether this is a group (and not personal) event/todo
-     * @return boolean for whether this is a group entity
-     */
-    public abstract boolean checkIfGroupEntry();
-
-    /**
-     * Get user/group ID of entity containing this event/todo
-     * @return user/group ID
-     */
-    public abstract String retrieveSource();
 }

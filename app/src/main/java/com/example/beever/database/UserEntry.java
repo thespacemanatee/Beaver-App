@@ -1,3 +1,25 @@
+/*
+Copyright (c) 2020 Beever
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+
 package com.example.beever.database;
 
 import android.annotation.SuppressLint;
@@ -16,6 +38,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
@@ -54,7 +77,7 @@ import java.util.Map;
  * To create an instance of this class manually, use only the 2nd constructor.
 **/
 
-public class UserEntry implements Parcelable {
+public class UserEntry implements Parcelable, MapEntry {
 
     /**
      * Set default maximum number of groups to feature on the dashboard
@@ -366,6 +389,23 @@ public class UserEntry implements Parcelable {
                 && ((getDisplay_picture()==null && other.getDisplay_picture()==null)
                     || (getDisplay_picture()!=null && other.getDisplay_picture()!=null
                     && getDisplay_picture().equals(other.getDisplay_picture())));
+    }
+
+    /**
+     * Return raw Map representation of this entry
+     * @return nested Map object representation
+     */
+    public Map<String, Object> retrieveRepresentation() {
+        HashMap<String,Object> ret = new HashMap<String,Object>();
+        ret.put("username",getUsername());
+        ret.put("name",getName());
+        ret.put("email",getEmail());
+        ret.put("display_picture",getDisplay_picture());
+        ret.put("groups",getGroups());
+        ret.put("dashboard_grps",getDashboard_grps());
+        ret.put("user_events",getUser_events());
+        ret.put("todo_list",getTodo_list());
+        return ret;
     }
 
     /**
@@ -695,6 +735,7 @@ public class UserEntry implements Parcelable {
         private static final String LOG_NAME = "UserEntry.SetUserEntry";
         private static final int SLEEP_INCREMENT = 10;
         private Boolean result = null;
+        private boolean timeoutOccurred = false;
 
         private UserEntry userEntry;
         private String userId;
@@ -746,6 +787,7 @@ public class UserEntry implements Parcelable {
             }
             if (result==null) {
                 Log.d(LOG_NAME, "Timeout");
+                timeoutOccurred = true;
                 result = false;
             }
             return;
@@ -757,6 +799,14 @@ public class UserEntry implements Parcelable {
          */
         public boolean isSuccessful(){
             return result!=null && result;
+        }
+
+        /**
+         * Check if failure occurred due to timeout (use only if setup failed)
+         * @return true if timeout occurred
+         */
+        public boolean isTimedOut(){
+            return timeoutOccurred;
         }
 
         /**
@@ -995,5 +1045,214 @@ public class UserEntry implements Parcelable {
          * @return true if any group entry does not exist
          */
         public boolean isGroupEntryMissing() {return !groupExists;}
+    }
+
+    /**
+     * Subclass of AsyncGetter used to update single fields in user entries safely. To make
+     * entirely new user entries use SetUserEntry instead.
+     * To use, create an instance of this class and start it.
+     */
+    public abstract static class UpdateUserEntry extends AsyncGetter{
+
+        private static final String LOG_NAME = "UserEntry.UpdateUserEntry";
+        private static final int SLEEP_INCREMENT = 10;
+
+        /**
+         * Enum to indicate what field to change, and how to change the field (for some fields)
+         */
+        public enum FieldChange{
+            USERNAME,
+            NAME,
+            EMAIL,
+            DISPLAY_PICTURE,
+            GROUPS_ADD,
+            GROUPS_REMOVE,
+            DASHBOARD_GRPS,
+            USER_EVENTS_CURRENT_ADD,
+            USER_EVENTS_CURRENT_REMOVE,
+            USER_EVENTS_PAST_ADD,
+            USER_EVENTS_PAST_REMOVE,
+            TODO_LIST_CURRENT_ADD,
+            TODO_LIST_CURRENT_REMOVE,
+            TODO_LIST_PAST_ADD,
+            TODO_LIST_PAST_REMOVE
+        }
+
+        private FieldChange fieldChange = null;
+        private String userId = null;
+        private Object updateObject = null;
+        private Integer timeout = null;
+        private Boolean result = null;
+        private boolean timeoutOccurred = false;
+
+        /**
+         * Standard constructor
+         * @param userId user id of entry to update
+         * @param fieldChange field to change
+         * @param updateObject value to use for update
+         * @param timeout timeout in milliseconds
+         */
+        public UpdateUserEntry(String userId, FieldChange fieldChange, Object updateObject, int timeout){
+            this.userId = userId;
+            this.fieldChange = fieldChange;
+            this.updateObject = updateObject;
+            this.timeout = timeout;
+        }
+
+        /**
+         * Main body of thread
+         */
+        @SuppressLint("LongLogTag")
+        public void runMainBody(){
+            String fieldString = null;
+            boolean isList = false;
+            boolean isAdd = true;
+
+            switch (fieldChange){
+                case USERNAME:
+                    fieldString = "username";
+                    assert updateObject instanceof String;
+                    break;
+                case NAME:
+                    fieldString = "name";
+                    assert updateObject instanceof String;
+                    break;
+                case EMAIL:
+                    fieldString = "email";
+                    assert updateObject instanceof String;
+                    break;
+                case DISPLAY_PICTURE:
+                    fieldString = "display_picture";
+                    assert updateObject instanceof String;
+                    break;
+                case GROUPS_ADD:
+                    fieldString = "groups";
+                    isList = true;
+                    assert updateObject instanceof String;
+                    break;
+                case GROUPS_REMOVE:
+                    fieldString = "groups";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof String;
+                    break;
+                case DASHBOARD_GRPS:
+                    fieldString = "dashboard_grps";
+                    assert updateObject instanceof List && ((List) updateObject).size()==UserEntry.DASHBOARD_GRPS;
+                    break;
+                case USER_EVENTS_CURRENT_ADD:
+                    fieldString = "user_events.current";
+                    isList = true;
+                    assert updateObject instanceof Map || updateObject instanceof EventEntry;
+                    break;
+                case USER_EVENTS_CURRENT_REMOVE:
+                    fieldString = "user_events.current";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof Map || updateObject instanceof EventEntry;
+                    break;
+                case USER_EVENTS_PAST_ADD:
+                    fieldString = "user_events.past";
+                    isList = true;
+                    assert updateObject instanceof Map || updateObject instanceof EventEntry;
+                    break;
+                case USER_EVENTS_PAST_REMOVE:
+                    fieldString = "user_events.past";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof Map || updateObject instanceof EventEntry;
+                    break;
+                case TODO_LIST_CURRENT_ADD:
+                    fieldString = "todo_list.current";
+                    isList = true;
+                    assert updateObject instanceof Map || updateObject instanceof TodoEntry;
+                    break;
+                case TODO_LIST_CURRENT_REMOVE:
+                    fieldString = "todo_list.current";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof Map || updateObject instanceof TodoEntry;
+                    break;
+                case TODO_LIST_PAST_ADD:
+                    fieldString = "todo_list.past";
+                    isList = true;
+                    assert updateObject instanceof Map || updateObject instanceof TodoEntry;
+                    break;
+                case TODO_LIST_PAST_REMOVE:
+                    fieldString = "todo_list.past";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof Map || updateObject instanceof TodoEntry;
+                    break;
+                default:
+                    assert false : "Invalid field choice.";
+                    break;
+            }
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference docRef = db.collection("users").document(userId);
+
+            OnSuccessListener<Void> onSuccessListener = new OnSuccessListener<Void>(){
+                public void onSuccess (Void aVoid){
+                    result = true;
+                }
+            };
+
+            OnFailureListener onFailureListener = new OnFailureListener() {
+                @SuppressLint("LongLogTag")
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    result = false;
+                    Log.d(LOG_NAME,"Update failed");
+                }
+            };
+
+            if (!isList) docRef.update(fieldString,updateObject).addOnSuccessListener(onSuccessListener)
+                    .addOnFailureListener(onFailureListener);
+            else {
+                if (isAdd) docRef.update(fieldString, FieldValue.arrayUnion(updateObject))
+                        .addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+                else docRef.update(fieldString, FieldValue.arrayRemove(updateObject))
+                        .addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+            }
+
+            long now = System.currentTimeMillis();
+            long end = now + timeout;
+            while (now < end) {
+                try {
+                    Thread.sleep(SLEEP_INCREMENT);
+                } catch (InterruptedException e) {
+                }
+                now = System.currentTimeMillis();
+                if (result!=null) {
+                    break;
+                }
+            }
+            if (result==null) {
+                Log.d(LOG_NAME, "Timeout");
+                result = false;
+                timeoutOccurred = true;
+            }
+
+            return;
+
+        }
+
+        /**
+         * Check whether update was successful.
+         * @return true if update was successful
+         */
+        public boolean isSuccessful(){
+            return result;
+        }
+
+        /**
+         * Check whether update failure was due to timeout (if update did fail). Use only if update failed.
+         * @return true if cause is timeout
+         */
+        public boolean isTimedOut() {
+            return timeoutOccurred;
+        }
+
     }
 }

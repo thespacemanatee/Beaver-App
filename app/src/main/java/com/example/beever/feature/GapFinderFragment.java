@@ -248,45 +248,33 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
             eventDesc.setError("Please enter an event name!");
         }
         if (!name.isEmpty() && !description.isEmpty()) {
-            GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupID,5000){
+            EventEntry eventEntry = new EventEntry();
+            eventEntry.setName(name);
+            eventEntry.setDescription(description);
+            eventEntry.setGroup_id_source(groupID);
+            eventEntry.setStart_time(timestamps.get(position));
+            eventEntry.setEnd_time(timestampsEnd.get(position));
+            GroupEntry.UpdateGroupEntry updateGroupEntry = new GroupEntry.UpdateGroupEntry(groupID,
+                    GroupEntry.UpdateGroupEntry.FieldChange.GROUP_EVENTS_CURRENT_ADD,eventEntry,5000) {
                 @Override
                 public void onPostExecute() {
-                    if (!isSuccessful()){
+                    if (!isSuccessful()) {
                         Toast toast = Toast.makeText(getContext(), "There was an error. Please try again.", Toast.LENGTH_SHORT);
                         toast.show();
-                        return;
                     }
-                    groupEntry = getResult();
-                    EventEntry eventEntry = new EventEntry();
-                    eventEntry.setName(name);
-                    eventEntry.setDescription(description);
-                    eventEntry.setGroup_id_source(groupID);
-                    eventEntry.setStart_time(timestamps.get(position));
-                    eventEntry.setEnd_time(timestampsEnd.get(position));
-                    groupEntry.modifyEventOrTodo(true, true, true, eventEntry);
-                    GroupEntry.SetGroupEntry setEvent = new GroupEntry.SetGroupEntry(groupEntry, groupID, 5000) {
-                        @Override
-                        public void onPostExecute() {
-                            if (!isSuccessful()) {
-                                Toast toast = Toast.makeText(getContext(), "There was an error. Please try again.", Toast.LENGTH_SHORT);
-                                toast.show();
-                            }
-                            else{
-                                Toast toast = Toast.makeText(getContext(), "Event added!", Toast.LENGTH_SHORT);
-                                toast.show();
-                                timestamps.clear();
-                                timestampsEnd.clear();
-                                eventName.getEditText().setText("");
-                                eventDesc.getEditText().setText("");
-                                adapter.notifyDataSetChanged();
-                                result.setText("");
-                            }
-                        }
-                    };
-                    setEvent.start();
+                    else{
+                        Toast toast = Toast.makeText(getContext(), "Event added!", Toast.LENGTH_SHORT);
+                        toast.show();
+                        timestamps.clear();
+                        timestampsEnd.clear();
+                        eventName.getEditText().setText("");
+                        eventDesc.getEditText().setText("");
+                        adapter.notifyDataSetChanged();
+                        result.setText("");
+                    }
                 }
             };
-            getGroupEntry.start();
+            updateGroupEntry.start();
         }
     }
 

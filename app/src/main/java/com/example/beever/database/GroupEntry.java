@@ -1,3 +1,25 @@
+/*
+Copyright (c) 2020 Beever
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+
 package com.example.beever.database;
 
 import android.annotation.SuppressLint;
@@ -16,6 +38,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
@@ -53,7 +76,7 @@ import java.util.Map;
  * To create an instance of this class manually, use only the 2nd constructor.
  **/
 
-public class GroupEntry implements Parcelable {
+public class GroupEntry implements Parcelable, MapEntry {
 
     private String name = null, display_picture = null;
     private Long colour = (long) 0;
@@ -384,6 +407,22 @@ public class GroupEntry implements Parcelable {
     }
 
     /**
+     * Return raw Map form of this entry
+     * @return entry as nested Map object
+     */
+    public Map<String,Object> retrieveRepresentation(){
+        HashMap<String,Object> ret = new HashMap<String,Object>();
+        ret.put("name",getName());
+        ret.put("display_picture",getDisplay_picture());
+        ret.put("colour",getColour());
+        ret.put("member_list",getMember_list());
+        ret.put("group_events",getGroup_events());
+        ret.put("todo_list",getTodo_list());
+        ret.put("chat",getChat());
+        return ret;
+    }
+
+    /**
      * Get string representation of this GroupEntry
      * @return string representation
      */
@@ -705,6 +744,7 @@ public class GroupEntry implements Parcelable {
         private static final String LOG_NAME = "GroupEntry.SetGroupEntry";
         private static final int SLEEP_INCREMENT = 10;
         private Boolean result = null;
+        private boolean timeoutOccurred = false;
 
         private GroupEntry groupEntry;
         private String groupId;
@@ -756,6 +796,7 @@ public class GroupEntry implements Parcelable {
             if (result==null) {
                 Log.d(LOG_NAME, "Timeout");
                 result = false;
+                timeoutOccurred = true;
             }
             return;
         }
@@ -772,6 +813,14 @@ public class GroupEntry implements Parcelable {
          * Abstract method for what to do after query, in main thread
          */
         public abstract void onPostExecute();
+
+        /**
+         * Check whether failure is due to timeout (if failure occurred). Use only if query failed.
+         * @return true if timeout occurred
+         */
+        public boolean isTimedOut(){
+            return timeoutOccurred;
+        }
     }
 
     /**
@@ -782,7 +831,6 @@ public class GroupEntry implements Parcelable {
      */
     public abstract static class GetGroupRelevantEvents extends AsyncGetter {
         private static final String LOG_NAME = "GroupEntry.GetGroupRelevantEvents";
-        private static final int SLEEP_INCREMENT = 10;
         private ArrayList<EventEntry> result = null;
         private boolean timeoutOccurred = false;
         private boolean userExists = true;
@@ -944,4 +992,216 @@ public class GroupEntry implements Parcelable {
         public boolean isGroupEntryMissing() {return !groupExists;}
 
     }
+
+    /**
+     * Subclass of AsyncGetter used to update single fields in group entries safely. To make
+     * entirely new group entries use SetGroupEntry instead.
+     * To use, create an instance of this class and start it.
+     */
+    public abstract static class UpdateGroupEntry extends AsyncGetter{
+
+        private static final String LOG_NAME = "GroupEntry.UpdateGroupEntry";
+        private static final int SLEEP_INCREMENT = 10;
+
+        /**
+         * Enum to indicate what field to change, and how to change the field (for some fields)
+         */
+        public enum FieldChange{
+            NAME,
+            DISPLAY_PICTURE,
+            COLOUR,
+            MEMBER_LIST_ADD,
+            MEMBER_LIST_REMOVE,
+            GROUP_EVENTS_CURRENT_ADD,
+            GROUP_EVENTS_CURRENT_REMOVE,
+            GROUP_EVENTS_PAST_ADD,
+            GROUP_EVENTS_PAST_REMOVE,
+            TODO_LIST_CURRENT_ADD,
+            TODO_LIST_CURRENT_REMOVE,
+            TODO_LIST_PAST_ADD,
+            TODO_LIST_PAST_REMOVE,
+            CHAT_ADD,
+            CHAT_REMOVE
+        }
+
+        private FieldChange fieldChange = null;
+        private String groupId = null;
+        private Object updateObject = null;
+        private Integer timeout = null;
+        private Boolean result = null;
+        private boolean timeoutOccurred = false;
+
+        /**
+         * Standard constructor
+         * @param groupId group id of entry to update
+         * @param fieldChange field to change
+         * @param updateObject value to use for update
+         * @param timeout timeout in milliseconds
+         */
+        public UpdateGroupEntry(String groupId, FieldChange fieldChange, Object updateObject, int timeout){
+            this.groupId = groupId;
+            this.fieldChange = fieldChange;
+            this.updateObject = updateObject;
+            this.timeout = timeout;
+        }
+
+        /**
+         * Main body of thread
+         */
+        @SuppressLint("LongLogTag")
+        public void runMainBody(){
+            String fieldString = null;
+            boolean isList = false;
+            boolean isAdd = true;
+            switch (fieldChange){
+                case NAME:
+                    fieldString = "name";
+                    assert updateObject instanceof String;
+                    break;
+                case DISPLAY_PICTURE:
+                    fieldString = "display_picture";
+                    assert updateObject instanceof String;
+                    break;
+                case COLOUR:
+                    fieldString = "colour";
+                    assert updateObject instanceof Long;
+                    break;
+                case MEMBER_LIST_ADD:
+                    fieldString = "member_list";
+                    isList = true;
+                    assert updateObject instanceof String;
+                    break;
+                case MEMBER_LIST_REMOVE:
+                    fieldString = "member_list";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof String;
+                    break;
+                case GROUP_EVENTS_CURRENT_ADD:
+                    fieldString = "group_events.current";
+                    isList = true;
+                    assert updateObject instanceof Map || updateObject instanceof EventEntry;
+                    break;
+                case GROUP_EVENTS_CURRENT_REMOVE:
+                    fieldString = "group_events.current";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof Map || updateObject instanceof EventEntry;
+                    break;
+                case GROUP_EVENTS_PAST_ADD:
+                    fieldString = "group_events.past";
+                    isList = true;
+                    assert updateObject instanceof Map || updateObject instanceof EventEntry;
+                    break;
+                case GROUP_EVENTS_PAST_REMOVE:
+                    fieldString = "group_events.past";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof Map || updateObject instanceof EventEntry;
+                    break;
+                case TODO_LIST_CURRENT_ADD:
+                    fieldString = "todo_list.current";
+                    isList = true;
+                    assert updateObject instanceof Map || updateObject instanceof TodoEntry;
+                    break;
+                case TODO_LIST_CURRENT_REMOVE:
+                    fieldString = "todo_list.current";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof Map || updateObject instanceof TodoEntry;
+                    break;
+                case TODO_LIST_PAST_ADD:
+                    fieldString = "todo_list.past";
+                    isList = true;
+                    assert updateObject instanceof Map || updateObject instanceof TodoEntry;
+                    break;
+                case TODO_LIST_PAST_REMOVE:
+                    fieldString = "todo_list.past";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof Map || updateObject instanceof TodoEntry;
+                    break;
+                case CHAT_ADD:
+                    fieldString = "chat";
+                    isList = true;
+                    assert updateObject instanceof Map || updateObject instanceof ChatEntry;
+                    break;
+                case CHAT_REMOVE:
+                    fieldString = "chat";
+                    isList = true;
+                    isAdd = false;
+                    assert updateObject instanceof Map || updateObject instanceof ChatEntry;
+                    break;
+                default:
+                    assert false : "Invalid field choice.";
+                    break;
+            }
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference docRef = db.collection("groups").document(groupId);
+
+            OnSuccessListener<Void> onSuccessListener = new OnSuccessListener<Void>(){
+                public void onSuccess (Void aVoid){
+                    result = true;
+                }
+            };
+
+            OnFailureListener onFailureListener = new OnFailureListener() {
+                @SuppressLint("LongLogTag")
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    result = false;
+                    Log.d(LOG_NAME,"Update failed");
+                }
+            };
+
+            if (!isList) docRef.update(fieldString,updateObject).addOnSuccessListener(onSuccessListener)
+                        .addOnFailureListener(onFailureListener);
+            else {
+                if (isAdd) docRef.update(fieldString, FieldValue.arrayUnion(updateObject))
+                        .addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+                else docRef.update(fieldString, FieldValue.arrayRemove(updateObject))
+                        .addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+            }
+
+            long now = System.currentTimeMillis();
+            long end = now + timeout;
+            while (now < end) {
+                try {
+                    Thread.sleep(SLEEP_INCREMENT);
+                } catch (InterruptedException e) {
+                }
+                now = System.currentTimeMillis();
+                if (result!=null) {
+                    break;
+                }
+            }
+            if (result==null) {
+                Log.d(LOG_NAME, "Timeout");
+                result = false;
+                timeoutOccurred = true;
+            }
+
+            return;
+
+        }
+
+        /**
+         * Check whether update was successful.
+         * @return true if update was successful
+         */
+        public boolean isSuccessful(){
+            return result;
+        }
+
+        /**
+         * Check whether update failure was due to timeout (if update did fail). Use only if update failed.
+         * @return true if cause is timeout
+         */
+        public boolean isTimedOut() {
+            return timeoutOccurred;
+        }
+
+    }
+
 }

@@ -155,24 +155,24 @@ public class AddEventFragment extends Fragment {
                     Toast.makeText(getContext(),"Please enter valid start/end times.", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(USER_ID,5000) {
+                    EventEntry eventEntry = new EventEntry();
+                    eventEntry.setName(input);
+                    eventEntry.setDescription(description);
+                    //Log.d("start",start.toString());
+                    //Log.d("end",end.toString());
+                    eventEntry.setStart_time(new Timestamp(start.getTime()));
+                    eventEntry.setEnd_time(new Timestamp(end.getTime()));
+                    eventEntry.setUser_id_source(USER_ID);
+                    UserEntry.UpdateUserEntry setEvent = new UserEntry.UpdateUserEntry(USER_ID,
+                            UserEntry.UpdateUserEntry.FieldChange.USER_EVENTS_CURRENT_ADD, eventEntry, 5000) {
                         @Override
                         public void onPostExecute() {
-                            userEntry = getResult();
-                            EventEntry eventEntry = new EventEntry();
-                            eventEntry.setName(input);
-                            eventEntry.setDescription(description);
-                            Log.d("start",start.toString());
-                            Log.d("end",end.toString());
-                            eventEntry.setStart_time(new Timestamp(start.getTime()));
-                            eventEntry.setEnd_time(new Timestamp(end.getTime()));
-                            eventEntry.setUser_id_source(USER_ID);
-                            userEntry.modifyEventOrTodo(true, true, true, eventEntry);
-                            UserEntry.SetUserEntry setEvent = new UserEntry.SetUserEntry(userEntry, USER_ID, 5000) {
-                                @Override
-                                public void onPostExecute() {
-                                    Toast.makeText(getContext(),"Event saved successfully.", Toast.LENGTH_SHORT).show();
-                                    getFragmentManager().popBackStackImmediate();
+                            if (isSuccessful()) {
+                                Toast.makeText(getContext(), "Event saved successfully.", Toast.LENGTH_SHORT).show();
+                                getFragmentManager().popBackStackImmediate();
+                                return;
+                            }
+                            Toast.makeText(getContext(), "There was an error, please try again.", Toast.LENGTH_SHORT).show();
 //                            populateEventsList();
 //                            textEventAdapter.notifyDataSetChanged();
 //                        TextEventAdapter adapter = new TextEventAdapter(list, getContext());
@@ -181,12 +181,9 @@ public class AddEventFragment extends Fragment {
 //                        mRecyclerView.setLayoutManager(linearLayoutManager);
 //                        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 //                        mRecyclerView.setAdapter(adapter);
-                                }
-                            };
-                            setEvent.start();
                         }
                     };
-                    getUserEntry.start();
+                    setEvent.start();
                 }
                 utils.fadeIn();
             }
