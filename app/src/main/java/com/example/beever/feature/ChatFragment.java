@@ -82,14 +82,14 @@ public class ChatFragment extends Fragment implements Populatable{
         adapter = new BubblesAdapter(getContext());
         layout.setAdapter(adapter);
 
-        // makes recycler view scroll to bottom
+        // makes recycler view scroll to bottom if user is at bottom
         RecyclerView.AdapterDataObserver observer = new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
 
                 if (isAtBottom) {
-                    layout.smoothScrollToPosition(layout.getAdapter().getItemCount() - 1);
+                    layout.smoothScrollToPosition(layout.getAdapter().getItemCount());
                 }
             }
         };
@@ -143,7 +143,6 @@ public class ChatFragment extends Fragment implements Populatable{
 
             }
 
-            //Todo: fix this shit
             public void onListenerUpdate(){
                 if (getStateChange()==StateChange.CHAT) {
 
@@ -157,7 +156,7 @@ public class ChatFragment extends Fragment implements Populatable{
                         senderImg.add(groupMemberImgs.get(chatEntry.getSender()));
 
                         //Scroll to latest message
-                        adapter.notifyItemRangeInserted(layout.getAdapter().getItemCount(), chats.size() - 1);
+                        adapter.notifyItemRangeInserted(layout.getAdapter().getItemCount(), chats.size());
                     } catch (NullPointerException e) {
                         populateRecyclerView();
                     }
