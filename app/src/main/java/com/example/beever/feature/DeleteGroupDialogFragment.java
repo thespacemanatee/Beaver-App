@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -40,6 +41,7 @@ public class DeleteGroupDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
+        View v = getActivity().getLayoutInflater().inflate(R.layout.fragment_groups, null);
 
         GroupsFragment fragment = new GroupsFragment();
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -66,6 +68,8 @@ public class DeleteGroupDialogFragment extends DialogFragment {
                                                     public void onSuccess(Void aVoid) {
                                                         Log.d("DELETE GROUP", "DocumentSnapshot successfully deleted!");
                                                         transaction.replace(R.id.fragment_container, fragment).commit();
+                                                        Utils utils = new Utils(v.getContext());
+                                                        utils.fadeIn();
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {
