@@ -10,9 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.beever.R;
-import com.example.beever.admin.UserHelperClass;
 import com.example.beever.database.UserEntry;
-import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 

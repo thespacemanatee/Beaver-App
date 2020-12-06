@@ -130,7 +130,7 @@ public class CreateGroupFragment extends Fragment {
     }
 
     private String generateGroupID() {
-        return userID + groupName.replaceAll("\\s+","");
+        return userID + groupName;
     }
 
     @Override

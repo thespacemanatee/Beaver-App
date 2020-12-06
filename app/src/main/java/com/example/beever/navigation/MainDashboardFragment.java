@@ -1,27 +1,24 @@
 package com.example.beever.navigation;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.beever.R;
 import com.example.beever.database.EventEntry;
 import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.example.beever.feature.CalendarFragment;
 import com.example.beever.feature.DashboardFragment;
 import com.example.beever.feature.GroupsFragment;
-import com.example.beever.R;
 import com.example.beever.feature.ToDoFragment;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainDashboardFragment extends Fragment {
 
@@ -32,10 +29,10 @@ public class MainDashboardFragment extends Fragment {
     private static final String DASH_GROUP_IDS = "dashGroupIds";
     private static final String USER_ENTRY = "userEntry";
     private UserEntry userEntry;
-    private ArrayList<GroupEntry> groupEntries = new ArrayList<>();
-    private ArrayList<GroupEntry> dashGroupEntries = new ArrayList<>();
-    private ArrayList<String> groupIds = new ArrayList<>();
-    private ArrayList<String> dashGroupIds = new ArrayList<>();
+    private final ArrayList<GroupEntry> groupEntries = new ArrayList<>();
+    private final ArrayList<GroupEntry> dashGroupEntries = new ArrayList<>();
+    private final ArrayList<String> groupIds = new ArrayList<>();
+    private final ArrayList<String> dashGroupIds = new ArrayList<>();
     private ArrayList<EventEntry> events = new ArrayList<>();
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private String userId;
@@ -144,7 +141,7 @@ public class MainDashboardFragment extends Fragment {
 
         for (String groupId: groupIds) {
 
-            GroupEntry.GroupEntryListener groupEntryListener = new GroupEntry.GroupEntryListener((String) groupId, 5000) {
+            GroupEntry.GroupEntryListener groupEntryListener = new GroupEntry.GroupEntryListener(groupId, 5000) {
                 @Override
                 public void onPreListening() {
 
@@ -180,45 +177,42 @@ public class MainDashboardFragment extends Fragment {
 
     private void bottomMenu() {
 
-        chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(int i) {
-                Fragment fragment = null;
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(USER_ENTRY, userEntry);
-                bundle.putParcelableArrayList(GROUP_ENTRIES, groupEntries);
-                bundle.putStringArrayList(GROUP_IDS, groupIds);
+        chipNavigationBar.setOnItemSelectedListener(i -> {
+            Fragment fragment = null;
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(USER_ENTRY, userEntry);
+            bundle.putParcelableArrayList(GROUP_ENTRIES, groupEntries);
+            bundle.putStringArrayList(GROUP_IDS, groupIds);
 //                Log.d(TAG, "bottomMenu: " + groupIds.toString());
-                bundle.putParcelableArrayList(RELEVANT_EVENTS, events);
-                bundle.putParcelableArrayList(DASH_GROUP_ENTRIES, dashGroupEntries);
-                bundle.putStringArrayList(DASH_GROUP_IDS, dashGroupIds);
+            bundle.putParcelableArrayList(RELEVANT_EVENTS, events);
+            bundle.putParcelableArrayList(DASH_GROUP_ENTRIES, dashGroupEntries);
+            bundle.putStringArrayList(DASH_GROUP_IDS, dashGroupIds);
 
-                switch (i) {
+            switch (i) {
 
-                    case R.id.bottom_menu_dashboard:
-                        fragment = new DashboardFragment();
-                        fragment.setArguments(bundle);
-                        break;
+                case R.id.bottom_menu_dashboard:
+                    fragment = new DashboardFragment();
+                    fragment.setArguments(bundle);
+                    break;
 
-                    case R.id.bottom_menu_calendar:
-                        fragment = new CalendarFragment();
-                        fragment.setArguments(bundle);
-                        break;
+                case R.id.bottom_menu_calendar:
+                    fragment = new CalendarFragment();
+                    fragment.setArguments(bundle);
+                    break;
 
-                    case R.id.bottom_menu_groups:
-                        fragment = new GroupsFragment();
-                        fragment.setArguments(bundle);
-                        break;
+                case R.id.bottom_menu_groups:
+                    fragment = new GroupsFragment();
+                    fragment.setArguments(bundle);
+                    break;
 
-                    case R.id.bottom_menu_todo:
-                        fragment = new ToDoFragment();
-                        fragment.setArguments(bundle);
-                        break;
-                }
-
-                getFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
-
+                case R.id.bottom_menu_todo:
+                    fragment = new ToDoFragment();
+                    fragment.setArguments(bundle);
+                    break;
             }
+
+            getFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+
         });
     }
 }
