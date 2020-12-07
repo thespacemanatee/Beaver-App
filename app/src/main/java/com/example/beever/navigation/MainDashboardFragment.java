@@ -55,7 +55,7 @@ public class MainDashboardFragment extends Fragment {
         UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userId, 5000) {
             @Override
             public void onPostExecute() {
-//                Log.d("USER LISTENERS", "getUserEntry: " + "I'M CALLED");
+                Log.d("USER LISTENERS", "getUserEntry: " + "I'M CALLED");
 
                 userEntry = getResult();
                 getGroupEntries(userEntry);

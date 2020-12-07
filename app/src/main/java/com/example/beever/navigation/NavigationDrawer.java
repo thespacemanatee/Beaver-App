@@ -154,7 +154,8 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
                             }.start();
                         } catch (Exception e) {
                             Log.d("TIMER", "onTick: " + "FAILED");
-                            e.printStackTrace();
+                            countdown.setText(" No\n upcoming\n meetings!");
+                            countdown.setTextSize(20);
                         }
 
                     }
