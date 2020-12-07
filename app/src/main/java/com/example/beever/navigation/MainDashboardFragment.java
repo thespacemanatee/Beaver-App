@@ -1,6 +1,7 @@
 package com.example.beever.navigation;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +55,8 @@ public class MainDashboardFragment extends Fragment {
         UserEntry.GetUserEntry getUserEntry = new UserEntry.GetUserEntry(userId, 5000) {
             @Override
             public void onPostExecute() {
+//                Log.d("USER LISTENERS", "getUserEntry: " + "I'M CALLED");
+
                 userEntry = getResult();
                 getGroupEntries(userEntry);
                 getUserRelevantEvents(userEntry);
@@ -71,6 +74,7 @@ public class MainDashboardFragment extends Fragment {
 
             @Override
             public void onListenerUpdate() {
+//                Log.d("USER LISTENERS", "userEntryListener: " + "I'M CALLED");
                 userEntry = getResult();
                 getGroupEntries(userEntry);
                 getUserRelevantEvents(userEntry);
@@ -116,6 +120,8 @@ public class MainDashboardFragment extends Fragment {
     }
 
     private void getGroupEntries(UserEntry userEntry) {
+        Log.d("GROUP LISTENERS", "getGroupEntries(): " + "I'M CALLED");
+
         groupEntries.clear();
         groupIds.clear();
         for (Object o: userEntry.getGroups()) {
@@ -126,8 +132,8 @@ public class MainDashboardFragment extends Fragment {
                 public void onPostExecute() {
                     groupEntries.add(getResult());
                     groupIds.add(getGroupId());
-//                    Log.d(TAG, "getGroupEntries: " + getGroupId());
                     if (groupEntries.size() == full) {
+                        Log.d("GROUP LISTENERS", "Calling getGroupEntryListener()");
                         getGroupEntryListeners();
                     }
                 }
@@ -139,8 +145,10 @@ public class MainDashboardFragment extends Fragment {
 
     private void getGroupEntryListeners() {
 
+        Log.d("GROUP LISTENERS", "getGroupEntryListeners(): " + "I'M CALLED");
         for (String groupId: groupIds) {
 
+            Log.d("GROUP LISTENERS", "startListening: " + groupId);
             GroupEntry.GroupEntryListener groupEntryListener = new GroupEntry.GroupEntryListener(groupId, 5000) {
                 @Override
                 public void onPreListening() {
@@ -151,11 +159,13 @@ public class MainDashboardFragment extends Fragment {
                 public void onListenerUpdate() {
                     groupEntries.clear();
                     groupIds.clear();
+                    getUserRelevantEvents(userEntry);
                     for (Object o: userEntry.getGroups()) {
 
                         GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry((String) o, 5000) {
                             @Override
                             public void onPostExecute() {
+                                Log.d("GROUP LISTENERS", "getGroupEntryListeners() onPostExecute: " + "I'M CALLED");
                                 groupEntries.add(getResult());
                                 groupIds.add(getGroupId());
                             }
@@ -183,10 +193,10 @@ public class MainDashboardFragment extends Fragment {
             bundle.putParcelable(USER_ENTRY, userEntry);
             bundle.putParcelableArrayList(GROUP_ENTRIES, groupEntries);
             bundle.putStringArrayList(GROUP_IDS, groupIds);
-//                Log.d(TAG, "bottomMenu: " + groupIds.toString());
             bundle.putParcelableArrayList(RELEVANT_EVENTS, events);
             bundle.putParcelableArrayList(DASH_GROUP_ENTRIES, dashGroupEntries);
             bundle.putStringArrayList(DASH_GROUP_IDS, dashGroupIds);
+            Log.d("GROUP LISTENERS", "bottomMenu(): " + groupIds);
 
             switch (i) {
 
