@@ -137,6 +137,7 @@ public class NavigationDrawer extends AppCompatActivity implements DrawerAdapter
 
                                     long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
 
+                                    Log.d("TIMER", "PRERESULT: " + days);
                                     if (days <= 0) {
                                         countdown.setText(hours + " Hours\n" + minutes + " Minutes");
                                     } else if (hours <= 0) {

@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
@@ -81,7 +82,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
 
         mRecyclerView = rootView.findViewById(R.id.gap_finder_recycler);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        layoutManager.setReverseLayout(true);
         mRecyclerView.setLayoutManager(layoutManager);
         adapter = new GapAdapter(timestamps, this);
         mRecyclerView.setAdapter(adapter);
@@ -188,6 +188,7 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
                     timestamps.add(t.get(0));
                     timestampsEnd.add(t.get(1));
                 }
+                Collections.reverse(timestamps);
                 adapter.notifyDataSetChanged();
                 searchBtn.revertAnimation();
             }
