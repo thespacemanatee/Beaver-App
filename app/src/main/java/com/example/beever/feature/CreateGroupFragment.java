@@ -48,7 +48,6 @@ public class CreateGroupFragment extends Fragment {
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-    private SharedPreferences mSharedPref;
     private String userID;
     private String groupName;
     private TextInputEditText groupNameText;
@@ -64,7 +63,6 @@ public class CreateGroupFragment extends Fragment {
         ((NavigationDrawer)getActivity()).getSupportActionBar().setTitle("Create a group");
         View rootView =  inflater.inflate(R.layout.fragment_create_group, container, false);
 
-        mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
         groupNameText = rootView.findViewById(R.id.group_name_selection);
         groupImageView = rootView.findViewById(R.id.group_picture_selection);
         userID = fAuth.getCurrentUser().getUid();

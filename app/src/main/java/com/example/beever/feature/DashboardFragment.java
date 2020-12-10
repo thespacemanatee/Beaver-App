@@ -13,13 +13,10 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,29 +28,25 @@ import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
+import java.util.Locale;
 
 public class DashboardFragment extends Fragment {
 
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    private String userID = fAuth.getUid();
-    private int currentTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+    private final String userID = fAuth.getUid();
+    private final int currentTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
     private SharedPreferences mSharedPref;
-    private ArrayList<String> dbGrpImgs = new ArrayList<>();
-    private ArrayList<String> dbGrpNames = new ArrayList<>();
-    private ArrayList<String> dbGrpIds = new ArrayList<>();
-    private ArrayList<EventEntry> dbEvents = new ArrayList<>();
+    private final ArrayList<String> dbGrpImgs = new ArrayList<>();
+    private final ArrayList<String> dbGrpNames = new ArrayList<>();
+    private final ArrayList<String> dbGrpIds = new ArrayList<>();
+    private final ArrayList<EventEntry> dbEvents = new ArrayList<>();
 
     private static final String GROUP_ENTRIES = "groupEntries";
     private static final String GROUP_IDS = "groupIds";
@@ -351,8 +344,8 @@ public class DashboardFragment extends Fragment {
     class DashboardEventsAdapter extends RecyclerView.Adapter<DashboardEventsAdapter.ViewHolder> {
 
         int moreThanDay;
-        SimpleDateFormat sfDate = new SimpleDateFormat("dd MMM");
-        SimpleDateFormat sfTime = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat sfDate = new SimpleDateFormat("dd MMM", Locale.getDefault());
+        SimpleDateFormat sfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
         Context context;
         LayoutInflater inflater;

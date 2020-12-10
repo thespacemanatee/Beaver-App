@@ -20,16 +20,16 @@ public abstract class GapFinderAlgorithm {
     private final int END_FORBIDDEN_TIMING_MIN = END_FORBIDDEN_TIMING_HOUR*60; // until 8 AM (rip my late-night MVMC meetings la T_T)
     private final int MIN_IN_DAY = 1440;
 
-    private String groupId = null;
-    private Integer timeout = null;
+    private final String groupId;
+    private final Integer timeout;
     private ArrayList<ArrayList<Timestamp> > result = null;
 
-    private int targetYear;
-    private int targetMonth;
-    private int targetDay;
-    private int targetHour;
-    private int targetMinute;
-    private int durationInMinutes;
+    private final int targetYear;
+    private final int targetMonth;
+    private final int targetDay;
+    private final int targetHour;
+    private final int targetMinute;
+    private final int durationInMinutes;
     private Timestamp targetStartTimestamp = null;
     private Timestamp targetEndTimestamp = null;
 

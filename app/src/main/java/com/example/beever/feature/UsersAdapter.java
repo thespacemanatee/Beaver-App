@@ -16,11 +16,11 @@ import java.util.ArrayList;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
 
-    private ArrayList<UserEntry> users;
+    private final ArrayList<UserEntry> users;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView textViewName;
-        private TextView textViewEmail;
+        private final TextView textViewName;
+        private final TextView textViewEmail;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

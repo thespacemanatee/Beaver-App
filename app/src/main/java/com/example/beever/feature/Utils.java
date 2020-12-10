@@ -29,7 +29,7 @@ public class Utils {
         // listener set on the view.
         view.animate()
                 .alpha(1f)
-                .setDuration(((Activity)context).getResources().getInteger(
+                .setDuration(context.getResources().getInteger(
                         android.R.integer.config_shortAnimTime))
                 .setListener(null);
     }
@@ -47,7 +47,7 @@ public class Utils {
         // listener set on the view.
         view.animate()
                 .alpha(0f)
-                .setDuration(((Activity)context).getResources().getInteger(
+                .setDuration(context.getResources().getInteger(
                         android.R.integer.config_shortAnimTime))
                 .setListener(new AnimatorListenerAdapter() {
                     @Override

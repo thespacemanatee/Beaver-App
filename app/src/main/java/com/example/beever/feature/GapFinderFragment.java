@@ -28,7 +28,6 @@ import com.example.beever.database.GroupEntry;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -118,7 +117,6 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO toggling
                 searchBtn.startAnimation();
                 Calendar c = Calendar.getInstance();
                 c.set(queryYear, queryMonth, queryDay, queryHour, queryMinute,0);

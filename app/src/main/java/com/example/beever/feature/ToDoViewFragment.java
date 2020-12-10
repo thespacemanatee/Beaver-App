@@ -22,6 +22,7 @@ import com.example.beever.navigation.NavigationDrawer;
 import com.google.firebase.Timestamp;
 
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -59,7 +60,7 @@ public class ToDoViewFragment extends Fragment {
         toDoFullTaskAssignedTo.setText(todoEntry.getAssigned_to());
         // formatting the timestamp to human readable format
         Timestamp deadline = todoEntry.getDeadline();
-        SimpleDateFormat sf = new SimpleDateFormat("dd MMM YYYY");
+        SimpleDateFormat sf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
         sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
         String deadlineStr = sf.format(deadline.toDate());
         toDoFullTaskDueDate.setText(deadlineStr);

@@ -33,6 +33,6 @@ public interface MapEntry {
      * Get Map representation of entry
      * @return Map object representation
      */
-    public Map<String,Object> retrieveRepresentation();
+    Map<String,Object> retrieveRepresentation();
 
 }

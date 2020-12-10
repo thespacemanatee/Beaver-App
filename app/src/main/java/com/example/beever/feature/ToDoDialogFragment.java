@@ -3,8 +3,6 @@ package com.example.beever.feature;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.NotificationManager;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,7 +23,6 @@ import com.example.beever.R;
 import com.example.beever.database.GroupEntry;
 import com.example.beever.database.TodoEntry;
 import com.example.beever.database.UserEntry;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
 
@@ -52,14 +49,8 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
     protected int year, month, day;
     protected List<String> groupMembers = new ArrayList<>();
     protected ArrayAdapter<String> spinnerAdapter;
-
     private final ToDoHelper helper;
-
     private final String groupID;
-
-//    protected String assignedTo;
-//    protected String taskTitle;
-//    protected String taskDescr;
     protected Date dueDate;
 
     /**
@@ -155,7 +146,7 @@ public class ToDoDialogFragment extends DialogFragment implements AdapterView.On
         final AlertDialog dialog = (AlertDialog)getDialog();
         if(dialog != null)
         {
-            Button positiveButton = (Button) dialog.getButton(Dialog.BUTTON_POSITIVE);
+            Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
             positiveButton.setOnClickListener(new View.OnClickListener()
             {
                 @Override

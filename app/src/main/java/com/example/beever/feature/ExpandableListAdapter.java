@@ -5,9 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.Button;
-import android.widget.ExpandableListView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -16,12 +13,10 @@ import com.example.beever.R;
 import com.example.beever.database.TodoEntry;
 import com.google.firebase.Timestamp;
 
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
@@ -98,7 +93,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         TextView toDoDeadline = toDoTaskView.findViewById(R.id.toDoDeadline);
 
         Timestamp deadline = todoEntry.getDeadline();
-        SimpleDateFormat sf = new SimpleDateFormat("dd-MM");
+        SimpleDateFormat sf = new SimpleDateFormat("dd-MM", Locale.getDefault());
         sf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
         String deadlineStr = sf.format(deadline.toDate());
 

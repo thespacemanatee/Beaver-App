@@ -1,7 +1,5 @@
 package com.example.beever.feature;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,7 +18,6 @@ import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -38,7 +35,6 @@ import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 public class AddUsersFragment extends Fragment {
 
     private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
-    private SharedPreferences mSharedPref;
     private String userID;
     private TextInputLayout addUsers;
     private CircularProgressButton addUsersBtn;
@@ -46,9 +42,8 @@ public class AddUsersFragment extends Fragment {
     private String groupName;
     private String groupID;
     private String groupImg;
-    private boolean groupExists;
     private List<Map<String, Object>> users;
-    private ArrayList<UserEntry> adaptedUsers = new ArrayList<>();
+    private final ArrayList<UserEntry> adaptedUsers = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private GroupEntry groupEntry;
     //Create ArrayList to store grpMemberIDs, HashMaps to store grpMemberNames and grpMemberImgs
@@ -59,13 +54,11 @@ public class AddUsersFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_add_users, container, false);
-        mSharedPref = getActivity().getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
 
         Bundle bundle = this.getArguments();
         groupImg = bundle.getString("imageUri");
         groupName = bundle.getString("groupName");
         groupID = bundle.getString("groupId");
-        groupExists = bundle.getBoolean("groupExists");
 
         addUsers = rootView.findViewById(R.id.addUsers);
         addUsersBtn = rootView.findViewById(R.id.addUsersBtn);
