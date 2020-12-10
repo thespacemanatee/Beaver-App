@@ -159,7 +159,8 @@
             android:numColumns="3"
             android:padding="16dp"
             android:scrollbars="none"
-            android:verticalSpacing="16dp" />
+            android:verticalSpacing="16dp"
+            android:listSelector="@android:color/transparent"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

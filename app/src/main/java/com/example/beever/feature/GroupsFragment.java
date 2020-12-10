@@ -45,18 +45,16 @@ public class GroupsFragment extends Fragment {
     private ArrayList<String> groupIds = new ArrayList<>();
 
     //Initialise global ArrayLists for storing information of Groups a User is in
-    ArrayList<String> grpImages = new ArrayList<>();
-    ArrayList<String> grpNames = new ArrayList<>();
-    ArrayList<String> grpIds = new ArrayList<>();
+    private final ArrayList<String> grpImages = new ArrayList<>();
+    private final ArrayList<String> grpNames = new ArrayList<>();
+    private final ArrayList<String> grpIds = new ArrayList<>();
 
     //For the Add Groups Button
-    String addGrpBtnImg = Integer.toString(R.drawable.plus);
-    String addGrpBtnText = "Create group";
-
-    ImageView imageView;
-    TextView textView;
-
-    GridAdapter adapter;
+    private final String addGrpBtnImg = Integer.toString(R.drawable.plus);
+    private final String addGrpBtnText = "Create group";
+    private ImageView imageView;
+    private TextView textView;
+    private GridAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

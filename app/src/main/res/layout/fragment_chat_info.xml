@@ -46,7 +46,8 @@
         android:dividerHeight="8dp"
         android:orientation="vertical"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp" />
+        android:paddingEnd="16dp"
+        android:listSelector="@android:color/transparent"/>
 
     <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
         android:id="@+id/addUsersBtn2"
