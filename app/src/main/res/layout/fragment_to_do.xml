@@ -119,16 +119,14 @@
         android:id="@+id/toDoAddButton"
         android:layout_width="56dp"
         android:layout_height="56dp"
+        android:elevation="8dp"
         android:layout_marginEnd="25dp"
         android:layout_marginBottom="100dp"
-        android:backgroundTint="@color/beever_light_blue"
-        android:contentDescription="@string/to_do"
-        android:elevation="8dp"
-        android:src="@drawable/ic_baseline_add_40"
-        android:tint="@android:color/white"
-        app:backgroundTint="@color/beever_dark_blue_transparent"
+        android:src="@drawable/plus"
+        android:backgroundTint="@color/white"
+        app:tint="@color/beever_pink"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:maxImageSize="40dp" />
+        app:maxImageSize="56dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
