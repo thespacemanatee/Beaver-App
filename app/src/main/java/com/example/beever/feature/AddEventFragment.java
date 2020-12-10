@@ -25,6 +25,7 @@ import com.example.beever.R;
 import com.example.beever.database.EventEntry;
 import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,11 +35,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
+
 public class AddEventFragment extends Fragment {
 
     private static final String TAG = "AddEventFragment";
 
-    private EditText mInput,mDescription;
+    private TextInputLayout mInput,mDescription;
     private Button startDate, endDate, startTime, endTime;
     private Calendar start, end;
     private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -58,9 +61,8 @@ public class AddEventFragment extends Fragment {
         LinearLayout eventEnd = root.findViewById(R.id.endEvent);
         endDate = eventEnd.findViewById(R.id.end_date);
         endTime = eventEnd.findViewById(R.id.end_time);
-        LinearLayout addEventButtons = root.findViewById(R.id.add_event_buttons);
-        Button cancel = addEventButtons.findViewById(R.id.cancel_button);
-        Button save = addEventButtons.findViewById(R.id.save_button);
+        CircularProgressButton cancel = root.findViewById(R.id.cancel_button);
+        CircularProgressButton save = root.findViewById(R.id.save_button);
 
         Bundle bundle = this.getArguments();
         int selectedDay = bundle.getInt("selectedDay");
@@ -100,9 +102,10 @@ public class AddEventFragment extends Fragment {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                cancel.startAnimation();
                 Log.d(TAG,"onClick: closing dialog");
                 utils = new Utils(v.getContext());
-                String input = mInput.getText().toString();
+                String input = mInput.getEditText().getText().toString();
                 if (input.isEmpty()) {
                     Toast.makeText(getContext(), "No information added. Event not saved.", Toast.LENGTH_SHORT).show();
                 }
@@ -117,20 +120,33 @@ public class AddEventFragment extends Fragment {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                save.startAnimation();
                 Log.d(TAG, "onClick: capturing input");
                 utils = new Utils(v.getContext());
-                String input = mInput.getText().toString();
-                String description = mDescription.getText().toString();
+                String input = mInput.getEditText().getText().toString();
+                String description = mDescription.getEditText().getText().toString();
                 InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(),0);
                 if (input.isEmpty()){
-                    Toast.makeText(getContext(),"Please enter event name.", Toast.LENGTH_SHORT).show();
+                    mInput.setError("Field cannot be empty");
+                    save.revertAnimation();
                     //getFragmentManager().popBackStackImmediate();
+                } else {
+                    mInput.setError(null);
+                    mInput.setErrorEnabled(false);
                 }
-                else if (start.compareTo(end)>=0){
+                if (description.isEmpty()) {
+                    mDescription.setError("Field cannot be empty");
+                    save.revertAnimation();
+                } else {
+                    mDescription.setError(null);
+                    mDescription.setErrorEnabled(false);
+                }
+                if (start.compareTo(end)>=0){
                     Toast.makeText(getContext(),"Please enter valid start/end times.", Toast.LENGTH_SHORT).show();
+                    save.revertAnimation();
                 }
-                else{
+                if (!(input.isEmpty() || description.isEmpty() || start.compareTo(end)>=0)) {
                     EventEntry eventEntry = new EventEntry();
                     eventEntry.setName(input);
                     eventEntry.setDescription(description);
@@ -148,22 +164,15 @@ public class AddEventFragment extends Fragment {
                                 CalendarFragment calendarFragment = new CalendarFragment();
                                 getFragmentManager().popBackStack();
                                 getFragmentManager().beginTransaction().replace(R.id.fragment_container,calendarFragment).commit();
+                                utils.fadeIn();
                                 return;
                             }
                             Toast.makeText(getContext(), "There was an error, please try again.", Toast.LENGTH_SHORT).show();
-//                            populateEventsList();
-//                            textEventAdapter.notifyDataSetChanged();
-//                        TextEventAdapter adapter = new TextEventAdapter(list, getContext());
-//                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
-//                        RecyclerView mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
-//                        mRecyclerView.setLayoutManager(linearLayoutManager);
-//                        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//                        mRecyclerView.setAdapter(adapter);
+
                         }
                     };
                     setEvent.start();
                 }
-                utils.fadeIn();
             }
         });
 

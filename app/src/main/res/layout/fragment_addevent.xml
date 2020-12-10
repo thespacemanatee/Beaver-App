@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    android:layout_height="match_parent"
+<ScrollView android:layout_height="match_parent"
     android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginBottom="0dp"
     android:background="@color/white"
     android:orientation="vertical"
@@ -11,40 +11,100 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:padding="26dp">
 
         <TextView
             android:id="@+id/add_event_header"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/add_event"
-            android:paddingTop="16dp"
-            android:paddingBottom="4dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
             android:fontFamily="@font/poppins_bold"
-            android:textSize="20sp"
-            android:gravity="center"/>
+            android:text="@string/add_event"
+            android:textColor="@color/beever_blue"
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
-        <EditText
+<!--        <TextView-->
+<!--            android:id="@+id/add_event_header"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@string/add_event"-->
+<!--            android:paddingTop="16dp"-->
+<!--            android:paddingBottom="4dp"-->
+<!--            android:fontFamily="@font/poppins_bold"-->
+<!--            android:textSize="20sp"-->
+<!--            android:gravity="center"/>-->
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/eventTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/title"
-            android:textSize="30sp"
-            android:layout_marginStart="36dp"
-            android:layout_marginEnd="36dp"
-            android:layout_marginBottom="20dp"
-            android:paddingTop="10dp"
             android:paddingBottom="16dp"
-            android:inputType="text"
-            android:fontFamily="@font/poppins"/>
+            android:paddingTop="26dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/white"
+                android:inputType="text"
+                android:maxLines="1"
+                android:hint="@string/title"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/white"
+                android:inputType="text"
+                android:maxLines="1"
+                android:hint="@string/description"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+<!--        <EditText-->
+<!--            android:id="@+id/description"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="36dp"-->
+<!--            android:layout_marginEnd="36dp"-->
+<!--            android:layout_marginBottom="20dp"-->
+<!--            android:hint="@string/description"-->
+<!--            android:layout_gravity="start"-->
+<!--            android:textSize="20sp"-->
+<!--            android:fontFamily="@font/poppins"-->
+<!--            />-->
+
+<!--        <EditText-->
+<!--            android:id="@+id/eventTitle"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:hint="@string/title"-->
+<!--            android:textSize="30sp"-->
+<!--            android:layout_marginStart="36dp"-->
+<!--            android:layout_marginEnd="36dp"-->
+<!--            android:layout_marginBottom="20dp"-->
+<!--            android:paddingTop="10dp"-->
+<!--            android:paddingBottom="16dp"-->
+<!--            android:inputType="text"-->
+<!--            android:fontFamily="@font/poppins"/>-->
 
         <LinearLayout
             android:id="@+id/startEvent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:layout_marginStart="36dp"
-            android:layout_marginEnd="36dp"
             android:clickable="true"
             android:focusable="true"
             android:orientation="horizontal">
@@ -55,7 +115,7 @@
                 android:layout_weight="1"
                 android:text="@string/start"
                 android:textSize="20sp"
-                android:fontFamily="@font/poppins"/>
+                android:fontFamily="@font/poppins_bold"/>
 
             <Button
                 android:id="@+id/start_date"
@@ -91,8 +151,6 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
-            android:layout_marginStart="36dp"
-            android:layout_marginEnd="36dp"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
@@ -102,7 +160,7 @@
                 android:layout_weight="1"
                 android:text="@string/End"
                 android:textSize="20sp"
-                android:fontFamily="@font/poppins"/>
+                android:fontFamily="@font/poppins_bold"/>
 
             <Button
                 android:id="@+id/end_date"
@@ -132,55 +190,58 @@
 
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="36dp"
-            android:layout_marginEnd="36dp"
-            android:layout_marginBottom="20dp"
-            android:hint="@string/description"
-            android:layout_gravity="start"
-            android:textSize="20sp"
-            android:fontFamily="@font/poppins"
-            />
-
-
-        <LinearLayout
-            android:id="@+id/add_event_buttons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp">
-
-            <Button
-                android:id="@+id/cancel_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="10dp"
-                android:text="@string/cancel"
-                android:backgroundTint="@color/white"
-                android:textColor="@color/beever_dark_blue"
-                android:fontFamily="@font/poppins"
-                />
-
-            <Button
+            <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
                 android:id="@+id/save_button"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center"
+                android:background="@drawable/circular_border_shape"
                 android:text="@string/save"
-                android:fontFamily="@font/poppins"
-                android:backgroundTint="@color/white"
-                android:textColor="@color/beever_dark_blue"/>
+                android:textColor="@color/white"
+                app:spinning_bar_width="4dp"
+                app:spinning_bar_color="#FFF"
+                app:spinning_bar_padding="6dp"
+                app:initialCornerAngle="1000dp"
+                app:finalCornerAngle="1000dp"/>
 
+            <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+                android:id="@+id/cancel_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center"
+                android:background="@drawable/circular_border_shape"
+                android:text="@string/cancel"
+                android:textColor="@color/white"
+                app:spinning_bar_width="4dp"
+                app:spinning_bar_color="#FFF"
+                app:spinning_bar_padding="6dp"
+                app:initialCornerAngle="1000dp"
+                app:finalCornerAngle="1000dp"/>
 
-        </LinearLayout>
+<!--            <Button-->
+<!--                android:id="@+id/cancel_button"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:layout_marginEnd="10dp"-->
+<!--                android:text="@string/cancel"-->
+<!--                android:backgroundTint="@color/white"-->
+<!--                android:textColor="@color/beever_dark_blue"-->
+<!--                android:fontFamily="@font/poppins"-->
+<!--                />-->
 
-
+<!--            <Button-->
+<!--                android:id="@+id/save_button"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:layout_marginStart="10dp"-->
+<!--                android:text="@string/save"-->
+<!--                android:fontFamily="@font/poppins"-->
+<!--                android:backgroundTint="@color/white"-->
+<!--                android:textColor="@color/beever_dark_blue"/>-->
 
     </LinearLayout>
 </ScrollView>
