@@ -67,25 +67,32 @@ public class IndivGroupFragment extends Fragment {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName() == null) {
+                if (getFragmentManager().getBackStackEntryAt(getFragmentManager()
+                        .getBackStackEntryCount() - 1).getName() == null) {
+
                     GroupsFragment fragment = new GroupsFragment();
-                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    getFragmentManager().popBackStack();
                     transaction.replace(R.id.fragment_container, fragment).commit();
-//                    getFragmentManager().beginTransaction()
-//                            .replace(R.id.fragment_container, new GroupsFragment(), "groupsFragment")
-//                            .addToBackStack("indivGroups")
-//                            .commit();
                     Utils utils = new Utils(getContext());
                     utils.fadeIn();
-                    Log.d("NINO", "handleOnBackPressed: " + "HELLO");
-                } else if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName().equals("dashboard")) {
+
+                } else if (getFragmentManager().getBackStackEntryAt(getFragmentManager()
+                        .getBackStackEntryCount() - 1).getName().equals("dashboard")) {
+
                     ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle("Dashboard");
                     getFragmentManager().popBackStack();
-                } else if (getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName().equals("groups")) {
+
+                } else if (getFragmentManager().getBackStackEntryAt(getFragmentManager()
+                        .getBackStackEntryCount() - 1).getName().equals("groups")) {
+
                     ((NavigationDrawer) getActivity()).getSupportActionBar().setTitle("Groups");
                     getFragmentManager().popBackStack();
+
                 } else {
+
                     getFragmentManager().popBackStack();
+
                 }
             }
         };
@@ -95,7 +102,7 @@ public class IndivGroupFragment extends Fragment {
     }
 
     //To create the tabs functionality
-    class StateAdapter extends FragmentStateAdapter {
+    static class StateAdapter extends FragmentStateAdapter {
         Bundle bundle;
 
         public StateAdapter(@NonNull Fragment fragment, Bundle bundle) {
