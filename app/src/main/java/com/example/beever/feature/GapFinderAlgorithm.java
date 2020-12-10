@@ -1,7 +1,5 @@
 package com.example.beever.feature;
 
-import android.util.Log;
-
 import com.example.beever.database.EventEntry;
 import com.example.beever.database.GroupEntry;
 import com.google.firebase.Timestamp;
@@ -26,12 +24,12 @@ public abstract class GapFinderAlgorithm {
     private Integer timeout = null;
     private ArrayList<ArrayList<Timestamp> > result = null;
 
-    private int targetYear = 0;
-    private int targetMonth = 0;
-    private int targetDay = 0;
-    private int targetHour = 0;
-    private int targetMinute = 0;
-    private int durationInMinutes = 0;
+    private int targetYear;
+    private int targetMonth;
+    private int targetDay;
+    private int targetHour;
+    private int targetMinute;
+    private int durationInMinutes;
     private Timestamp targetStartTimestamp = null;
     private Timestamp targetEndTimestamp = null;
 
@@ -92,19 +90,7 @@ public abstract class GapFinderAlgorithm {
     }
 
     public void runMainGapFinder(ArrayList<EventEntry> events){
-        //Log.d("targetStart",targetStartTimestamp.toDate().toString());
-        //Log.d("targetEnd",targetEndTimestamp.toDate().toString());
-        //Log.d("targetStart",Long.toString(targetStartTimestamp.getSeconds()));
-        //Log.d("targetEnd",Long.toString(targetEndTimestamp.getSeconds()));
-        //Calendar cd = Calendar.getInstance();
-        for (EventEntry e:events){
-            //cd.setTime(e.getStart_time().toDate());
-            //Log.d("testStart",e.getStart_time().toDate().toString());
-            //cd.setTime(e.getEnd_time().toDate());
-            //Log.d("testEnd",e.getEnd_time().toDate().toString());
-            //Log.d("testStart",Long.toString(e.getStart_time().getSeconds()));
-            //Log.d("testEnd",Long.toString(e.getEnd_time().getSeconds()));
-        }
+
         Calendar calendar = Calendar.getInstance();
         calendar.set(targetYear,targetMonth,targetDay,0,0,0);
         if (isAvailable){
@@ -129,11 +115,11 @@ public abstract class GapFinderAlgorithm {
         int requestedBlockCount = (durationInMinutes%MIN_BLOCK_MINUTES==0?
                 durationInMinutes/MIN_BLOCK_MINUTES:(durationInMinutes/MIN_BLOCK_MINUTES)+1);
         if (requestedBlockCount > availableBlockCount) {
-            result = new ArrayList<ArrayList<Timestamp> >();
+            result = new ArrayList<>();
             onPostExecute();
             return;
         }
-        ArrayList<Boolean> occupancy = new ArrayList<Boolean>();
+        ArrayList<Boolean> occupancy = new ArrayList<>();
         for (int i = 0;i<availableBlockCount;i++){
             occupancy.add(((i+1)*MIN_BLOCK_MINUTES<=START_FORBIDDEN_TIMING_MIN)
             | (i*MIN_BLOCK_MINUTES>=END_FORBIDDEN_TIMING_MIN && (i+1)*MIN_BLOCK_MINUTES<=MIN_IN_DAY+START_FORBIDDEN_TIMING_MIN));
@@ -147,12 +133,12 @@ public abstract class GapFinderAlgorithm {
                 occupancy.set(i,false);
             }
         }
-        ArrayList<Integer> occupancyCumulative = new ArrayList<Integer>(availableBlockCount);
+        ArrayList<Integer> occupancyCumulative = new ArrayList<>(availableBlockCount);
         for (int i=0;i<availableBlockCount;i++) occupancyCumulative.add(0);
         occupancyCumulative.set(availableBlockCount-1,occupancy.get(availableBlockCount-1)? 1 : 0);
-        result = new ArrayList<ArrayList<Timestamp> >();
+        result = new ArrayList<>();
         if (requestedBlockCount==1 && occupancy.get(availableBlockCount-1)) {
-            ArrayList<Timestamp> resultAppend = new ArrayList<Timestamp>();
+            ArrayList<Timestamp> resultAppend = new ArrayList<>();
             resultAppend.add(getOffsetTimestamp(targetDateBase, availableBlockCount-1));
             resultAppend.add(getOffsetTimestamp(targetDateBase, availableBlockCount-1 + requestedBlockCount));
             result.add(resultAppend);
@@ -161,7 +147,7 @@ public abstract class GapFinderAlgorithm {
         for (int i = availableBlockCount-2;i>-1;i--) {
             occupancyCumulative.set(i, occupancy.get(i) ? occupancyCumulative.get(i + 1) + 1 : 0);
             if (occupancyCumulative.get(i) >= requestedBlockCount) {
-                ArrayList<Timestamp> resultAppend = new ArrayList<Timestamp>();
+                ArrayList<Timestamp> resultAppend = new ArrayList<>();
                 resultAppend.add(getOffsetTimestamp(targetDateBase, i));
                 resultAppend.add(getOffsetTimestamp(targetDateBase, i + requestedBlockCount));
                 //Log.d("cat",resultAppend.toString());
@@ -170,7 +156,6 @@ public abstract class GapFinderAlgorithm {
         }
 
         onPostExecute();
-        return;
     }
 
     public abstract void onPostExecute();

@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-public class ChatFragment extends Fragment implements Populatable{
+public class ChatFragment extends Fragment{
 
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    private String userID = fAuth.getUid();
+    private final String userID = fAuth.getUid();
 
     //Bundle-related variables
     private String groupName;
@@ -49,14 +49,11 @@ public class ChatFragment extends Fragment implements Populatable{
     private RecyclerView layout;
 
     //Initialise global ArrayLists for storing Chat message information
-    private ArrayList<String> senderImg = new ArrayList<>();
-    private ArrayList<String> texts = new ArrayList<>();
-    private ArrayList<String> sender = new ArrayList<>();
-    private ArrayList<Timestamp> times = new ArrayList<>();
+    private final ArrayList<String> senderImg = new ArrayList<>();
+    private final ArrayList<String> texts = new ArrayList<>();
+    private final ArrayList<String> sender = new ArrayList<>();
+    private final ArrayList<Timestamp> times = new ArrayList<>();
     private SharedPreferences mSharedPref;
-    private boolean isAtBottom;
-
-    private GroupEntry groupEntry;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,27 +84,10 @@ public class ChatFragment extends Fragment implements Populatable{
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
-/*
-                if (isAtBottom) {
-                    layout.smoothScrollToPosition(layout.getAdapter().getItemCount());
-                }*/
 
                 layout.smoothScrollToPosition(layout.getAdapter().getItemCount());
             }
         };
-
-/*        layout.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-
-                if (!layout.canScrollVertically(1)) {
-                    isAtBottom = true;
-                } else {
-                    isAtBottom = false;
-                }
-            }
-        });*/
 
         // set layout manager and assign observer to adapter
         adapter.registerAdapterDataObserver(observer);
@@ -132,7 +112,6 @@ public class ChatFragment extends Fragment implements Populatable{
         GroupEntry.GetGroupEntry getGroupEntry = new GroupEntry.GetGroupEntry(groupId, 5000) {
             @Override
             public void onPostExecute() {
-                groupEntry = getResult();
             }
         };
         getGroupEntry.start();;
@@ -188,7 +167,6 @@ public class ChatFragment extends Fragment implements Populatable{
     }
 
     //Read information from FireStore
-    @Override
     public void populateRecyclerView() {
 
         texts.clear();

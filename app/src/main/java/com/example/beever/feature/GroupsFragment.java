@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class GroupsFragment extends Fragment implements Populatable{
+public class GroupsFragment extends Fragment {
 
     private final FirebaseAuth fAuth = FirebaseAuth.getInstance();
     private final String userId = fAuth.getUid();
@@ -115,7 +115,6 @@ public class GroupsFragment extends Fragment implements Populatable{
         return rootView;
     }
 
-    @Override
     public void populateRecyclerView() {
         grpNames.clear();
         grpImages.clear();
@@ -316,8 +315,8 @@ public class GroupsFragment extends Fragment implements Populatable{
     public static class AddToDashboardDialogFragment extends DialogFragment {
 
         private static final String TAG = "DIALOG";
-        private String selectedGrpId;
-        private String userID;
+        private final String selectedGrpId;
+        private final String userID;
 
         public AddToDashboardDialogFragment(String selectedGrpId, String userID) {
             this.selectedGrpId = selectedGrpId;

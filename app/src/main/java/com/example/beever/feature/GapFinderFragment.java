@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -37,7 +38,7 @@ import java.util.Collections;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
-public class GapFinderFragment extends Fragment implements AdapterView.OnItemSelectedListener, GapAdapter.OnTimestampListener {
+public class GapFinderFragment extends Fragment implements AdapterView.OnItemSelectedListener, OnTimestampListener {
 
     private final int DURATION_BLOCK_UPPER_LIMIT = 10;
     private String groupID;
@@ -359,6 +360,65 @@ public class GapFinderFragment extends Fragment implements AdapterView.OnItemSel
                         }
                     });
             return builder.create();
+        }
+    }
+
+    static class GapAdapter extends RecyclerView.Adapter<GapAdapter.ViewHolder> {
+
+        private final ArrayList<Timestamp> adapterTimestamps;
+        private final OnTimestampListener mOnTimestampListener;
+
+        public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+            private final TextView timestampTitle;
+            OnTimestampListener onTimestampListener;
+
+
+            public ViewHolder(@NonNull View itemView, OnTimestampListener onTimestampListener) {
+                super(itemView);
+                timestampTitle = itemView.findViewById(R.id.timestamp_text_title);
+                itemView.setOnClickListener(this);
+                this.onTimestampListener = onTimestampListener;
+            }
+
+            public TextView getTimestampTitle() {
+                return timestampTitle;
+            }
+
+            @Override
+            public void onClick(View v) {
+                onTimestampListener.onTimestampClick(getAbsoluteAdapterPosition());
+            }
+        }
+
+        /**
+         * Initialize the dataset of the Adapter.
+         *
+         * @param timestamps ArrayList<Timestamp> containing the data to populate views to be used
+         * by RecyclerView.
+         */
+        public GapAdapter(ArrayList<Timestamp> timestamps, OnTimestampListener onTimestampListener) {
+            adapterTimestamps = timestamps;
+            this.mOnTimestampListener = onTimestampListener;
+        }
+
+        @NonNull
+        @Override
+        public GapAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.gap_finder_cells, parent, false);
+
+            return new GapAdapter.ViewHolder(itemView, mOnTimestampListener);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull GapAdapter.ViewHolder holder, int position) {
+            holder.getTimestampTitle().setText(adapterTimestamps.get(position).toDate().toString().substring(0, 16));
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return adapterTimestamps.size();
         }
     }
 }

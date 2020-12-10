@@ -36,14 +36,13 @@ import java.util.List;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
-public class ChatInfoFragment extends Fragment implements Populatable{
+public class ChatInfoFragment extends Fragment {
 
     private CircularProgressButton addUsersBtn, deleteGroup;
     private final ArrayList<String> grpMemberNames = new ArrayList<>();
     private final ArrayList<String> grpMemberImg = new ArrayList<>();
     private final ArrayList<String> grpMemberIds = new ArrayList<>();
     private GroupMemberAdapter adapter;
-    private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private String groupId;
     private String groupName;
     private GroupEntry groupEntry;
@@ -115,7 +114,6 @@ public class ChatInfoFragment extends Fragment implements Populatable{
 
     }
 
-    @Override
     public void populateRecyclerView() {
         grpMemberNames.clear();
         grpMemberImg.clear();
@@ -225,9 +223,14 @@ public class ChatInfoFragment extends Fragment implements Populatable{
     public static class DeleteUserDialogFragment extends DialogFragment {
 
         private static final String TAG = "DIALOG";
-        private String selectedMemberId, selectedMemberImg, selectedMemberName, groupId;
-        private ChatInfoFragment.GroupMemberAdapter adapter;
-        private ArrayList<String> grpMemberId, grpMemberImg, grpMemberName;
+        private final String selectedMemberId;
+        private String selectedMemberImg;
+        private final String selectedMemberName;
+        private final String groupId;
+        private final ChatInfoFragment.GroupMemberAdapter adapter;
+        private final ArrayList<String> grpMemberId;
+        private final ArrayList<String> grpMemberImg;
+        private final ArrayList<String> grpMemberName;
 
         public DeleteUserDialogFragment(String selectedMemberId, String groupId, ChatInfoFragment.GroupMemberAdapter adapter,
                                         ArrayList<String> grpMemberId, ArrayList<String> grpMemberImg, ArrayList<String> grpMemberName,
