@@ -1,66 +1,49 @@
 package com.example.beever.feature;
 
-import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
-import android.database.DataSetObserver;
-import android.graphics.Bitmap;
+import android.content.DialogInterface;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.ImageSwitcher;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.beever.R;
-import com.example.beever.database.ChatEntry;
 import com.example.beever.database.GroupEntry;
 import com.example.beever.database.UserEntry;
 import com.example.beever.navigation.NavigationDrawer;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.auth.User;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
 public class ChatInfoFragment extends Fragment implements Populatable{
 
-    //TODO: Implement onListenerUpdate()
     private CircularProgressButton addUsersBtn, deleteGroup;
-    private ArrayList<String> grpMemberNames = new ArrayList<>();
-    private ArrayList<String> grpMemberImg = new ArrayList<>();
-    private ArrayList<String> grpMemberIds = new ArrayList<>();
+    private final ArrayList<String> grpMemberNames = new ArrayList<>();
+    private final ArrayList<String> grpMemberImg = new ArrayList<>();
+    private final ArrayList<String> grpMemberIds = new ArrayList<>();
     private GroupMemberAdapter adapter;
-    private FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     private String groupId;
     private String groupName;
     private GroupEntry groupEntry;
@@ -220,7 +203,6 @@ public class ChatInfoFragment extends Fragment implements Populatable{
             viewHolder.memberImg.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    Toast.makeText(getContext(), selectedMemberId, Toast.LENGTH_SHORT).show();
                     DeleteUserDialogFragment deleteUserDialogFragment = new DeleteUserDialogFragment(selectedMemberId, groupId, adapter,
                             grpMemberIds, grpMemberImg, grpMemberNames,
                             selectedMemberImg, selectedMemberName);
@@ -238,5 +220,165 @@ public class ChatInfoFragment extends Fragment implements Populatable{
             TextView member;
         }
 
+    }
+
+    public static class DeleteUserDialogFragment extends DialogFragment {
+
+        private static final String TAG = "DIALOG";
+        private String selectedMemberId, selectedMemberImg, selectedMemberName, groupId;
+        private ChatInfoFragment.GroupMemberAdapter adapter;
+        private ArrayList<String> grpMemberId, grpMemberImg, grpMemberName;
+
+        public DeleteUserDialogFragment(String selectedMemberId, String groupId, ChatInfoFragment.GroupMemberAdapter adapter,
+                                        ArrayList<String> grpMemberId, ArrayList<String> grpMemberImg, ArrayList<String> grpMemberName,
+                                        String selectedMemberImg, String selectedMemberName) {
+            this.selectedMemberId = selectedMemberId;
+            this.groupId = groupId;
+            this.selectedMemberImg = selectedMemberImg;
+            this.selectedMemberImg = selectedMemberImg;
+            this.selectedMemberName =selectedMemberName;
+            this.grpMemberId = grpMemberId;
+            this.grpMemberImg = grpMemberImg;
+            this.grpMemberName = grpMemberName;
+            this.adapter = adapter;
+        }
+
+        @NotNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("Delete user?")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            UserEntry.UpdateUserEntry deleteGroupId = new UserEntry.UpdateUserEntry(selectedMemberId,
+                                    UserEntry.UpdateUserEntry.FieldChange.GROUPS_REMOVE, groupId, 5000) {
+                                @Override
+                                public void onPostExecute() {
+                                    Log.d("DELETE GROUP ID", "onPostExecute: " + "SUCCESS");
+                                    GroupEntry.UpdateGroupEntry deleteUser = new GroupEntry.UpdateGroupEntry(groupId,
+                                            GroupEntry.UpdateGroupEntry.FieldChange.MEMBER_LIST_REMOVE, selectedMemberId, 5000) {
+                                        @Override
+                                        public void onPostExecute() {
+                                            Log.d("DELETE GROUP USER", "onPostExecute: " + "SUCCESS");
+                                            grpMemberId.remove(selectedMemberId);
+                                            grpMemberImg.remove(selectedMemberImg);
+                                            grpMemberName.remove(selectedMemberName);
+                                            adapter.notifyDataSetChanged();
+
+                                        }
+                                    };
+                                    deleteUser.start();
+                                }
+                            };
+                            deleteGroupId.start();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
+    }
+
+    public static class DeleteGroupDialogFragment extends DialogFragment {
+
+        private static final String TAG = "DIALOG";
+        private final String groupId;
+        private final List<Object> members;
+        private final FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+        private int counter = 0;
+        private Fragment fragment = new Fragment();
+        private FragmentManager fm;
+
+        public DeleteGroupDialogFragment(String groupId, List<Object> members) {
+            this.groupId = groupId;
+            this.members = members;
+        }
+
+        @NotNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            View v = getActivity().getLayoutInflater().inflate(R.layout.fragment_groups, null);
+
+            if (getActivity().getSupportFragmentManager().getBackStackEntryAt(getActivity()
+                    .getSupportFragmentManager().getBackStackEntryCount() - 1).getName() != null) {
+
+                if (getActivity().getSupportFragmentManager().getBackStackEntryAt(getActivity()
+                        .getSupportFragmentManager().getBackStackEntryCount() - 1).getName().equals("dashboard")) {
+
+                    fragment = new DashboardFragment();
+
+                } else if (getActivity().getSupportFragmentManager().getBackStackEntryAt(getActivity()
+                        .getSupportFragmentManager().getBackStackEntryCount() - 1).getName().equals("groups")) {
+
+                    fragment = new GroupsFragment();
+
+                } else {
+
+                    fragment = new GroupsFragment();
+                }
+
+            } else {
+
+                fragment = new GroupsFragment();
+            }
+
+            fm = getActivity().getSupportFragmentManager();
+            FragmentTransaction transaction = fm.beginTransaction();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("Delete group?")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            for (Object member: members) {
+
+                                int full = members.size();
+                                UserEntry.UpdateUserEntry deleteGroupId = new UserEntry.UpdateUserEntry((String) member,
+                                        UserEntry.UpdateUserEntry.FieldChange.GROUPS_REMOVE, groupId, 5000) {
+                                    @Override
+                                    public void onPostExecute() {
+                                        Log.d("DELETE GROUP ID", "onPostExecute: " + "SUCCESS");
+
+                                        counter++;
+
+                                        if (counter == full) {
+                                            fStore.collection("groups").document(groupId).delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d("DELETE GROUP", "DocumentSnapshot successfully deleted!");
+                                                            fm.popBackStack();
+                                                            transaction.replace(R.id.fragment_container, fragment).commit();
+                                                            Utils utils = new Utils(v.getContext());
+                                                            utils.fadeIn();
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w("DELETE GROUP", "Error deleting document", e);
+                                                        }
+                                                    });
+                                        }
+                                    }
+                                };
+                                deleteGroupId.start();
+                            }
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
     }
 }
