@@ -82,7 +82,7 @@ public class ToDoFragment extends Fragment implements AdapterView.OnItemSelected
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
 
-        Objects.requireNonNull(((NavigationDrawer) Objects.requireNonNull(getActivity())).getSupportActionBar()).setTitle("To-Do");
+        Objects.requireNonNull(((NavigationDrawer) requireActivity()).getSupportActionBar()).setTitle("To-Do");
 
         // getting userid from firestore
         FirebaseUser fUser = fAuth.getCurrentUser();
