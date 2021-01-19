@@ -34,6 +34,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708330814385:android:bd3ed77a9671d22b36db90",
+        "android_client_info": {
+          "package_name": "tech.cheekit.beever"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708330814385-j3a11ilc84c16rahm0m1bub5patl43al.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrTWLK2NhC8auy6YkIT2j6vQlDeZWosrE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708330814385-j3a11ilc84c16rahm0m1bub5patl43al.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
